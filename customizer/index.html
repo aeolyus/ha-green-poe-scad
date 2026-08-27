@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>HA Green Rack Mount Customizer</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Experimental static prototype</p>
+      <h1>HA Green rack-mount customizer</h1>
+      <p class="lede">Choose a known-safe design combination, preview it, then generate a validated STL and 3MF locally in your browser.</p>
+    </div>
+    <a class="quiet-link" href="../viewer/interactive_viewer.html">Open the full 3D viewer</a>
+  </header>
+
+  <main>
+    <form id="customizer-form">
+      <section class="panel" aria-labelledby="layout-heading">
+        <div class="section-heading">
+          <span>1</span>
+          <div>
+            <h2 id="layout-heading">Layout</h2>
+            <p>Choose the splitter position and where Ethernet enters.</p>
+          </div>
+        </div>
+
+        <fieldset>
+          <legend>Rear spacing</legend>
+          <div class="choice-grid three">
+            <label class="choice">
+              <input type="radio" name="spacing" value="compact">
+              <strong>Compact</strong>
+              <small>35 mm · comparison only; tight cable bends</small>
+            </label>
+            <label class="choice">
+              <input type="radio" name="spacing" value="balanced">
+              <strong>Balanced</strong>
+              <small>47.5 mm · slim-cable test fit</small>
+            </label>
+            <label class="choice recommended">
+              <input type="radio" name="spacing" value="cable_friendly" checked>
+              <strong>Cable-friendly</strong>
+              <small>60 mm · recommended for straight plugs</small>
+            </label>
+          </div>
+          <label class="number-control" id="custom-setback-control" hidden>
+            Custom splitter setback
+            <span><input id="custom-setback" type="number" min="35" max="120" step="0.5" value="60"> mm</span>
+          </label>
+          <button type="button" class="text-button" id="custom-spacing-toggle">Use a custom setback</button>
+        </fieldset>
+
+        <fieldset>
+          <legend>Ethernet entry</legend>
+          <div class="choice-grid two">
+            <label class="choice recommended">
+              <input type="radio" name="ethernetEntry" value="rear" checked>
+              <strong>Rear</strong>
+              <small>Clean front; no extra coupler</small>
+            </label>
+            <label class="choice">
+              <input type="radio" name="ethernetEntry" value="front">
+              <strong>Front</strong>
+              <small>Easy service access; adds a keystone</small>
+            </label>
+          </div>
+          <div id="front-position" class="conditional" hidden>
+            <p class="subheading">Front keystone position</p>
+            <div class="choice-grid three">
+              <label class="choice">
+                <input type="radio" name="frontPosition" value="right" checked>
+                <strong>Center gap</strong>
+                <small>SCAD value: right</small>
+              </label>
+              <label class="choice">
+                <input type="radio" name="frontPosition" value="far_right">
+                <strong>HA right</strong>
+                <small>One-piece only</small>
+              </label>
+              <label class="choice">
+                <input type="radio" name="frontPosition" value="left">
+                <strong>Left</strong>
+                <small>Uses 89 mm safe setback</small>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+      </section>
+
+      <section class="panel" aria-labelledby="retention-heading">
+        <div class="section-heading">
+          <span>2</span>
+          <div>
+            <h2 id="retention-heading">Retention</h2>
+            <p>Select how the Home Assistant Green sits in its tray.</p>
+          </div>
+        </div>
+        <fieldset>
+          <legend>Green tray</legend>
+          <div class="choice-grid two">
+            <label class="choice recommended">
+              <input type="radio" name="trayStyle" value="friction_pads" checked>
+              <strong>Friction fit · four pads</strong>
+              <small>Selected production design; ventilated and lighter</small>
+            </label>
+            <label class="choice">
+              <input type="radio" name="trayStyle" value="friction_full">
+              <strong>Friction fit · full honeycomb</strong>
+              <small>Most underside support; more filament</small>
+            </label>
+            <label class="choice">
+              <input type="radio" name="trayStyle" value="friction_skeletal">
+              <strong>Friction fit · open frame</strong>
+              <small>Lowest material; less diaphragm stiffness</small>
+            </label>
+            <label class="choice">
+              <input type="radio" name="trayStyle" value="standard">
+              <strong>Factory-screw tray</strong>
+              <small>Legacy tolerance-insensitive fallback</small>
+            </label>
+          </div>
+        </fieldset>
+
+        <details>
+          <summary>Fit tuning</summary>
+          <div class="number-grid">
+            <label>Green clearance per side <span><input id="green-clearance" type="number" min="0.1" max="1.5" step="0.05" value="0.50"> mm</span></label>
+            <label>Green wall interference <span><input id="green-interference" type="number" min="0" max="0.5" step="0.01" value="0.10"> mm</span></label>
+            <label>TP-Link clearance per side <span><input id="splitter-clearance" type="number" min="0.1" max="1.5" step="0.05" value="0.40"> mm</span></label>
+            <label>TP-Link wall interference <span><input id="splitter-interference" type="number" min="0" max="0.5" step="0.01" value="0.05"> mm</span></label>
+          </div>
+          <p class="notice">Print both fit coupons before the full mount. Printer and filament tolerances matter more than the nominal CAD value.</p>
+        </details>
+      </section>
+
+      <section class="panel" aria-labelledby="design-heading">
+        <div class="section-heading">
+          <span>3</span>
+          <div>
+            <h2 id="design-heading">Print design</h2>
+            <p>These choices alter the exported geometry.</p>
+          </div>
+        </div>
+        <div class="toggle-grid">
+          <label class="switch-row">
+            <span><strong>Home Assistant logo</strong><small>Recess and separate inlay</small></span>
+            <input id="face-logo" type="checkbox" role="switch">
+          </label>
+          <label class="switch-row">
+            <span><strong>LED shutter hardware</strong><small>Off leaves the LED window open</small></span>
+            <input id="led-shutter" type="checkbox" role="switch">
+          </label>
+          <label class="switch-row disabled-study">
+            <span><strong>Ventilated 1U chassis</strong><small>Viewer study only; not in printable preset yet</small></span>
+            <input id="chassis" type="checkbox" role="switch" disabled>
+          </label>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="output-heading">
+        <div class="section-heading">
+          <span>4</span>
+          <div>
+            <h2 id="output-heading">Output</h2>
+            <p>Pick the plate that fits your printer.</p>
+          </div>
+        </div>
+        <div class="choice-grid three">
+          <label class="choice">
+            <input type="radio" name="part" value="one_piece" checked>
+            <strong>One piece</strong>
+            <small>254 mm wide; only 1 mm margin per side on X2D</small>
+          </label>
+          <label class="choice recommended">
+            <input type="radio" name="part" value="x2d_plate">
+            <strong>X2D split plate</strong>
+            <small>Core and ears; lower-risk bed fit</small>
+          </label>
+          <label class="choice">
+            <input type="radio" name="part" value="core">
+            <strong>Core only</strong>
+            <small>Print the two rack ears separately</small>
+          </label>
+        </div>
+      </section>
+
+      <section class="panel viewer-options" aria-labelledby="appearance-heading">
+        <div class="section-heading">
+          <span>5</span>
+          <div>
+            <h2 id="appearance-heading">Viewer helpers</h2>
+            <p>Visual-only settings; they do not change the printed mesh.</p>
+          </div>
+        </div>
+        <div class="toggle-grid compact">
+          <label class="switch-row"><span><strong>Show Green</strong></span><input id="show-green" type="checkbox" role="switch" checked></label>
+          <label class="switch-row"><span><strong>Show TP-Link</strong></span><input id="show-splitter" type="checkbox" role="switch" checked></label>
+          <label class="switch-row"><span><strong>Show cables</strong></span><input id="show-cables" type="checkbox" role="switch" checked></label>
+          <label class="switch-row"><span><strong>Simulate LEDs</strong></span><input id="show-leds" type="checkbox" role="switch" checked></label>
+          <label class="switch-row"><span><strong>Auto-rotate</strong></span><input id="auto-rotate" type="checkbox" role="switch"></label>
+        </div>
+      </section>
+    </form>
+
+    <aside class="summary" aria-labelledby="summary-heading">
+      <section class="viewer-card" aria-labelledby="live-preview-heading">
+        <div class="viewer-card-heading">
+          <div>
+            <p class="eyebrow">Live preview</p>
+            <h2 id="live-preview-heading">Your current design</h2>
+          </div>
+          <a id="full-viewer-link" class="quiet-link" href="../viewer/interactive_viewer.html" target="_blank" rel="noopener">Open full viewer</a>
+        </div>
+        <iframe id="live-viewer" title="Interactive 3D preview of the current rack-mount configuration" src="../viewer/interactive_viewer.html?embed=1"></iframe>
+      </section>
+      <div class="summary-sticky">
+        <p class="eyebrow">Current configuration</p>
+        <h2 id="summary-heading">Ready to export</h2>
+        <div class="rack-sketch" aria-hidden="true">
+          <div class="rack-face"><i></i><i></i></div>
+          <div class="splitter-block">PoE</div>
+          <div class="green-block"><span></span><span></span><span></span></div>
+        </div>
+        <dl id="summary-list"></dl>
+        <div id="warnings" class="warnings" aria-live="polite"></div>
+
+        <div class="export-actions">
+          <button type="button" class="primary" id="download-config">Download config JSON</button>
+          <button type="button" id="download-openscad">Download OpenSCAD preset</button>
+          <button type="button" id="copy-command">Copy build command</button>
+          <a id="viewer-link" href="../viewer/interactive_viewer.html" target="_blank" rel="noopener">Open full viewer</a>
+        </div>
+        <section class="generator" aria-labelledby="generator-heading">
+          <h3 id="generator-heading">Generate locally</h3>
+          <p>The first run loads a 14 MB OpenSCAD WebAssembly engine. Geometry stays in this browser.</p>
+          <div class="generate-actions">
+            <button type="button" class="primary" id="generate-mesh">Generate STL + 3MF</button>
+            <button type="button" id="cancel-generation" disabled>Cancel</button>
+          </div>
+          <div id="generation-status" class="generation-status" data-state="idle" aria-live="polite">
+            <progress id="generation-progress" max="5" value="0"></progress>
+            <strong id="generation-message">Ready</strong>
+            <small id="generation-detail">Requires HTTP(S); preset export still works when opened directly as a file.</small>
+          </div>
+          <div id="mesh-downloads" class="mesh-downloads" hidden>
+            <a id="download-stl" download>Download STL</a>
+            <a id="download-3mf" download>Download 3MF</a>
+          </div>
+        </section>
+        <label class="command-label" for="command-output">OpenSCAD command</label>
+        <textarea id="command-output" rows="7" readonly spellcheck="false"></textarea>
+        <p class="prototype-note"><strong>Experimental generator.</strong> Every download is checked for finite triangles, closed two-manifold edges, consistent winding, positive volume, and plausible dimensions. Physical fit still requires the coupons.</p>
+        <button type="button" class="text-button reset" id="reset-defaults">Reset to Richard’s selected defaults</button>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="site-footer">
+    <p>Static and serverless. Browser mesh generation uses the vendored GPL-2.0 OpenSCAD WASM runtime; production geometry remains in <code>ha_green_rack.scad</code>.</p>
+  </footer>
+</body>
+</html>
