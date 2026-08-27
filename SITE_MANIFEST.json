@@ -16,8 +16,8 @@
     "sha256": "8b1e7dbafeea23aaec7e65da9fe89d58d56f3164b1ab081ad1fa0b4a81d98010"
   },
   "README.md": {
-    "bytes": 30286,
-    "sha256": "7046096b00eeba888b3ed87a917ff35a208ae1f4de523576c5041122cb6f8831"
+    "bytes": 31142,
+    "sha256": "270e03cbb10456fdd4ade01b1f0dc21a4900c72b777f2e33cd06fb6f944bc372"
   },
   "assets/home-assistant-logo.svg": {
     "bytes": 678,
@@ -33,7 +33,7 @@
   },
   "customizer/app.js": {
     "bytes": 25503,
-    "sha256": "61ae39cb9da39c3930eda66a002b9374bc6dc3e13311078194494fc6895152e3"
+    "sha256": "7eafd36089d71c5af3db53f42e38c7a5ef70af33062957fc8c59d2dbd843ffd7"
   },
   "customizer/index.html": {
     "bytes": 12989,
@@ -162,6 +162,14 @@
   "exports/friction_fit_coupon.stl": {
     "bytes": 154684,
     "sha256": "bf09399ea5ea279eae885f27cef55ea80fd44c5a9668df3d39b874caf16a3f68"
+  },
+  "exports/green_hybrid_clip_coupon.3mf": {
+    "bytes": 26973,
+    "sha256": "5aafe3d5f3a9422e2de96b951ecdd3a348de448b485982ecf3160f5c90e10fb5"
+  },
+  "exports/green_hybrid_clip_coupon.stl": {
+    "bytes": 118284,
+    "sha256": "6ae79de070d3c6559b1122a97f417e109d6361749b67f4665de066d3c1831d7d"
   },
   "exports/green_spacer_legacy_screw_tray.stl": {
     "bytes": 20884,
@@ -343,6 +351,14 @@
     "bytes": 152484,
     "sha256": "9c27af5dac67a4afc26a672bf62ed1410d4e53ebc5e0e0f443cd082d66befcbb"
   },
+  "exports/splitter_hybrid_clip_coupon.3mf": {
+    "bytes": 44268,
+    "sha256": "b064afa90909aaacbbe8d4ae1dacf81d363d230166683de3c7688d55738514f5"
+  },
+  "exports/splitter_hybrid_clip_coupon.stl": {
+    "bytes": 171084,
+    "sha256": "ce3086b72b3d4fd71165c95dbac40d25a26ffd72bd1f9efb17ceed55618dd701"
+  },
   "exports/x2d_plate.3mf": {
     "bytes": 150918,
     "sha256": "ea3a218b47247ee79eb71e576e42e74a8dd94bfb2c3a7ce56bbd4db7b4b14ed1"
@@ -416,8 +432,8 @@
     "sha256": "c3e1d1deaa744fd64c7330d8b178ca006aa2b5f8397b2027e94859eef9ae5d02"
   },
   "ha_green_rack.scad": {
-    "bytes": 135414,
-    "sha256": "44ca9aaa08941ec9383861e67aef061dd7a28f36f83de95aac5d165afd2fb98d"
+    "bytes": 156875,
+    "sha256": "ab59e923b5fbc37b4587e7d84936d6a23461ad2ec7fcb5a7a06fbb2a248eb484"
   },
   "index.html": {
     "bytes": 417,
@@ -484,20 +500,20 @@
     "sha256": "571538c87a04e5fe3ffef6de9004d697ee75ea63dcc49e11f58c88929a288323"
   },
   "screwless-retention-research.md": {
-    "bytes": 8372,
-    "sha256": "bf4987d615d4819a05dc17634cc0d29841a7d351aad0fe1c2cf9161dab47f0bd"
+    "bytes": 10091,
+    "sha256": "fac6e4914914602c31d1c028f2ffd0043510ab033c768021e28653b9c0ba7e02"
   },
   "scripts/build.sh": {
-    "bytes": 7977,
-    "sha256": "268467bf3721f103ecb3bf4dbd70acd659d7fdfa2f831518488e910aaef54c45"
+    "bytes": 8005,
+    "sha256": "fd543b8b39e564e5192feaa0f2f6dd3253414f5d6cfcc6a1864ccaccf37c6c8b"
   },
   "scripts/build_assets.sh": {
-    "bytes": 17707,
-    "sha256": "08af0148b8b356029767e2c5130c1ae7a318c957875910bdbf7360fd38df591e"
+    "bytes": 18127,
+    "sha256": "4b86e256e812d2e48f4534cffdcfc5d47668ded369567bf7a16a58ee8b8ab484"
   },
   "scripts/build_viewer.py": {
-    "bytes": 31410,
-    "sha256": "019a57c45a42259bf6ad6a6f69a2d7a2fdd13339bfbb9d0a51c6c8086049196e"
+    "bytes": 32299,
+    "sha256": "e1803dec4ccebe7e32bd4c97af49f8b9bc0b5e4cd9bf40cbbdaa6e08c159db83"
   },
   "scripts/openscad_export.py": {
     "bytes": 16578,
@@ -516,84 +532,84 @@
     "sha256": "2e4dae1cf449bfa0023779b98ddade2de6cd7d8e88ec0d6b7ba6d9236e72663c"
   },
   "viewer/home-assistant-green-rack-balanced-no_shutter.glb": {
-    "bytes": 3279716,
-    "sha256": "e045311ad74e18c2484fb7c39af3a7e5a592418186ccbc0a16ade1975db85ef8"
+    "bytes": 3638784,
+    "sha256": "0b34799c20b42256180fe647f253992e4e3775759a87e32d5073bfe7fd305286"
   },
   "viewer/home-assistant-green-rack-balanced.glb": {
-    "bytes": 3398188,
-    "sha256": "9c735005157845cc03f6f22aa9e70288a5308246ca682d8c9441722cab3d002b"
+    "bytes": 3757256,
+    "sha256": "dad9cbb714e40e5d9ae85b6b42ae0b4b66d2893482c0fce397e85676afc41ae5"
   },
   "viewer/home-assistant-green-rack-cable_friendly-no_shutter.glb": {
-    "bytes": 3282056,
-    "sha256": "402ed6bf125f6439324973b239bb4f2bba5385859d1d5f438ff8baba2267d7e2"
+    "bytes": 3641124,
+    "sha256": "23eec4ad66e7d39a0b78559262e37ad293a6b10e0498ac1565b3a58195ecca9c"
   },
   "viewer/home-assistant-green-rack-cable_friendly.glb": {
-    "bytes": 3400524,
-    "sha256": "bfe2552a25f008bf47269ff71f2394d5fda595c13f40bace3489e44dfba8fe87"
+    "bytes": 3759592,
+    "sha256": "5972b9fe5f76a1223f51a072f7829878bccdd8fb63a996f9629f42d63c73c476"
   },
   "viewer/home-assistant-green-rack-compact-no_shutter.glb": {
-    "bytes": 3270500,
-    "sha256": "3913f9d425ec903803c6443eeb64bcbdfaa89883cf3885b46d004e934424383d"
+    "bytes": 3629568,
+    "sha256": "24568d2bb96cbc025731d3a3bdeee7cfc08695f53fdf06664856212f66ea558c"
   },
   "viewer/home-assistant-green-rack-compact.glb": {
-    "bytes": 3388968,
-    "sha256": "d4182eb4f3da9a2ac4b7a410870f181fa09ed8431e4706de75da8237caa045f4"
+    "bytes": 3748036,
+    "sha256": "8a87fddb9e269c13ed3c98fb297bfed9330d06a1c97efc35c40bf4b582b1108d"
   },
   "viewer/home-assistant-green-rack-front_ethernet-no_shutter.glb": {
-    "bytes": 3466016,
-    "sha256": "89775eedddb5f1bae056c049582a035a53f4c4b8dfb83359424270905a60806a"
+    "bytes": 3825084,
+    "sha256": "25f1d5b2b40aebba9cd9a4fd10ffe28cd9c75efd03b9ed8e08fd8609bec0b517"
   },
   "viewer/home-assistant-green-rack-front_ethernet.glb": {
-    "bytes": 3584484,
-    "sha256": "ec531f54a97ad94fd6eb44186dfb8700e5a0a40ac1fa1fe9a9c4c9b73851cfcc"
+    "bytes": 3943552,
+    "sha256": "e419b9b60313169c327d275de4af17412616ad6db33a45e95b0ceea8068181b5"
   },
   "viewer/home-assistant-green-rack-front_ethernet_far_right-no_shutter.glb": {
-    "bytes": 3519384,
-    "sha256": "6f3ea91484e794ca4fbc5973b84dba7e39bdadefc100192f111ba46c27e3b965"
+    "bytes": 3878452,
+    "sha256": "bb01454995f7c60ea090afd8d22cb147e71768d3e729c91c2ae2f5e19abf7e10"
   },
   "viewer/home-assistant-green-rack-front_ethernet_far_right.glb": {
-    "bytes": 3637828,
-    "sha256": "9c24ef24cb68bcbeffe26f232ab41f9658fd01ec3ec2a0b324c58d060571643a"
+    "bytes": 3996896,
+    "sha256": "89b093038e30d1397fe4712684063182a6ad90dfb50b445b2ef7da68d092f078"
   },
   "viewer/home-assistant-green-rack-front_ethernet_left-no_shutter.glb": {
-    "bytes": 3679524,
-    "sha256": "8990eb24b7bb1176d29cc4418cf91b70a379fb6217ab6433019a4a85bc2becbc"
+    "bytes": 4038592,
+    "sha256": "e12cebc337d92a4fc6ce4df53eaa18be9f97ff97fc23e07e988b8a042368e630"
   },
   "viewer/home-assistant-green-rack-front_ethernet_left.glb": {
-    "bytes": 3797992,
-    "sha256": "27c4f4df9ee009890afe3ace841f9649e9cedbf04377c725323e7a9075aaed64"
+    "bytes": 4157060,
+    "sha256": "20e79959db06950610324ea402375cca0a24c506b16476e027153d4173f1310c"
   },
   "viewer/home-assistant-green-rack-front_ethernet_right-no_shutter.glb": {
-    "bytes": 3466016,
-    "sha256": "89775eedddb5f1bae056c049582a035a53f4c4b8dfb83359424270905a60806a"
+    "bytes": 3825084,
+    "sha256": "25f1d5b2b40aebba9cd9a4fd10ffe28cd9c75efd03b9ed8e08fd8609bec0b517"
   },
   "viewer/home-assistant-green-rack-front_ethernet_right.glb": {
-    "bytes": 3584484,
-    "sha256": "ec531f54a97ad94fd6eb44186dfb8700e5a0a40ac1fa1fe9a9c4c9b73851cfcc"
+    "bytes": 3943552,
+    "sha256": "e419b9b60313169c327d275de4af17412616ad6db33a45e95b0ceea8068181b5"
   },
   "viewer/home-assistant-green-rack-preview-no_shutter.glb": {
-    "bytes": 3282056,
-    "sha256": "402ed6bf125f6439324973b239bb4f2bba5385859d1d5f438ff8baba2267d7e2"
+    "bytes": 3641124,
+    "sha256": "23eec4ad66e7d39a0b78559262e37ad293a6b10e0498ac1565b3a58195ecca9c"
   },
   "viewer/home-assistant-green-rack-preview-with_shutter.glb": {
-    "bytes": 3400524,
-    "sha256": "bfe2552a25f008bf47269ff71f2394d5fda595c13f40bace3489e44dfba8fe87"
+    "bytes": 3759592,
+    "sha256": "5972b9fe5f76a1223f51a072f7829878bccdd8fb63a996f9629f42d63c73c476"
   },
   "viewer/home-assistant-green-rack-preview.glb": {
-    "bytes": 3282056,
-    "sha256": "402ed6bf125f6439324973b239bb4f2bba5385859d1d5f438ff8baba2267d7e2"
+    "bytes": 3641124,
+    "sha256": "23eec4ad66e7d39a0b78559262e37ad293a6b10e0498ac1565b3a58195ecca9c"
   },
   "viewer/home-assistant-green-rack-sics_angled-no_shutter.glb": {
-    "bytes": 3168540,
-    "sha256": "98b7dc51f28591a465434637b5ded6b8ac574601d94ad43adcfa2189ab356694"
+    "bytes": 3505716,
+    "sha256": "04db31d081f27bbeba266e35dd2558bf86a519875fda627c06d014e943c57c51"
   },
   "viewer/home-assistant-green-rack-sics_angled.glb": {
-    "bytes": 3287012,
-    "sha256": "b6e6781b610d009669588878269e5357c354ca53d8a0c2ba93f511184a3143ce"
+    "bytes": 3624188,
+    "sha256": "6aeb34103c872d2de65fd6665dd0686f720db5f59bb32f239120d3ce198859dd"
   },
   "viewer/interactive_viewer.html": {
-    "bytes": 995781,
-    "sha256": "ccb92c0e6ed0f981fe4b3ab3487b9a194edc7a3fee454d477a2c021f8b022193"
+    "bytes": 997743,
+    "sha256": "9afb44b07e62546920cbdeb7458f6d50f27593abf945c1897bdaa45f1bb96ddd"
   },
   "viewer/variants/balanced/viewer_dc_cable.stl": {
     "bytes": 395684,
@@ -604,8 +620,8 @@
     "sha256": "15761cc2cc28d38e22bc8bd91ef2259c68f4266abcb3d98897f06f99cd89c945"
   },
   "viewer/variants/balanced/viewer_green.stl": {
-    "bytes": 10284,
-    "sha256": "f798ae2335776adeee67a05d0014708e73b3b4a987b2bc8cb79b90d7407dabb2"
+    "bytes": 41484,
+    "sha256": "71eaccf3ea8ba55abbe0731c32fb1e2b8fd1a0ad0de9bf34c7a561194b3083b7"
   },
   "viewer/variants/balanced/viewer_green_ports.stl": {
     "bytes": 12484,
@@ -640,12 +656,12 @@
     "sha256": "b79d0721c4a959fe39f1d146b1b23747bbea893b0897418547d87619f3b70dfa"
   },
   "viewer/variants/balanced/viewer_mount_without_green_tray.stl": {
-    "bytes": 211984,
-    "sha256": "fe1438ff159c7ded5e722adf06102303ce5966eb205f1a94b305e55b556f5109"
+    "bytes": 213984,
+    "sha256": "87f86da9d4f506b36354c714696ea4d7b824f6707d421fc428d1c379e289ab41"
   },
   "viewer/variants/balanced/viewer_mount_without_green_tray_no_shutter.stl": {
-    "bytes": 191784,
-    "sha256": "c5096a4ac2b83c21ecd2eb814664211348c7e47fa52ce4313ec1a07c7cfba9d1"
+    "bytes": 193784,
+    "sha256": "9efa5cb966f64ffd34f6dc320259fc32567db18577bcf723ff911b3022f2f554"
   },
   "viewer/variants/balanced/viewer_rulers.stl": {
     "bytes": 50484,
@@ -653,7 +669,7 @@
   },
   "viewer/variants/balanced/viewer_shutter_closed.stl": {
     "bytes": 23284,
-    "sha256": "513378ccda4c185fffc3811bcced9e5662e6e7cc1cd27025adece083f1cff572"
+    "sha256": "86f6a5bf8c44c8f62b2f2925038b68b2296b6b144a7c597358d1df2bdf5c2f3c"
   },
   "viewer/variants/balanced/viewer_shutter_open.stl": {
     "bytes": 23284,
@@ -664,8 +680,8 @@
     "sha256": "5bfa87bfb10fec84bf1503c3d655aa448a121f32dbb0d01e726dd34e2d562aea"
   },
   "viewer/variants/balanced/viewer_splitter.stl": {
-    "bytes": 10284,
-    "sha256": "d0f70cc82d98c6432669ba4ae955e83ae6f2f208c142778455e52bd64c70026e"
+    "bytes": 31084,
+    "sha256": "c65f58cf2b77a4c43067f9e28d2a4aa426e7ad83711f7d7635c7d6925927025b"
   },
   "viewer/variants/balanced/viewer_splitter_ports.stl": {
     "bytes": 7284,
@@ -680,8 +696,8 @@
     "sha256": "15761cc2cc28d38e22bc8bd91ef2259c68f4266abcb3d98897f06f99cd89c945"
   },
   "viewer/variants/cable_friendly/viewer_green.stl": {
-    "bytes": 10284,
-    "sha256": "f798ae2335776adeee67a05d0014708e73b3b4a987b2bc8cb79b90d7407dabb2"
+    "bytes": 41484,
+    "sha256": "71eaccf3ea8ba55abbe0731c32fb1e2b8fd1a0ad0de9bf34c7a561194b3083b7"
   },
   "viewer/variants/cable_friendly/viewer_green_ports.stl": {
     "bytes": 12484,
@@ -716,12 +732,12 @@
     "sha256": "b79d0721c4a959fe39f1d146b1b23747bbea893b0897418547d87619f3b70dfa"
   },
   "viewer/variants/cable_friendly/viewer_mount_without_green_tray.stl": {
-    "bytes": 211984,
-    "sha256": "a8bdba20ffc15a80a5aaabfcf1f21683ac890c02a396f45701b89c88ee55be48"
+    "bytes": 213984,
+    "sha256": "b0455ddda34b85e2db50b31ef7787a7be5b78ea45f8727576e37fda9bed0d647"
   },
   "viewer/variants/cable_friendly/viewer_mount_without_green_tray_no_shutter.stl": {
-    "bytes": 191784,
-    "sha256": "982b3bc7a18cefe1e3bceb9ee31738fb1b2024d6681e7469b1e1aa8d25c42615"
+    "bytes": 193784,
+    "sha256": "7faa492703cbb88a817633770c6ba85ba3aafae8abb548a0a87d2ed157b28e60"
   },
   "viewer/variants/cable_friendly/viewer_rulers.stl": {
     "bytes": 51484,
@@ -729,19 +745,19 @@
   },
   "viewer/variants/cable_friendly/viewer_shutter_closed.stl": {
     "bytes": 23284,
-    "sha256": "513378ccda4c185fffc3811bcced9e5662e6e7cc1cd27025adece083f1cff572"
+    "sha256": "86f6a5bf8c44c8f62b2f2925038b68b2296b6b144a7c597358d1df2bdf5c2f3c"
   },
   "viewer/variants/cable_friendly/viewer_shutter_open.stl": {
     "bytes": 23284,
-    "sha256": "545804a7ff9920370c5a8089c8e211a47fee2a9fd5e9547e13b158696dfba656"
+    "sha256": "5514283b275955c900b292b051a62a0c3d3408303d32cf12cae6f2961c8b428d"
   },
   "viewer/variants/cable_friendly/viewer_shutter_retainer.stl": {
     "bytes": 22684,
     "sha256": "5bfa87bfb10fec84bf1503c3d655aa448a121f32dbb0d01e726dd34e2d562aea"
   },
   "viewer/variants/cable_friendly/viewer_splitter.stl": {
-    "bytes": 10284,
-    "sha256": "0781512befea9e1c29695e90abd6b9a2e6ea660989924cb5e7ff9a0c94ba8013"
+    "bytes": 31084,
+    "sha256": "39bce92feba4a18a163fa0b3409862293986b9610c54cbda5bdac20e21b3a4d7"
   },
   "viewer/variants/cable_friendly/viewer_splitter_ports.stl": {
     "bytes": 7284,
@@ -756,8 +772,8 @@
     "sha256": "15761cc2cc28d38e22bc8bd91ef2259c68f4266abcb3d98897f06f99cd89c945"
   },
   "viewer/variants/compact/viewer_green.stl": {
-    "bytes": 10284,
-    "sha256": "f798ae2335776adeee67a05d0014708e73b3b4a987b2bc8cb79b90d7407dabb2"
+    "bytes": 41484,
+    "sha256": "71eaccf3ea8ba55abbe0731c32fb1e2b8fd1a0ad0de9bf34c7a561194b3083b7"
   },
   "viewer/variants/compact/viewer_green_ports.stl": {
     "bytes": 12484,
@@ -792,12 +808,12 @@
     "sha256": "b79d0721c4a959fe39f1d146b1b23747bbea893b0897418547d87619f3b70dfa"
   },
   "viewer/variants/compact/viewer_mount_without_green_tray.stl": {
-    "bytes": 211884,
-    "sha256": "e1391c6a8ffc229bcab310dc22a4be0178b61cdef85869af1f8bdd952fe3d379"
+    "bytes": 213884,
+    "sha256": "b66e02b49b91a789b4291041f0559f920cc476787a00a15264f9a06b15524cda"
   },
   "viewer/variants/compact/viewer_mount_without_green_tray_no_shutter.stl": {
-    "bytes": 191684,
-    "sha256": "9c20541da6b5b4098cc2a8eedbef64c8efbfc42c5f457da78389ed45e9939a08"
+    "bytes": 193684,
+    "sha256": "7629b12db29e000fbfdc9d0c693c26d8b115d193df4aa654ca34ec75cc8bb14c"
   },
   "viewer/variants/compact/viewer_rulers.stl": {
     "bytes": 49084,
@@ -805,7 +821,7 @@
   },
   "viewer/variants/compact/viewer_shutter_closed.stl": {
     "bytes": 23284,
-    "sha256": "513378ccda4c185fffc3811bcced9e5662e6e7cc1cd27025adece083f1cff572"
+    "sha256": "86f6a5bf8c44c8f62b2f2925038b68b2296b6b144a7c597358d1df2bdf5c2f3c"
   },
   "viewer/variants/compact/viewer_shutter_open.stl": {
     "bytes": 23284,
@@ -816,8 +832,8 @@
     "sha256": "5bfa87bfb10fec84bf1503c3d655aa448a121f32dbb0d01e726dd34e2d562aea"
   },
   "viewer/variants/compact/viewer_splitter.stl": {
-    "bytes": 10284,
-    "sha256": "d7f073a8d24d2d277d0e1016456495091e2994828477221b0ef3d44b3f30fb0a"
+    "bytes": 31084,
+    "sha256": "2e83a01ab756c2cb39db0c2295e1bb7f5615267d2c5d62582111e8045e003d13"
   },
   "viewer/variants/compact/viewer_splitter_ports.stl": {
     "bytes": 7284,
@@ -832,8 +848,8 @@
     "sha256": "69cecc85c01998d03404f0128b90fd252f357742faf3da65eaaa283bcfc68f38"
   },
   "viewer/variants/front_ethernet_far_right/viewer_green.stl": {
-    "bytes": 10284,
-    "sha256": "f798ae2335776adeee67a05d0014708e73b3b4a987b2bc8cb79b90d7407dabb2"
+    "bytes": 41484,
+    "sha256": "71eaccf3ea8ba55abbe0731c32fb1e2b8fd1a0ad0de9bf34c7a561194b3083b7"
   },
   "viewer/variants/front_ethernet_far_right/viewer_green_ports.stl": {
     "bytes": 12484,
@@ -872,12 +888,12 @@
     "sha256": "b79d0721c4a959fe39f1d146b1b23747bbea893b0897418547d87619f3b70dfa"
   },
   "viewer/variants/front_ethernet_far_right/viewer_mount_without_green_tray.stl": {
-    "bytes": 213784,
-    "sha256": "74755db6f53ce786f10c6114735cf315a014d91f7b74f679fbdf8337c238f2bb"
+    "bytes": 215784,
+    "sha256": "4927a5210895296521cf422876fc8413d0040d1dff0b0c3e7ac8f78236ea3cad"
   },
   "viewer/variants/front_ethernet_far_right/viewer_mount_without_green_tray_no_shutter.stl": {
-    "bytes": 193584,
-    "sha256": "ba41c0e34825312d2c9ded74d4efa6354c01d1e83092fdba1dff0a1b653c3df8"
+    "bytes": 195584,
+    "sha256": "2df07513ac722177d37063a056dacd18ad9624805fa20e0205838364a5b5353b"
   },
   "viewer/variants/front_ethernet_far_right/viewer_rulers.stl": {
     "bytes": 51484,
@@ -885,19 +901,19 @@
   },
   "viewer/variants/front_ethernet_far_right/viewer_shutter_closed.stl": {
     "bytes": 23284,
-    "sha256": "71911fd6d44394d7a64029fcca944330f2b94eefe705f01b2552d5ab9bb35d18"
+    "sha256": "98f134eec0364ca9f32e74b48b8569fc5cade5e9bcf6d0aba39f8f6019481455"
   },
   "viewer/variants/front_ethernet_far_right/viewer_shutter_open.stl": {
     "bytes": 23284,
-    "sha256": "0c0d7a1e07586a352052ad24d0b32910e602ac63069fd784e2f62f707808bc53"
+    "sha256": "fd496f7160a5027b120d02c1f0e7b427a7e02536b4d76e6b2c788f1fa1f1b2e9"
   },
   "viewer/variants/front_ethernet_far_right/viewer_shutter_retainer.stl": {
     "bytes": 22684,
     "sha256": "ec900b7d216bec643d060269a458f044d25837c5e72d337d91a95eb93bf349b7"
   },
   "viewer/variants/front_ethernet_far_right/viewer_splitter.stl": {
-    "bytes": 10284,
-    "sha256": "0781512befea9e1c29695e90abd6b9a2e6ea660989924cb5e7ff9a0c94ba8013"
+    "bytes": 31084,
+    "sha256": "39bce92feba4a18a163fa0b3409862293986b9610c54cbda5bdac20e21b3a4d7"
   },
   "viewer/variants/front_ethernet_far_right/viewer_splitter_ports.stl": {
     "bytes": 7284,
@@ -912,8 +928,8 @@
     "sha256": "f1553bf2687b85d89c0b3afb3d91d8ef62e01ae2eef65ad82df5f6ed6658d825"
   },
   "viewer/variants/front_ethernet_left/viewer_green.stl": {
-    "bytes": 10284,
-    "sha256": "f798ae2335776adeee67a05d0014708e73b3b4a987b2bc8cb79b90d7407dabb2"
+    "bytes": 41484,
+    "sha256": "71eaccf3ea8ba55abbe0731c32fb1e2b8fd1a0ad0de9bf34c7a561194b3083b7"
   },
   "viewer/variants/front_ethernet_left/viewer_green_ports.stl": {
     "bytes": 12484,
@@ -952,12 +968,12 @@
     "sha256": "7efb7641949eeb43e0949450ea34a0c0fc24694a11c24f34aa0255b145cd89a6"
   },
   "viewer/variants/front_ethernet_left/viewer_mount_without_green_tray.stl": {
-    "bytes": 213784,
-    "sha256": "d8c9efc19127a3716351662973e354c635a2270132ce81d0b14e3a0ab1f73658"
+    "bytes": 215784,
+    "sha256": "ace57eaca1758f1d64e56f240d8a1a33c729f2082d5a74f2dcb96740a66984c0"
   },
   "viewer/variants/front_ethernet_left/viewer_mount_without_green_tray_no_shutter.stl": {
-    "bytes": 193584,
-    "sha256": "25bd95fbc3ca47091ecb3842cbdbcdd5f594d524f90af2de8cc2b6b7136d06de"
+    "bytes": 195584,
+    "sha256": "c4c381bdb6615cab7e5cab0d96a902c3eb136ff32c0077bdf526fbaec5773f37"
   },
   "viewer/variants/front_ethernet_left/viewer_rulers.stl": {
     "bytes": 53884,
@@ -965,19 +981,19 @@
   },
   "viewer/variants/front_ethernet_left/viewer_shutter_closed.stl": {
     "bytes": 23284,
-    "sha256": "513378ccda4c185fffc3811bcced9e5662e6e7cc1cd27025adece083f1cff572"
+    "sha256": "86f6a5bf8c44c8f62b2f2925038b68b2296b6b144a7c597358d1df2bdf5c2f3c"
   },
   "viewer/variants/front_ethernet_left/viewer_shutter_open.stl": {
     "bytes": 23284,
-    "sha256": "545804a7ff9920370c5a8089c8e211a47fee2a9fd5e9547e13b158696dfba656"
+    "sha256": "5514283b275955c900b292b051a62a0c3d3408303d32cf12cae6f2961c8b428d"
   },
   "viewer/variants/front_ethernet_left/viewer_shutter_retainer.stl": {
     "bytes": 22684,
     "sha256": "5bfa87bfb10fec84bf1503c3d655aa448a121f32dbb0d01e726dd34e2d562aea"
   },
   "viewer/variants/front_ethernet_left/viewer_splitter.stl": {
-    "bytes": 10284,
-    "sha256": "08e83d41cdf49e65d95f7cb4a7d5b8e43a6ddfbddaedf3b9ed4be946b65755c0"
+    "bytes": 31084,
+    "sha256": "8f07613e5ce6ea8a48cc5d85a0e90f08ec3d2fd83dd02b5996053fd1eb318d52"
   },
   "viewer/variants/front_ethernet_left/viewer_splitter_ports.stl": {
     "bytes": 7284,
@@ -992,8 +1008,8 @@
     "sha256": "69cecc85c01998d03404f0128b90fd252f357742faf3da65eaaa283bcfc68f38"
   },
   "viewer/variants/front_ethernet_right/viewer_green.stl": {
-    "bytes": 10284,
-    "sha256": "f798ae2335776adeee67a05d0014708e73b3b4a987b2bc8cb79b90d7407dabb2"
+    "bytes": 41484,
+    "sha256": "71eaccf3ea8ba55abbe0731c32fb1e2b8fd1a0ad0de9bf34c7a561194b3083b7"
   },
   "viewer/variants/front_ethernet_right/viewer_green_ports.stl": {
     "bytes": 12484,
@@ -1032,12 +1048,12 @@
     "sha256": "b79d0721c4a959fe39f1d146b1b23747bbea893b0897418547d87619f3b70dfa"
   },
   "viewer/variants/front_ethernet_right/viewer_mount_without_green_tray.stl": {
-    "bytes": 213784,
-    "sha256": "b57a23cfe0691b897b29ea2b964537508e6bb511bd8dcf5a38ecb0f03d29d6e6"
+    "bytes": 215784,
+    "sha256": "e371f296bf790354982fb1ddd38d87f0c9ec080f5a352ed3813c15886e0ec1bf"
   },
   "viewer/variants/front_ethernet_right/viewer_mount_without_green_tray_no_shutter.stl": {
-    "bytes": 193584,
-    "sha256": "e9c615d1e533764ceb7e4732269ab59a47be0aeeadfe7781456800274243c2ca"
+    "bytes": 195584,
+    "sha256": "478cefc0b3f89d2de16bc4a0f824628ae8a9e611afdcea9e321da72c8a4bd938"
   },
   "viewer/variants/front_ethernet_right/viewer_rulers.stl": {
     "bytes": 51484,
@@ -1045,19 +1061,19 @@
   },
   "viewer/variants/front_ethernet_right/viewer_shutter_closed.stl": {
     "bytes": 23284,
-    "sha256": "513378ccda4c185fffc3811bcced9e5662e6e7cc1cd27025adece083f1cff572"
+    "sha256": "86f6a5bf8c44c8f62b2f2925038b68b2296b6b144a7c597358d1df2bdf5c2f3c"
   },
   "viewer/variants/front_ethernet_right/viewer_shutter_open.stl": {
     "bytes": 23284,
-    "sha256": "545804a7ff9920370c5a8089c8e211a47fee2a9fd5e9547e13b158696dfba656"
+    "sha256": "5514283b275955c900b292b051a62a0c3d3408303d32cf12cae6f2961c8b428d"
   },
   "viewer/variants/front_ethernet_right/viewer_shutter_retainer.stl": {
     "bytes": 22684,
     "sha256": "5bfa87bfb10fec84bf1503c3d655aa448a121f32dbb0d01e726dd34e2d562aea"
   },
   "viewer/variants/front_ethernet_right/viewer_splitter.stl": {
-    "bytes": 10284,
-    "sha256": "0781512befea9e1c29695e90abd6b9a2e6ea660989924cb5e7ff9a0c94ba8013"
+    "bytes": 31084,
+    "sha256": "39bce92feba4a18a163fa0b3409862293986b9610c54cbda5bdac20e21b3a4d7"
   },
   "viewer/variants/front_ethernet_right/viewer_splitter_ports.stl": {
     "bytes": 7284,
@@ -1072,8 +1088,8 @@
     "sha256": "2cbc656fb4d17272e0ad4c4a7ef3982f398282d33e3aa83fcf9ddb0308d37f33"
   },
   "viewer/variants/sics_angled/viewer_green.stl": {
-    "bytes": 10284,
-    "sha256": "f798ae2335776adeee67a05d0014708e73b3b4a987b2bc8cb79b90d7407dabb2"
+    "bytes": 41484,
+    "sha256": "71eaccf3ea8ba55abbe0731c32fb1e2b8fd1a0ad0de9bf34c7a561194b3083b7"
   },
   "viewer/variants/sics_angled/viewer_green_ports.stl": {
     "bytes": 12484,
@@ -1121,11 +1137,11 @@
   },
   "viewer/variants/sics_angled/viewer_shutter_closed.stl": {
     "bytes": 23284,
-    "sha256": "513378ccda4c185fffc3811bcced9e5662e6e7cc1cd27025adece083f1cff572"
+    "sha256": "86f6a5bf8c44c8f62b2f2925038b68b2296b6b144a7c597358d1df2bdf5c2f3c"
   },
   "viewer/variants/sics_angled/viewer_shutter_open.stl": {
     "bytes": 23284,
-    "sha256": "545804a7ff9920370c5a8089c8e211a47fee2a9fd5e9547e13b158696dfba656"
+    "sha256": "5514283b275955c900b292b051a62a0c3d3408303d32cf12cae6f2961c8b428d"
   },
   "viewer/variants/sics_angled/viewer_shutter_retainer.stl": {
     "bytes": 22684,
@@ -1156,24 +1172,24 @@
     "sha256": "07af6b8fde65b697048c1c0c8e960d8068b06543ad0f8de28051a3f930ba3b2a"
   },
   "viewer/viewer_green_tray_friction.stl": {
-    "bytes": 171084,
-    "sha256": "3edcf9442f59693eb7418ac918e3e72038980208bcdd4dbfcf081f00bf35c561"
+    "bytes": 153084,
+    "sha256": "fb42a2e69b285b4821078a3c2ff75a25cfab3d5634bdc487f5e702aafee1af36"
   },
   "viewer/viewer_green_tray_friction_full.stl": {
-    "bytes": 171084,
-    "sha256": "10b427b496b379786ea874dd7c2a60dfc2d6ec1d181cb70d46ba45b103c5af76"
+    "bytes": 153084,
+    "sha256": "76478a4dff1b5574b85fec69cbf33161650918ac39e7bf1582280a85dc90cf7e"
   },
   "viewer/viewer_green_tray_friction_pads.stl": {
-    "bytes": 225184,
-    "sha256": "ae3ca19e5a37ee43aff04aedf377ce9b3ee7945f21a92b3f3e553f96635fa750"
+    "bytes": 207184,
+    "sha256": "fe5bf1295db36a8fad75ba36790a36c9720e72d61486e0ce89bb886a43cc89f1"
   },
   "viewer/viewer_green_tray_friction_skeletal.stl": {
-    "bytes": 127184,
-    "sha256": "9df7e56dab6d3cb42df7445dce13b3639a67bf3e3fc612213550c0bc0fd683f9"
+    "bytes": 109184,
+    "sha256": "07adf8ae2832d6d9e07391478aedfd60e99ce3f4aa467e8623a969ce9e1abfcb"
   },
   "viewer/viewer_green_tray_standard.stl": {
     "bytes": 178884,
-    "sha256": "a2b163b8729acc272fa7428720b9eaae828839b1be92b715072b6cfbd9c1b963"
+    "sha256": "701679c9df40653ac9bce88ac31eaa02ddd8a08c2787610f51833965cbdaaedf"
   },
   "viewer/viewer_input_data_cable.stl": {
     "bytes": 13684,
@@ -1234,6 +1250,10 @@
   "viewer/viewer_retention_friction_sleeve.stl": {
     "bytes": 171084,
     "sha256": "3227778cbb7da808f9f605c8c45387318d21984fef790c1c931fbf40c1c0b52a"
+  },
+  "viewer/viewer_retention_hybrid_clips.stl": {
+    "bytes": 369984,
+    "sha256": "76fc03c9d156021fe58f442f33f5fd2d01f52904a85328774c4520d0235d6e6f"
   },
   "viewer/viewer_retention_padded_rails.stl": {
     "bytes": 102084,

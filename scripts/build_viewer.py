@@ -268,6 +268,25 @@ RETENTION_OPTIONS = [
         ),
     },
     {
+        "id": "hybrid_clips",
+        "label": "Hybrid top clips · Green + TP-Link",
+        "short_label": "Hybrid clips",
+        "filename": "viewer_retention_hybrid_clips.stl",
+        "material_name": "Device retention — hybrid top clips",
+        "color": (37, 99, 235, 0),
+        "highlight": (37, 99, 235, 255),
+        "roughness": 0.56,
+        "printable": False,
+        "note": (
+            "Community-informed prototype: short fixed and flexible catches "
+            "capture the Green's clear top edge, while two tuck-and-snap "
+            "pairs capture the TP-Link's top bevel. The lower guides account for "
+            "the Green's measured 109.54 mm base, its published 112 mm cover "
+            "envelope, and the TP-Link's lower bevel. Existing low stops take "
+            "fore/aft loads. Print both clip coupons before production."
+        ),
+    },
+    {
         "id": "friction_sleeve",
         "label": "Integrated raised-tray friction fit",
         "short_label": "Tray friction fit",

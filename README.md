@@ -11,9 +11,9 @@ Designed for:
 
 The canonical printable edition is the final selected design: **rear cable entry, 60 mm cable-friendly splitter setback, an integrated Green friction tray with four raised support pads, a plain front with no logo, an open LED viewing aperture with no shutter or lens, visible LEDs, and no surrounding chassis**. The unqualified `core`, `one_piece`, and `x2d_plate` exports all use that combination.
 
-Smooth continuous tray walls target a light 0.10 mm-per-side friction fit around the physically measured 109.54 mm lower footprint. A 3 mm lead-in chamfer opens to 0.50 mm-per-side clearance for insertion, and low front/rear stops resist sliding without localized ribs, tabs, or clips. Four broad lands centered on the factory mounting locations carry the Green at the normal 9.025 mm device height while the original 3 mm ventilated honeycomb floor remains low and open. The support and walls are fused into the mount; there is no separate sleeve or Green mounting hardware.
+Smooth continuous tray walls target a light 0.10 mm-per-side friction fit around the physically measured 109.54 mm lower footprint, then flare outward around Home Assistant's published 112 mm maximum cover envelope. Low front/rear stops resist sliding without localized ribs, tabs, or clips. Four broad lands centered on the factory mounting locations carry the Green at the normal 9.025 mm device height while the original 3 mm ventilated honeycomb floor remains low and open. The support and walls are fused into the mount; there is no separate sleeve or Green mounting hardware.
 
-All device ports face the rear. The TP-Link splitter sits straight on the left with its POWER+DATA IN port toward the rack rear. Its cradle uses continuous side walls with a conservative 0.05 mm-per-side interference, a 3 mm lead-in chamfer, and four low corner stops that leave both connector centers open. Its LAN/DC outputs face the front internally, and both short jumpers route through the open lane between the two trays before reaching the Green's rear ports.
+All device ports face the rear. The TP-Link splitter sits straight on the left with its POWER+DATA IN port toward the rack rear. Its cradle opens by 0.50 mm/side around the lower case bevel, transitions to a conservative 0.05 mm-per-side grip at the widest body band, and uses four low corner stops that leave both connector centers open. Its LAN/DC outputs face the front internally, and both short jumpers route through the open lane between the two trays before reaching the Green's rear ports.
 
 The front is solid, word-free, logo-free, and has no decorative vents. Its outside corners and exposed tray edges are rounded. Cooling remains open where it matters: the Green's top is unobstructed, the low 15 mm-pitch Green honeycomb ties the tray together below the four pads, and the narrower splitter shelf uses a 10 mm-pitch honeycomb inside its friction walls. The exposed triangular tray braces remain removed.
 
@@ -69,7 +69,7 @@ For this rack, rear entry is the selected production layout: it keeps the front 
 
 TP-Link lists a power cord in the box, and an independent unboxing clearly shows a male-to-male barrel jumper. TP-Link does not publish its exact length, barrel dimensions, or polarity. Try that supplied straight lead first. Before connecting the Green, set the selector to 12 V and verify both fit and center-positive polarity with a meter. If a replacement is needed, use a verified 12-inch straight-through lead whose Green end is 5.5 × 2.1 mm and whose current rating is at least 2 A.
 
-Status: the generated geometry is manifold and dimensionally checked, but the final friction fit has not yet been physically test-printed. `assembly.stl` is a multi-body reference file rather than a print target. Print `friction_fit_coupon.stl` and `splitter_fit_coupon.stl` before committing to the full plate.
+Status: the generated geometry is manifold and dimensionally checked, but the final fits have not yet been physically validated. `assembly.stl` is a multi-body reference file rather than a print target. The original friction coupons remain available; experimental top-clip coupons for both devices are also included for evaluating positive retention before the hybrid viewer concept is promoted to production.
 
 ## Interactive preview
 
@@ -77,7 +77,7 @@ Open `viewer/interactive_viewer.html` in a web browser and choose the splitter, 
 
 The default view matches the production choice: TP-Link, rear Ethernet, Cable-friendly spacing, raised-tray friction retention with **Four pads**, open trays with no chassis, no logo, no shutter hardware, visible simulated LEDs, and auto-rotation off. The comparison controls can still show the alternate supports, logo, captive shutter, front-entry layouts, other retention studies, and ventilated chassis. Those toggles do not change which files are canonical.
 
-The **Green retention** controls compare the selected integrated friction tray with the earlier M3-screw baseline and six other screwless studies. The Four pads friction tray is the production geometry; the remaining retention choices are retained for inspection and historical comparison. Home Assistant publishes the enclosure envelope but not detailed lower-heatsink geometry, so print `friction_fit_coupon` and verify the real unit before committing to the full plate.
+The **Retention** controls compare the selected integrated friction tray with the earlier M3-screw baseline and eight other studies. **Hybrid top clips · Green + PoE** is the newest viewer-only option: each device uses two fixed and two releasable catches over its top edge or bevel. The Four pads friction tray remains the production geometry until both new clip coupons pass.
 
 The support selector switches among three complete, mutually exclusive friction-tray meshes without reloading the GLB. **Four pads** is the selected production geometry: the low 3 mm honeycomb floor remains ventilated while four broad lands carry the Green. **Full honeycomb** raises the complete lattice and perimeter to the seating plane; **Open frame** replaces the floor with a perimeter, two transverse load paths, a center spine, and the same four lands. Every version includes the same fused friction walls and low stops, with the rear center open for ports and cable service.
 
@@ -112,7 +112,9 @@ The viewer is a hand-built HTML page using Google's open-source `<model-viewer>`
 - `left_ear.stl` / `right_ear.stl` — detachable rack ears for `core.stl`
 - `led_insert_optional.stl` and `led_fixed_window_kit_optional.stl` / `.3mf` — optional self-retaining translucent insert comparison
 - `friction_fit_coupon.stl` / `.3mf` — follow-up smooth-wall channels at 0.25, 0.30, and 0.35 mm interference per side. The original three-hole 0.20 mm/side coupon was a near-perfect clearance fit but did not grip, so test these in order and use the first one that holds without scuffing.
+- `green_hybrid_clip_coupon.stl` / `.3mf` — three full-height single-edge gauges testing 1.4, 1.8, and 2.2 mm Green top-catch reach. Test one hole first and use a 5 mm slicer brim because the gauges are intentionally tall and narrow.
 - `splitter_fit_coupon.stl` / `.3mf` — three short open-ended smooth-wall test channels at 0.00, 0.05, and 0.10 mm interference per side for the TP-Link body; use the least aggressive level that holds before committing to its full-length friction cradle
+- `splitter_hybrid_clip_coupon.stl` / `.3mf` — three bevel-aware cradle sections with 1.2 mm fixed catches and 0.8, 1.2, or 1.6 mm spring-catch reach; the full four-clip concept uses the shallow 0.8 mm spring option
 - `assembly.stl` — reference assembly only; print the separate parts above
 - `fit_test.stl` / `.3mf` — general device-clearance check
 
@@ -136,6 +138,7 @@ Viewer and render artifacts:
 - `viewer/home-assistant-green-rack-front_ethernet.glb` and its no-shutter counterpart are compatibility aliases of the center-gap GLBs
 - `viewer/home-assistant-green-rack-sics_angled.glb` — viewer-only angled SICSOLINK mockup showing its captive cable routing
 - `viewer/viewer_green_tray_friction_full.stl`, `viewer/viewer_green_tray_friction_pads.stl`, and `viewer/viewer_green_tray_friction_skeletal.stl` — mutually exclusive complete friction-tray meshes for Full honeycomb, Four pads, and Open frame support; each includes the fused walls and stops
+- `viewer/viewer_retention_hybrid_clips.stl` — viewer-only combined prototype containing the complete four-pad Green top-clip tray plus two fixed bridge-side and two flexible outboard TP-Link catches
 - `viewer/variants/*/viewer_enclosure_airframe.stl` — viewer-only ventilated 1U chassis study; it is not part of the printable production files
 
 The canonical core is approximately 220 × 144 mm. The one-piece faceplate is 254 mm wide and nominally fits the X2D's 256 mm main-nozzle area with only 1 mm per side; center it carefully and do not use a brim. It does not fit the 235.5 mm dual-nozzle overlap area, so `x2d_plate` remains the lower-risk fallback. The printed tray and modeled cable exits stay within the RackMate T2's approximately 240 mm internal depth.
@@ -166,7 +169,7 @@ The supplied 3MF is geometry-only, not a pre-sliced Bambu project. In Bambu Stud
 
 The production LED window is intentionally left open, so there is no lens, shutter blade, or retainer to print or assemble. The optional translucent insert can still be generated for comparison if dust protection is preferred later.
 
-Print `friction_fit_coupon.stl` first. Its one-, two-, and three-hole channels are now 0.25, 0.30, and 0.35 mm interference per side; use the first one that holds the actual Green without scuffing it. The enclosure narrows toward the top, so the physically measured 109.54 mm bottom footprint remains the controlling tray dimension. Then print `splitter_fit_coupon.stl` and select the least aggressive channel that securely holds the TP-Link body. Printer calibration, material, and long-term PETG relaxation all affect these fits.
+For the current friction baseline, print `friction_fit_coupon.stl` and `splitter_fit_coupon.stl`. For the positive-catch study, print `green_hybrid_clip_coupon.stl` and `splitter_hybrid_clip_coupon.stl`; test the one-hole sample first in each set and advance only if it does not overlap securely. Use PETG or ASA, 0.20 mm layers, and 4–5 walls. Add a 5 mm slicer brim to the tall Green clip gauges. Printer calibration, material, and long-term creep all affect these fits.
 
 ## Electrical safety
 
@@ -192,7 +195,9 @@ openscad -o exports/one_piece.stl -D 'part="one_piece"' ha_green_rack.scad
 openscad -o exports/x2d_plate.stl -D 'part="x2d_plate"' ha_green_rack.scad
 openscad -o exports/led_insert_optional.stl -D 'part="led_insert"' -D 'led_window_insert_enabled=true' ha_green_rack.scad
 openscad -o exports/friction_fit_coupon.stl -D 'part="friction_fit_coupon"' ha_green_rack.scad
+openscad -o exports/green_hybrid_clip_coupon.stl -D 'part="green_hybrid_clip_coupon"' ha_green_rack.scad
 openscad -o exports/splitter_fit_coupon.stl -D 'part="splitter_fit_coupon"' ha_green_rack.scad
+openscad -o exports/splitter_hybrid_clip_coupon.stl -D 'part="splitter_hybrid_clip_coupon"' ha_green_rack.scad
 
 # Clearly named optional comparisons.
 openscad -o exports/one_piece_legacy_screw_tray.stl -D 'part="one_piece"' -D 'green_tray_style="standard"' ha_green_rack.scad

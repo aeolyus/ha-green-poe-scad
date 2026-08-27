@@ -58,7 +58,9 @@ canonical_stl_parts=(
   right_ear
   fit_test
   friction_fit_coupon
+  green_hybrid_clip_coupon
   splitter_fit_coupon
+  splitter_hybrid_clip_coupon
 )
 for part_name in "${canonical_stl_parts[@]}"; do
   run_openscad -o "exports/${part_name}.stl" \
@@ -181,6 +183,12 @@ for part_name in x2d_plate one_piece fit_test friction_fit_coupon splitter_fit_c
   run_openscad -o "exports/${part_name}.3mf" \
     -D "part=\"${part_name}\"" ha_green_rack.scad
 done
+for part_name in green_hybrid_clip_coupon splitter_hybrid_clip_coupon; do
+  # These tall snap gauges contain short fit-critical catch faces. CGAL avoids
+  # the degenerate facets that some Manifold 3MF exports retain at those seams.
+  run_openscad --backend=CGAL -o "exports/${part_name}.3mf" \
+    -D "part=\"${part_name}\"" ha_green_rack.scad
+done
 cp exports/one_piece.3mf \
    exports/one_piece_rear_cable_friendly_friction_pads_no_shutter_flat_face.3mf
 for part_name in x2d_plate one_piece; do
@@ -253,7 +261,7 @@ done
 
 # Green-retention concepts use the same device coordinates in every layout.
 # Build each lightweight overlay once and reuse it in all viewer GLBs.
-for retention_name in factory_screws slide_latch corner_gate sled_gate padded_rails captive_strap x_cage friction_sleeve; do
+for retention_name in factory_screws slide_latch corner_gate sled_gate padded_rails captive_strap x_cage hybrid_clips friction_sleeve; do
   run_openscad \
     -o "viewer/viewer_retention_${retention_name}.stl" \
     -D "part=\"viewer_retention_${retention_name}\"" ha_green_rack.scad

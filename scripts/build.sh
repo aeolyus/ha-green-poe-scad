@@ -23,6 +23,7 @@ retention_ids=(
   padded_rails
   captive_strap
   x_cage
+  hybrid_clips
   friction_sleeve
 )
 
@@ -60,7 +61,7 @@ variant_spec() {
 
 retention_is_valid() {
   case "$1" in
-    factory_screws|slide_latch|corner_gate|sled_gate|padded_rails|captive_strap|x_cage|friction_sleeve)
+    factory_screws|slide_latch|corner_gate|sled_gate|padded_rails|captive_strap|x_cage|hybrid_clips|friction_sleeve)
       return 0
       ;;
     *) return 1 ;;

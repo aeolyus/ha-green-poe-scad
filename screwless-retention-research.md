@@ -4,64 +4,64 @@ Research date: 2026-08-26
 
 ## Recommendation
 
-Use a rear-loaded, segmented slide cradle that captures the dark lower-base perimeter ledge, with two fixed front stops and a separately printed, replaceable rear release latch. Keep the existing four-screw design as the best-documented baseline until a physical print verifies this mount and a fit coupon validates the lower ledge.
+For the next prototype, use **light lower guide contact plus localized positive top-edge catches**, printed tray-down. Keep the current four-pad friction tray as the unchanged production baseline until the new Green and TP-Link clip coupons are physically tested.
 
-This approach is preferable because it:
+The viewer prototype applies the same force-path idea to both devices:
 
-- positively resists lift and cable-pull forces instead of relying on friction;
-- leaves the translucent polycarbonate cover, top vents, and finned underside unobstructed;
-- fits the approximately 1.98 mm of remaining 1U clearance above the Green, where top hooks would not;
-- lets the Green slide out for service after pressing a rear release;
-- permits the latch to be reprinted independently if it fatigues.
+- **Home Assistant Green:** two fixed left catches and two releasable right spring catches overlap the clear lid edge. Short lower guides locate the measured 109.5375 mm base, then flare outward around the official 112 mm cover envelope.
+- **TP-Link:** the bevel-aware cradle opens at the lower bevel, grips only the widest side band, and uses two fixed bridge-side catches plus two external outboard spring arms.
+- Existing low front/rear stops take cable-pull loads, so the spring features mainly resist lift and tilt rather than carrying constant preload.
+- The catches are short and broad instead of a thin X roof, and they leave the center of both devices open for airflow.
+- The Green prototype reaches 42.55 mm, leaving about 0.45 mm inside the modeled 43 mm 1U envelope. That is enough for a visual prototype, but too close to call production-ready without a rack fit check.
 
 ## Evidence from existing designs
 
 - [MakerWorld 883556](https://makerworld.com/en/models/883556-home-assistant-green-wall-mount) uses a slide-in pocket/sleeve with open ports and airflow. It has 294 reported prints and 385 downloads. In a horizontal rack it would still need a positive end latch because gravity no longer retains the device.
 - [MakerWorld 2297786](https://makerworld.com/en/models/2297786-wall-mount-din-rail-for-home-assistant-green) uses side rails, compliant S-shaped spring pieces, and end restraints and is shown holding the Green upside down. It proves compliant retention can work, but its glued multipart construction is less attractive for this rack.
-- [MakerWorld 452481](https://makerworld.com/en/models/452481-wallmount-for-home-assistant-green) is an open-air surrounding cage with substantial community use.
+- [MakerWorld 452481](https://makerworld.com/en/models/452481-wallmount-for-home-assistant-green), [Printables 691723](https://www.printables.com/model/691723-home-assistant-green-wall-mount), [Printables 680691](https://www.printables.com/model/680691-home-assistant-green-wall-mount), and [Thingiverse 6846821](https://www.thingiverse.com/thing:6846821) use the same broad C-channel family. Downloaded sections measure about 112 mm between side walls and about 104 mm between inward returns: roughly 4 mm of clear-lid overlap per side. That is a rear-slide sleeve dimension, not a suitable snap-over value.
 - [Thingiverse 6770609](https://www.thingiverse.com/thing:6770609) uses two side grips and suggests rubber feet to improve retention.
-- [Thingiverse 6846821](https://www.thingiverse.com/thing:6846821) uses a tight ventilated cradle with tie-wrap backup slots.
+- [Thingiverse 6846821](https://www.thingiverse.com/thing:6846821) uses rounded inward return rails over the clear top edge. The rounded return is stronger and less scuff-prone than a sharp hook.
 - [Hive Tech rack mount](https://hivets.au/products/rack-mount-for-home-assistant-green-modular) uses a snug slide-in frame.
-- [MakerWorld 590818](https://makerworld.com/en/models/590818-home-assistant-green-poe-splitter-10-rack-mount#profileId-512398) uses an open X-braced cage for both the Green and a TL-POE10R, followed by separate removable rear retaining frames. It provides positive capture, but one commenter reported repeated breakage at thin diagonal-truss nodes. Its license is BY-NC, and the viewer option is an independent dimensional sketch rather than copied mesh geometry.
+- [MakerWorld 590818](https://makerworld.com/en/models/590818-home-assistant-green-poe-splitter-10-rack-mount#profileId-512398) uses an open X-braced cage over the clear lid plus separate removable rear retaining frames. It proves that positive top capture works in a rack orientation, but one commenter reported repeated breakage at thin diagonal-truss nodes. Its license is BY-NC, and the viewer option is an independent dimensional study rather than copied mesh geometry.
 - [Etsy 4430188404](https://web.archive.org/web/20260207053959/https://www.etsy.com/listing/4430188404/home-assistant-green-10-rack-mount) is a one-piece open-top pocket with tapered side cheeks and shallow end stops. The listing and [Nexus3D assembly guide](https://nexus3d.co.uk/guides/assemble-10-inch-rack-mounts/) describe a deliberately tight fit, with no visible latch, gate, screw, or upper capture feature.
 
 ## Ranked alternatives
 
-1. **Segmented lower-ledge rails plus rear spring latch** — best security, airflow, serviceability, and filament use.
-2. **Four lower corner cups plus a captive sliding or quarter-turn rear gate** — more tolerant of uncertain case geometry, but less direct uplift capture and one extra moving part.
-3. **Separate sliding sled/cage with a captive rear gate** — very robust and replaceable, but costs more filament and parts.
-4. **Rigid rails with small TPU anti-rattle pads plus a hard rear stop** — tolerant and quiet; TPU must not be the only restraint.
-5. **Captive TPU or hook-and-loop strap** — mechanically dependable but visually busier, crosses the top, and consumes scarce vertical clearance.
-6. **Zip ties through existing backup slots** — reliable fallback, but unattractive and potentially obstructive.
-7. **Full X-brace cage plus removable rear cap** — positive capture without Green screws, but heavier, less open, and dependent on a loose gate; thin truss intersections need generous radii and width.
-8. **Direct-seat friction tray** — simplest one-piece option: localized side ribs and shallow end stops are fused into the existing tray, and the Green sits directly on the 3 mm honeycomb tray without the 6.025 mm screw spacers. This is the most sensitive option to printer calibration, underside flatness, surface scuffing, removal cycles, and PETG creep.
+1. **Light guides + localized top-edge catches** — current engineering recommendation for a one-piece, top-loadable prototype. It adds positive lift resistance while keeping the floor, vents, and ports open.
+2. **Direct-seat friction tray** — simplest and still the current production baseline, but sensitive to printer calibration, surface scuffing, removal cycles, and PETG creep.
+3. **Rear-slide C-rails + rear latch/gate** — the most directly community-proven top-capture pattern, but it needs either a separate rear closure or a more complex one-piece latch.
+4. **Four lower corner cups plus a captive rear gate** — tolerant of uncertain case geometry, but adds a moving part.
+5. **Separate sliding sled/cage with a captive rear gate** — robust and replaceable, but costs more filament and parts.
+6. **Rigid rails with TPU anti-rattle pads plus a hard latch** — tolerant and quiet; TPU must not be the only restraint.
+7. **Captive TPU or hook-and-loop strap** — dependable but visually busier and consumes scarce vertical clearance.
+8. **Full X-brace cage plus removable rear cap** — secure, but heavier and vulnerable at thin diagonal intersections.
 
-Avoid top hooks, friction-only side springs, magnets, and adhesive/Dual Lock. Top clearance is too small; PETG friction preload will creep; the heatsink is aluminum; and adhesive can leave residue or interfere with cooling.
+Avoid 4 mm-class community return rails in a top-loading design: those dimensions assume the device slides in from an open end. Also avoid friction-only side springs, thin X lattices, magnets, and adhesive/Dual Lock. The Green can use shallow top catches only if their complete height remains below the real rack clearance and a coupon verifies release without whitening or scuffing.
 
 The browser overlays are form and force-path studies, not finished printable mechanisms. Gate captivity, sled receivers, latch flexures, strap hinges/snaps, mating features, and final tolerances still require engineering and physical coupons. TPU pads are anti-rattle aids rather than standalone positive retention.
 
-## Starting geometry for a PETG prototype
+## Starting geometry for PETG prototypes
 
-- Hard-rail side clearance: 0.4, 0.55, and 0.7 mm coupon variants.
-- Rail segments: 16–20 mm long, 2.4–3.0 mm wall, 6–8 mm high.
-- Lower-ledged capture overlap: approximately 0.8–1.0 mm, only after measuring the actual ledge.
-- Vertical running clearance: 0.3–0.4 mm.
-- Lead-in chamfer: 0.6–0.8 mm.
-- Fixed front stops: 8–12 mm wide at both corners.
-- Rear latch arms: 26–30 mm long, 1.8–2.0 mm thick, 8–10 mm tall.
-- Latch flex: 1.2–1.5 mm; hook depth about 1.0 mm; root fillet at least 1.5 mm.
-- Moving clearance: 0.5–0.6 mm; installed back-clearance: 0.15–0.25 mm so the latch is relaxed when locked.
-- Print flexures flat/in the XY plane with 4–5 walls and elephant-foot compensation.
+- Green lower guide: 0.20 mm/side nominal interference against the measured 109.5375 mm lower footprint, held for only 2.5 mm above the device seat before flaring around the 112 mm cover.
+- Green upper clearance: 0.35 mm/side around the published cover envelope.
+- Green catches: two per side, 18 mm long; 2.4 mm fixed arms on the left and 2.8 mm spring arms on the accessible right side.
+- Green clip coupon: 1.4, 1.8, and 2.2 mm reach, identified by one, two, and three holes. The 1.8 mm viewer value is provisional.
+- Green catch underside: 0.30 mm above the modeled top; 0.30 mm nearly-flat nose with a 45-degree lower support face. Maximum prototype height is 42.55 mm.
+- TP-Link lower bevel: 0.50 mm/side relief at the floor, transitioning to the 0.05 mm/side body-band fit over 3.5 mm.
+- TP-Link clip: 14 mm long, 1.6 mm thick external arm with a 0.60 mm gap from the existing wall, 0.50 mm top clearance, and a 0.30 mm catch nose.
+- TP-Link clip coupon: fixed catches remain 1.2 mm while the spring catches test 0.8, 1.2, and 1.6 mm reach, identified by one, two, and three holes. The four-clip viewer uses 0.8 mm spring catches.
+- Print tray-down in PETG or ASA at 0.20 mm layers with 4–5 walls. The tall Green coupon pieces need a 5 mm slicer brim.
 
 Design target: at least 25–30 N extraction resistance and 20 N lift/tilt resistance. The Green weighs about 340 g, or 3.34 N statically.
 
 ## Measurements needed before the full CAD revision
 
-Official material does not publish the lower-base retention geometry. Measure with calipers:
+Official material does not publish the taper cross-section. Measure with calipers if possible:
 
 - maximum width/depth at the dark lower base;
-- ledge projection or undercut on each side;
-- ledge thickness and height above the bottom;
+- maximum clear-cover width at the catch height;
+- top-face width immediately inside the clear edge;
+- height where the lower black base transitions to the clear cover;
 - lower-base corner radius;
 - flat support areas versus cooling fins;
 - port-edge keep-out;
@@ -75,10 +75,10 @@ No complete official Green enclosure CAD was found. The closest device-part refe
 
 ## Validation sequence
 
-1. Print three 25–30 mm rail coupons with 0.4/0.55/0.7 mm clearance.
-2. Print a latch comb with 1.6/1.8/2.0 mm beams and 0.8/1.0 mm hooks.
-3. Print a 35–40 mm combined rail-and-latch section.
-4. Require insertion below 10 N, deliberate release below 15 N, unassisted extraction above 25 N, 50 cycles without whitening/cracks, and a warm 10–20 N load test.
+1. Print `green_hybrid_clip_coupon` and test the one-hole 1.4 mm catch first, then 1.8 and 2.2 mm only as needed.
+2. Print `splitter_hybrid_clip_coupon` and test the one-hole 0.8 mm spring catch first, then 1.2 and 1.6 mm.
+3. Select the first variant that visibly overlaps the top edge, holds when gently inverted, and releases without whitening or surface scuffing.
+4. After the coupon fit is chosen, generate one complete hybrid tray and perform at least 50 install/remove cycles plus a warm cable-pull test before promoting it to the canonical print.
 
 ## Sources
 
