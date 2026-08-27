@@ -111,7 +111,7 @@ The viewer is a hand-built HTML page using Google's open-source `<model-viewer>`
 - `x2d_plate.stl` / `.3mf` — canonical split core and both ears nested for the X2D dual-nozzle area
 - `left_ear.stl` / `right_ear.stl` — detachable rack ears for `core.stl`
 - `led_insert_optional.stl` and `led_fixed_window_kit_optional.stl` / `.3mf` — optional self-retaining translucent insert comparison
-- `friction_fit_coupon.stl` / `.3mf` — three short smooth-wall test channels at 0.00, 0.10, and 0.20 mm interference per side; use the least aggressive level that holds the actual Green without scuffing it
+- `friction_fit_coupon.stl` / `.3mf` — follow-up smooth-wall channels at 0.25, 0.30, and 0.35 mm interference per side. The original three-hole 0.20 mm/side coupon was a near-perfect clearance fit but did not grip, so test these in order and use the first one that holds without scuffing.
 - `splitter_fit_coupon.stl` / `.3mf` — three short open-ended smooth-wall test channels at 0.00, 0.05, and 0.10 mm interference per side for the TP-Link body; use the least aggressive level that holds before committing to its full-length friction cradle
 - `assembly.stl` — reference assembly only; print the separate parts above
 - `fit_test.stl` / `.3mf` — general device-clearance check
@@ -166,7 +166,7 @@ The supplied 3MF is geometry-only, not a pre-sliced Bambu project. In Bambu Stud
 
 The production LED window is intentionally left open, so there is no lens, shutter blade, or retainer to print or assemble. The optional translucent insert can still be generated for comparison if dust protection is preferred later.
 
-Print `friction_fit_coupon.stl` first and use the least aggressive channel that holds the actual Green without scuffing it. Then print `splitter_fit_coupon.stl` and select the least aggressive channel that securely holds the TP-Link body. Printer calibration, material, and long-term PETG relaxation all affect these fits.
+Print `friction_fit_coupon.stl` first. Its one-, two-, and three-hole channels are now 0.25, 0.30, and 0.35 mm interference per side; use the first one that holds the actual Green without scuffing it. The enclosure narrows toward the top, so the physically measured 109.54 mm bottom footprint remains the controlling tray dimension. Then print `splitter_fit_coupon.stl` and select the least aggressive channel that securely holds the TP-Link body. Printer calibration, material, and long-term PETG relaxation all affect these fits.
 
 ## Electrical safety
 

@@ -2717,8 +2717,9 @@ module friction_fit_coupon_single(interference = 0.10,
             }
         }
 
-        // One, two, or three small through-holes identify the 0.00, 0.10,
-        // and 0.20 mm-per-side coupons after they are removed from the plate.
+        // One, two, or three small through-holes identify the 0.25, 0.30,
+        // and 0.35 mm-per-side follow-up coupons after the first 0.00/0.10/
+        // 0.20 test showed that 0.20 was only a near-perfect clearance fit.
         for (mark = [0 : marker_count - 1])
             translate([7.0 + mark * 4.0, coupon_d / 2, -epsilon])
                 cylinder(h = coupon_base_h + 2 * epsilon,
@@ -2727,7 +2728,7 @@ module friction_fit_coupon_single(interference = 0.10,
 }
 
 module friction_fit_coupon() {
-    values = [0.00, 0.10, 0.20];
+    values = [0.25, 0.30, 0.35];
     for (index = [0 : len(values) - 1])
         translate([0, index * 20.0, 0])
             friction_fit_coupon_single(

@@ -16,8 +16,8 @@
     "sha256": "8b1e7dbafeea23aaec7e65da9fe89d58d56f3164b1ab081ad1fa0b4a81d98010"
   },
   "README.md": {
-    "bytes": 29994,
-    "sha256": "ed38f773010cba4e16c545865eb5d3ce712061cca586eea1834605651581c87f"
+    "bytes": 30286,
+    "sha256": "7046096b00eeba888b3ed87a917ff35a208ae1f4de523576c5041122cb6f8831"
   },
   "assets/home-assistant-logo.svg": {
     "bytes": 678,
@@ -33,7 +33,7 @@
   },
   "customizer/app.js": {
     "bytes": 25503,
-    "sha256": "0a039e3df0426e783dd4eb1b76bcfe84e8c74a19911ebe51d080bbba47da5253"
+    "sha256": "61ae39cb9da39c3930eda66a002b9374bc6dc3e13311078194494fc6895152e3"
   },
   "customizer/index.html": {
     "bytes": 12989,
@@ -156,12 +156,12 @@
     "sha256": "082cfe4a57fb6ceae07e4f195825b35f0dcc8a5e5cc3454dca6244359b2e72d3"
   },
   "exports/friction_fit_coupon.3mf": {
-    "bytes": 40127,
-    "sha256": "5474adfac72c487f9e258dd02612ab873085a3398519c479c9958785125c40a6"
+    "bytes": 39990,
+    "sha256": "7b7b312cad5dea91050b2bd60765e326efcee5a81ef6757f3b4c7d9e8475185f"
   },
   "exports/friction_fit_coupon.stl": {
-    "bytes": 155084,
-    "sha256": "6e0b1198ac1e46b83550040ac8c2868aaa400203c7ee6b457181666d65d01849"
+    "bytes": 154684,
+    "sha256": "bf09399ea5ea279eae885f27cef55ea80fd44c5a9668df3d39b874caf16a3f68"
   },
   "exports/green_spacer_legacy_screw_tray.stl": {
     "bytes": 20884,
@@ -416,8 +416,8 @@
     "sha256": "c3e1d1deaa744fd64c7330d8b178ca006aa2b5f8397b2027e94859eef9ae5d02"
   },
   "ha_green_rack.scad": {
-    "bytes": 135339,
-    "sha256": "4414fcd481bc89e5e10a1a19781105d8a5fcc293b677bbb4660845dee6cc108f"
+    "bytes": 135414,
+    "sha256": "44ca9aaa08941ec9383861e67aef061dd7a28f36f83de95aac5d165afd2fb98d"
   },
   "index.html": {
     "bytes": 417,
