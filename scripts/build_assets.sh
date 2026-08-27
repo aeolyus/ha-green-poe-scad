@@ -5,7 +5,11 @@ project_dir="$(cd "$(dirname "$0")/.." && pwd)"
 viewer_build_jobs="${VIEWER_BUILD_JOBS:-4}"
 
 cd "$project_dir"
+read -r OPENSCAD_SUPPORTS_BACKEND OPENSCAD_SUPPORTS_EXPORT_FORMAT \
+  < <(python3 scripts/openscad_export.py --features)
+export OPENSCAD_SUPPORTS_BACKEND OPENSCAD_SUPPORTS_EXPORT_FORMAT
 python3 scripts/openscad_export.py --check
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest scripts/test_openscad_export.py
 if ! [[ "$viewer_build_jobs" =~ ^[1-9][0-9]*$ ]]; then
   echo "VIEWER_BUILD_JOBS must be a positive integer" >&2
   exit 1

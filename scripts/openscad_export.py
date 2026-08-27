@@ -76,6 +76,10 @@ def without_controlled_options(arguments: Sequence[str]) -> list[str]:
 
 
 def engine_features(engine: str) -> tuple[bool, bool]:
+    cached_backend = os.environ.get("OPENSCAD_SUPPORTS_BACKEND")
+    cached_format = os.environ.get("OPENSCAD_SUPPORTS_EXPORT_FORMAT")
+    if cached_backend is not None and cached_format is not None:
+        return cached_backend == "1", cached_format == "1"
     completed = subprocess.run(
         [engine, "--help"],
         stdout=subprocess.PIPE,
@@ -173,16 +177,33 @@ def validate_stl(path: Path) -> tuple[bool, str]:
         if not triangles:
             raise ValueError("STL contains no triangles")
 
-        edge_counts: dict[tuple[Vertex, Vertex], list[int]] = {}
-        signed_volume_times_six = 0.0
-        for first, second, third in triangles:
+        edge_counts: dict[tuple[Vertex, Vertex], list[int | list[int]]] = {}
+        vertex_triangles: dict[Vertex, list[int]] = {}
+        triangle_volumes: list[float] = []
+        parents = list(range(len(triangles)))
+
+        def find(value: int) -> int:
+            while parents[value] != value:
+                parents[value] = parents[parents[value]]
+                value = parents[value]
+            return value
+
+        def join(left: int, right: int) -> None:
+            left = find(left)
+            right = find(right)
+            if left != right:
+                parents[right] = left
+
+        for triangle_index, (first, second, third) in enumerate(triangles):
             if first == second or second == third or third == first:
                 raise ValueError("STL contains a degenerate triangle")
-            signed_volume_times_six += (
+            triangle_volumes.append(
                 first[0] * (second[1] * third[2] - second[2] * third[1])
                 - first[1] * (second[0] * third[2] - second[2] * third[0])
                 + first[2] * (second[0] * third[1] - second[1] * third[0])
             )
+            for vertex in (first, second, third):
+                vertex_triangles.setdefault(vertex, []).append(triangle_index)
             for start, end in (
                 (first, second),
                 (second, third),
@@ -194,9 +215,11 @@ def validate_stl(path: Path) -> tuple[bool, str]:
                 else:
                     key = (end, start)
                     direction = -1
-                use = edge_counts.setdefault(key, [0, 0])
-                use[0] += 1
-                use[1] += direction
+                use = edge_counts.setdefault(key, [0, 0, []])
+                use[0] = int(use[0]) + 1
+                use[1] = int(use[1]) + direction
+                assert isinstance(use[2], list)
+                use[2].append(triangle_index)
 
         boundary_edges = sum(use[0] == 1 for use in edge_counts.values())
         overused_edges = sum(use[0] > 2 for use in edge_counts.values())
@@ -208,9 +231,97 @@ def validate_stl(path: Path) -> tuple[bool, str]:
                 f"{len(triangles)} triangles; {boundary_edges} boundary, "
                 f"{overused_edges} over-shared, {winding_edges} winding edges"
             )
-        if abs(signed_volume_times_six) < 1e-12:
-            return False, f"{len(triangles)} triangles; zero signed volume"
-        return True, f"{len(triangles)} triangles; closed 2-manifold"
+        for use in edge_counts.values():
+            triangle_pair = use[2]
+            assert isinstance(triangle_pair, list) and len(triangle_pair) == 2
+            join(triangle_pair[0], triangle_pair[1])
+
+        # Edge-manifold checks alone miss a bow-tie vertex where otherwise
+        # closed shells touch at exactly one point. Around every vertex, all
+        # incident triangles must form one edge-connected fan.
+        vertex_edge_pairs: dict[Vertex, list[list[int]]] = {}
+        for edge, use in edge_counts.items():
+            pair = use[2]
+            assert isinstance(pair, list)
+            vertex_edge_pairs.setdefault(edge[0], []).append(pair)
+            vertex_edge_pairs.setdefault(edge[1], []).append(pair)
+        for vertex, incident in vertex_triangles.items():
+            if len(incident) <= 1:
+                continue
+            local_parent = {triangle: triangle for triangle in incident}
+
+            def local_find(value: int) -> int:
+                while local_parent[value] != value:
+                    local_parent[value] = local_parent[local_parent[value]]
+                    value = local_parent[value]
+                return value
+
+            for pair in vertex_edge_pairs.get(vertex, []):
+                left = local_find(pair[0])
+                right = local_find(pair[1])
+                if left != right:
+                    local_parent[right] = left
+            if len({local_find(triangle) for triangle in incident}) != 1:
+                return False, (
+                    f"{len(triangles)} triangles; non-manifold vertex fan"
+                )
+
+        component_volumes: dict[int, float] = {}
+        component_bounds: dict[int, list[list[float]]] = {}
+        for triangle_index, triangle in enumerate(triangles):
+            root = find(triangle_index)
+            component_volumes[root] = (
+                component_volumes.get(root, 0.0)
+                + triangle_volumes[triangle_index]
+            )
+            bounds = component_bounds.setdefault(
+                root,
+                [[math.inf, math.inf, math.inf],
+                 [-math.inf, -math.inf, -math.inf]],
+            )
+            for vertex in triangle:
+                for axis in range(3):
+                    bounds[0][axis] = min(bounds[0][axis], vertex[axis])
+                    bounds[1][axis] = max(bounds[1][axis], vertex[axis])
+
+        zero_components = [
+            root for root, volume in component_volumes.items()
+            if abs(volume) < 1e-12
+        ]
+        if zero_components:
+            return False, (
+                f"{len(triangles)} triangles; zero-volume component"
+            )
+
+        # Negative shells are valid only when they represent a cavity nested
+        # inside a positive shell. This rejects a detached inward-wound solid
+        # while preserving legitimate enclosed voids.
+        positive_roots = [
+            root for root, volume in component_volumes.items() if volume > 0
+        ]
+        for root, volume in component_volumes.items():
+            if volume > 0:
+                continue
+            inner = component_bounds[root]
+            contained = any(
+                all(
+                    component_bounds[outer][0][axis] <= inner[0][axis]
+                    and component_bounds[outer][1][axis] >= inner[1][axis]
+                    for axis in range(3)
+                )
+                for outer in positive_roots
+            )
+            if not contained:
+                return False, (
+                    f"{len(triangles)} triangles; detached inward-wound shell"
+                )
+
+        if sum(component_volumes.values()) <= 1e-12:
+            return False, f"{len(triangles)} triangles; non-positive volume"
+        return True, (
+            f"{len(triangles)} triangles; {len(component_volumes)} component(s); "
+            "closed 2-manifold"
+        )
     except (OSError, ValueError, struct.error) as error:
         return False, str(error)
 
@@ -287,6 +398,12 @@ def validated_stl_export(
 
 def main() -> int:
     engine = select_engine()
+    if len(sys.argv) == 2 and sys.argv[1] == "--features":
+        if not engine or not shutil.which(engine):
+            return 127
+        supports_backend, supports_export_format = engine_features(engine)
+        print(int(supports_backend), int(supports_export_format))
+        return 0
     if len(sys.argv) == 2 and sys.argv[1] == "--check":
         if not engine or not shutil.which(engine):
             print(

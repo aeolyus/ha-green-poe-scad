@@ -15,6 +15,16 @@ The root page redirects to the combined customizer and live 3D viewer. All
 paths are relative, so the project works under GitHub Pages' repository
 subdirectory. Browser STL/3MF generation also runs entirely client-side.
 
+After copying a fresh project build into the repository, run:
+
+```bash
+python3 scripts/prepare_static_site.py .
+```
+
+This replaces the offline viewer's embedded GLB data with relative file URLs
+and regenerates `SITE_MANIFEST.json`, keeping the hosted HTML small while
+preserving the standalone viewer in the source project.
+
 ## Before making the repository public
 
 The project source is MIT licensed. The vendored OpenSCAD WebAssembly runtime

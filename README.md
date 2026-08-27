@@ -5,13 +5,13 @@ GitHub Pages site: <https://aeolyus.github.io/ha-green-poe-scad/>
 Designed for:
 
 - DeskPi/GeeekPi RackMate T2 12U, 10-inch rack
-- Home Assistant Green (112 × 112 × 32 mm)
+- Home Assistant Green (official 112 × 112 × 32 mm envelope; measured tray-contact footprint 109.54 × 109.54 mm)
 - TP-Link TL-PD30G-M2 2.5G PoE+ splitter (80.8 × 54 × 24 mm body)
 - Bambu Lab X2D
 
 The canonical printable edition is the final selected design: **rear cable entry, 60 mm cable-friendly splitter setback, an integrated Green friction tray with four raised support pads, a plain front with no logo, an open LED viewing aperture with no shutter or lens, visible LEDs, and no surrounding chassis**. The unqualified `core`, `one_piece`, and `x2d_plate` exports all use that combination.
 
-Smooth continuous tray walls provide a light 0.10 mm-per-side friction fit around the Green. A 3 mm lead-in chamfer opens to 0.50 mm-per-side clearance for insertion, and low front/rear stops resist sliding without localized ribs, tabs, or clips. Four broad lands centered on the factory mounting locations carry the Green at the normal 9.025 mm device height while the original 3 mm ventilated honeycomb floor remains low and open. The support and walls are fused into the mount; there is no separate sleeve or Green mounting hardware.
+Smooth continuous tray walls target a light 0.10 mm-per-side friction fit around the physically measured 109.54 mm lower footprint. A 3 mm lead-in chamfer opens to 0.50 mm-per-side clearance for insertion, and low front/rear stops resist sliding without localized ribs, tabs, or clips. Four broad lands centered on the factory mounting locations carry the Green at the normal 9.025 mm device height while the original 3 mm ventilated honeycomb floor remains low and open. The support and walls are fused into the mount; there is no separate sleeve or Green mounting hardware.
 
 All device ports face the rear. The TP-Link splitter sits straight on the left with its POWER+DATA IN port toward the rack rear. Its cradle uses continuous side walls with a conservative 0.05 mm-per-side interference, a 3 mm lead-in chamfer, and four low corner stops that leave both connector centers open. Its LAN/DC outputs face the front internally, and both short jumpers route through the open lane between the two trays before reaching the Green's rear ports.
 

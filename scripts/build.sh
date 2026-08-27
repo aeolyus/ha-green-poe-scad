@@ -68,6 +68,9 @@ retention_is_valid() {
 }
 
 require_openscad() {
+  read -r OPENSCAD_SUPPORTS_BACKEND OPENSCAD_SUPPORTS_EXPORT_FORMAT \
+    < <(python3 scripts/openscad_export.py --features)
+  export OPENSCAD_SUPPORTS_BACKEND OPENSCAD_SUPPORTS_EXPORT_FORMAT
   if ! python3 scripts/openscad_export.py --check; then
     echo "Use the Nix command documented in README.md." >&2
     exit 1

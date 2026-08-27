@@ -1126,6 +1126,17 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
   .dimensions { color: #896115; font-variant-numeric: tabular-nums; }
   .viewer-stage { min-width: 0; min-height: 0; position: relative; }
   model-viewer { width: 100%; height: 100%; min-height: 0; background: radial-gradient(circle at 50% 42%, #fff 0, #eef1ee 72%); --poster-color: transparent; }
+  .measurement-overlay { position: absolute; z-index: 2; left: 12px; bottom: 12px; width: min(480px, calc(100% - 24px)); padding: 8px; border: 1px solid rgba(137, 97, 21, 0.32); border-radius: 11px; background: rgba(255, 253, 247, 0.90); box-shadow: 0 4px 18px rgba(23, 54, 42, 0.12); backdrop-filter: blur(8px); pointer-events: none; font-variant-numeric: tabular-nums; }
+  .measurement-heading { display: flex; justify-content: space-between; gap: 8px; margin: 0 2px 6px; color: #74500f; font-size: 10px; font-weight: 750; letter-spacing: 0.06em; text-transform: uppercase; }
+  .measurement-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+  .measurement-item { min-width: 0; padding: 6px 7px; border-radius: 7px; background: rgba(255, 255, 255, 0.82); }
+  .measurement-label { display: flex; gap: 5px; align-items: center; color: #63716b; font-size: 9.5px; line-height: 1.1; text-transform: uppercase; }
+  .measurement-axis { display: inline-grid; place-items: center; min-width: 17px; height: 17px; border-radius: 5px; background: #e69a24; color: #fff; font-size: 10px; font-weight: 800; }
+  .measurement-value { display: block; margin-top: 3px; color: #17362a; font-size: 12.5px; line-height: 1.15; white-space: nowrap; }
+  .measurement-value small { color: #6b7772; font-size: 10.5px; font-weight: 500; }
+  .measurement-clearance { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; margin-top: 5px; padding: 6px 7px; border-radius: 7px; background: #f8ebcf; color: #664710; font-size: 11px; }
+  .measurement-clearance strong { color: #563b0a; white-space: nowrap; }
+  .measurement-detail { margin-top: 4px; padding: 0 3px; color: #77633b; font-size: 9.5px; line-height: 1.2; }
   footer { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; padding: 9px 1px 2px; }
   button, a { border: 1px solid #c8d2cd; background: white; color: #17362a; border-radius: 999px; padding: 6px 9px; font: inherit; font-size: 12px; line-height: 1.15; text-decoration: none; cursor: pointer; }
   button:hover, a:hover { border-color: #31a66a; }
@@ -1137,6 +1148,17 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
     main { height: auto; min-height: 100vh; display: block; overflow: visible; }
     .sidebar { overflow: visible; border-right: 0; border-bottom: 1px solid #d5ddd9; padding: 12px; }
     .viewer-stage { height: 68vh; min-height: 460px; }
+    .measurement-overlay { left: 10px; bottom: 10px; width: calc(100% - 20px); }
+  }
+  @media (max-width: 430px) {
+    .measurement-overlay { padding: 6px; }
+    .measurement-heading { margin-bottom: 4px; }
+    .measurement-grid { gap: 3px; }
+    .measurement-item { padding: 5px; }
+    .measurement-label { font-size: 8.5px; }
+    .measurement-value { font-size: 11px; }
+    .measurement-value small { display: block; font-size: 9px; }
+    .measurement-clearance { align-items: flex-start; font-size: 10px; }
   }
   html.embedded-viewer body { background: transparent; }
   html.embedded-viewer main { display: block; height: 100vh; overflow: hidden; }
@@ -1165,12 +1187,20 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
           <button data-splitter="sics" aria-pressed="false">SICSOLINK study</button>
         </div>
       </div>
+      <div class="subcontrol" id="arrangement-section">
+        <span class="option-label">Device arrangement</span>
+        <div class="control-row" role="group" aria-label="Device arrangement">
+          <button data-arrangement="side_by_side" aria-pressed="true">Side-by-side</button>
+          <button data-arrangement="stacked_center" aria-pressed="false">Centered · PoE behind</button>
+        </div>
+      </div>
       <div class="subcontrol" id="spacing-section">
         <span class="option-label">Rear spacing</span>
         <div class="control-row" role="group" aria-label="TP-Link splitter spacing">
           <button data-spacing="compact" aria-pressed="false">Compact · 35</button>
-          <button data-spacing="balanced" aria-pressed="false">Balanced · 47.5</button>
+          <button data-spacing="balanced" aria-pressed="false">Balanced · 1.75 in clear</button>
           <button data-spacing="cable_friendly" aria-pressed="true">Cable-friendly · 60</button>
+          <button data-spacing="unified_roof" aria-pressed="false">Bottom-aligned · unified frame</button>
         </div>
       </div>
       <div class="subcontrol" id="entry-section">
@@ -1190,6 +1220,9 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
       <legend>Retention</legend>
       <div class="control-row" role="group" aria-label="Home Assistant Green retention concept">
         <button data-retention="friction_sleeve" aria-pressed="true">Raised tray friction fit</button>
+        <button data-retention="hybrid_clips" aria-pressed="false">Hybrid top clips · Green + PoE</button>
+        <button data-retention="ventilated_sleeves" aria-pressed="false">Rounded vent-frame cages · Green + PoE</button>
+        <button data-retention="dovetail_gates" aria-pressed="false">Vent-frame cages + dovetail gates</button>
         <button data-retention="factory_screws" aria-pressed="false">M3 screws</button>
         <button data-retention="slide_latch" aria-pressed="false">Slide + latch</button>
         <button data-retention="corner_gate" aria-pressed="false">Corner gate</button>
@@ -1201,8 +1234,9 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
       <div class="subcontrol" id="friction-support-section">
         <span class="option-label">Friction-tray support</span>
         <div class="control-row" role="group" aria-label="Friction tray support style">
+          <button data-friction-support="raised" aria-pressed="true">Unified raised deck</button>
           <button data-friction-support="full" aria-pressed="false">Full honeycomb</button>
-          <button data-friction-support="pads" aria-pressed="true">Four pads</button>
+          <button data-friction-support="pads" aria-pressed="false">Four pads</button>
           <button data-friction-support="skeletal" aria-pressed="false">Open frame</button>
         </div>
       </div>
@@ -1253,10 +1287,11 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
   <div class="context-status" role="status" aria-live="polite" aria-atomic="true">
     <p id="layout-status">TP-Link · rear · cable-friendly spacing.</p>
     <p class="retention-note" id="retention-note">Raised tray friction fit selected.</p>
-    <p class="retention-note" id="friction-support-note">Tray support: Four pads — production selection with a low ventilated floor.</p>
+    <p class="retention-note" id="friction-support-note">Tray support: Unified raised deck — thin honeycomb at device height with no riser columns.</p>
     <p class="protection-note" id="protection-note">Optional protection: Open tray — default and lowest-filament option.</p>
     <p class="variant-note" id="variant-note">Straight-cable baseline with room for ordinary molded plugs and rounded bends.</p>
-    <p class="dimensions" id="dimensions">254 W × 43 H × 143.7 D mm · 10 mm ruler ticks</p>
+    <p class="dimensions" id="dimensions">254 W × 44.45 H × 143.7 D mm · 10 mm ruler ticks</p>
+    <p class="dimensions" id="poe-clearance">Panel inside → PoE front: 57 mm / 2.24 in · after 25 mm boot: 32 mm / 1.26 in</p>
   </div>
 <footer>
   <a id="layout-download" href="home-assistant-green-rack-cable_friendly-no_shutter.glb" download>Download all-options comparison GLB</a>
@@ -1268,19 +1303,65 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
 </aside>
 <section class="viewer-stage" aria-label="Interactive 3D model">
   <model-viewer id="rack" camera-controls auto-rotate-delay="1500" rotation-per-second="16deg" shadow-intensity="0.9" shadow-softness="0.8" exposure="1.05" environment-image="neutral" camera-orbit="28deg 68deg 120%" min-camera-orbit="auto 20deg 65%" max-camera-orbit="auto 155deg 260%" interaction-prompt="auto" alt="Interactive 3D preview of a Home Assistant Green and PoE splitter in a white 10-inch rack mount"></model-viewer>
+  <aside class="measurement-overlay" id="measurement-overlay" aria-label="Model ruler measurements" aria-live="polite" aria-atomic="true">
+    <div class="measurement-heading">
+      <span>Gold ruler readout</span>
+      <span>10 mm ticks</span>
+    </div>
+    <div class="measurement-grid">
+      <div class="measurement-item">
+        <span class="measurement-label"><span class="measurement-axis">X</span>Panel width</span>
+        <strong class="measurement-value" id="measure-width">254 mm <small>/ 10.00 in</small></strong>
+      </div>
+      <div class="measurement-item">
+        <span class="measurement-label"><span class="measurement-axis">Z</span>Panel height</span>
+        <strong class="measurement-value" id="measure-height">44.45 mm <small>/ 1.750 in</small></strong>
+      </div>
+      <div class="measurement-item">
+        <span class="measurement-label"><span class="measurement-axis">Y</span><span id="measure-depth-label">Mount depth</span></span>
+        <strong class="measurement-value" id="measure-depth">143.7 mm <small>/ 5.66 in</small></strong>
+      </div>
+    </div>
+    <div class="measurement-clearance" id="measurement-clearance-row">
+      <span id="measurement-clearance-label">Panel → PoE face</span>
+      <strong id="measurement-clearance-value">57 mm / 2.24 in</strong>
+    </div>
+    <div class="measurement-detail" id="measurement-clearance-detail">After 25 mm boot: 32 mm / 1.26 in</div>
+  </aside>
 </section>
 </main>
 <script>
-  const RETENTION_OPTIONS = /* RETENTION_OPTIONS_START */ {"factory_screws":{"id":"factory_screws","label":"Current M3 screws","short_label":"M3 screws","material_name":"Green retention \u2014 current M3 screws","roughness":0.42,"printable":true,"note":"The best-documented baseline: four M3\u00d725 screws and locating spacers use the Green's factory bottom holes. Strongest and least tolerance-sensitive, but this mount still needs a physical fit test and removal needs a hex key.","highlight":[0.4117647058823529,0.45098039215686275,0.5098039215686274,1.0]},"slide_latch":{"id":"slide_latch","label":"Slide rails + rear latch (earlier engineering recommendation)","short_label":"Slide + latch","material_name":"Green retention \u2014 segmented rails + rear latch","roughness":0.58,"printable":false,"note":"Earlier engineering recommendation: four short lower-edge shoes guide the Green into place; two rear thumb latches provide positive retention. Best balance of airflow, serviceability, strength, and material, pending a caliper/coupon check of the lower-base ledge.","highlight":[0.13333333333333333,0.6509803921568628,0.8627450980392157,1.0]},"corner_gate":{"id":"corner_gate","label":"Corner cups + captive rear gate","short_label":"Corner gate","material_name":"Green retention \u2014 corner cups + rear gate","roughness":0.58,"printable":false,"note":"Four low corner cups locate the enclosure and a captive low rear gate blocks withdrawal. More tolerant than lip-fitting rails, but adds a separate moving part.","highlight":[0.9607843137254902,0.6196078431372549,0.043137254901960784,1.0]},"sled_gate":{"id":"sled_gate","label":"Separate removable sled + rear gate","short_label":"Removable sled","material_name":"Green retention \u2014 separate sled + rear gate","roughness":0.58,"printable":false,"note":"The Green rides in an open U-frame that slides out as a unit. It is robust and replaceable, while costing the most parts and filament of the screwless concepts.","highlight":[0.5450980392156862,0.3607843137254902,0.9647058823529412,1.0]},"padded_rails":{"id":"padded_rails","label":"Rigid rails + TPU anti-rattle pads","short_label":"TPU pads","material_name":"Green retention \u2014 rails + TPU pads","roughness":0.75,"printable":false,"note":"Small compliant pads preload the Green against rigid rails and hard stops. Excellent for eliminating rattle, but it still needs a positive latch for dependable uplift retention.","highlight":[0.48627450980392156,0.22745098039215686,0.9294117647058824,1.0]},"captive_strap":{"id":"captive_strap","label":"Captive TPU strap","short_label":"Captive strap","material_name":"Green retention \u2014 captive strap","roughness":0.78,"printable":false,"note":"A hinged TPU strap stays attached when open, so there is no loose cover or clip. It is tolerant and secure, but consumes most of the roughly 2 mm remaining 1U clearance.","highlight":[0.6588235294117647,0.3333333333333333,0.9686274509803922,1.0]},"x_cage":{"id":"x_cage","label":"X-brace cage + removable rear cap","short_label":"X-brace cage","material_name":"Green retention \u2014 X-brace cage + rear cap","roughness":0.6,"printable":false,"note":"Inspired by MakerWorld 590818: the Green slides into a full open cage, diagonal top braces prevent lift, and a separate rear frame closes the sleeve. Very secure, but heavier and less open; one user reported thin truss nodes breaking.","highlight":[0.054901960784313725,0.4549019607843137,0.5647058823529412,1.0]},"friction_sleeve":{"id":"friction_sleeve","label":"Integrated raised-tray friction fit","short_label":"Tray friction fit","material_name":"Green tray friction \u2014 full honeycomb","roughness":0.62,"printable":true,"note":"Selected production retention: smooth continuous side walls and shallow front/rear stops are built into the tray and hold the Green with a close interference fit. A 3 mm lead-in chamfer guides insertion without localized ribs, tabs, or clips. The support remains fused into the tray at the normal LED height, with Four pads selected and full-honeycomb/open-frame variants available for comparison. There is no separate sleeve to print. Print the fit coupon before the full plate and check for surface scuffing and long-term PETG relaxation.","highlight":[0.06274509803921569,0.7254901960784313,0.5058823529411764,1.0]}} /* RETENTION_OPTIONS_END */;
-  const FRICTION_SUPPORT_OPTIONS = /* FRICTION_SUPPORT_OPTIONS_START */ {"full":{"id":"full","label":"Full honeycomb","material_name":"Green tray friction \u2014 full honeycomb","roughness":0.62,"note":"The continuous raised honeycomb/perimeter deck supports the whole underside. This remains available as the higher-material compatibility comparison."},"pads":{"id":"pads","label":"Four pads","material_name":"Green tray friction \u2014 four pads","roughness":0.62,"note":"The original 3 mm honeycomb floor stays low while four broad lands at the factory mounting locations carry the Green at its normal height. This is the selected production support."},"skeletal":{"id":"skeletal","label":"Open frame","material_name":"Green tray friction \u2014 open frame","roughness":0.62,"note":"An exact perimeter, two crossbars, a center spine, and four support lands replace the full floor for the most open, lowest-material comparison."}} /* FRICTION_SUPPORT_OPTIONS_END */;
-  RETENTION_OPTIONS.friction_sleeve.note = "Inspired by Etsy 4430188404: smooth continuous side walls and shallow front/rear stops hold the Green with a close interference fit. A 3 mm lead-in chamfer guides insertion without localized ribs, tabs, or clips. Support remains fused into the tray at the normal LED height, with full-honeycomb, four-pad, and open-frame comparisons. There is no separate sleeve to print. The concept remains sensitive to print tolerance, surface scuffing, and long-term PETG relaxation.";
+  const RETENTION_OPTIONS = /* RETENTION_OPTIONS_START */ {"factory_screws":{"id":"factory_screws","label":"Current M3 screws","short_label":"M3 screws","material_name":"Green retention \u2014 current M3 screws","roughness":0.42,"printable":true,"note":"The best-documented baseline: four M3\u00d725 screws and locating spacers use the Green's factory bottom holes. Strongest and least tolerance-sensitive, but this mount still needs a physical fit test and removal needs a hex key.","highlight":[0.4117647058823529,0.45098039215686275,0.5098039215686274,1.0]},"slide_latch":{"id":"slide_latch","label":"Slide rails + rear latch (earlier engineering recommendation)","short_label":"Slide + latch","material_name":"Green retention \u2014 segmented rails + rear latch","roughness":0.58,"printable":false,"note":"Earlier engineering recommendation: four short lower-edge shoes guide the Green into place; two rear thumb latches provide positive retention. Best balance of airflow, serviceability, strength, and material, pending a caliper/coupon check of the lower-base ledge.","highlight":[0.13333333333333333,0.6509803921568628,0.8627450980392157,1.0]},"corner_gate":{"id":"corner_gate","label":"Corner cups + captive rear gate","short_label":"Corner gate","material_name":"Green retention \u2014 corner cups + rear gate","roughness":0.58,"printable":false,"note":"Four low corner cups locate the enclosure and a captive low rear gate blocks withdrawal. More tolerant than lip-fitting rails, but adds a separate moving part.","highlight":[0.9607843137254902,0.6196078431372549,0.043137254901960784,1.0]},"sled_gate":{"id":"sled_gate","label":"Separate removable sled + rear gate","short_label":"Removable sled","material_name":"Green retention \u2014 separate sled + rear gate","roughness":0.58,"printable":false,"note":"The Green rides in an open U-frame that slides out as a unit. It is robust and replaceable, while costing the most parts and filament of the screwless concepts.","highlight":[0.5450980392156862,0.3607843137254902,0.9647058823529412,1.0]},"padded_rails":{"id":"padded_rails","label":"Rigid rails + TPU anti-rattle pads","short_label":"TPU pads","material_name":"Green retention \u2014 rails + TPU pads","roughness":0.75,"printable":false,"note":"Small compliant pads preload the Green against rigid rails and hard stops. Excellent for eliminating rattle, but it still needs a positive latch for dependable uplift retention.","highlight":[0.48627450980392156,0.22745098039215686,0.9294117647058824,1.0]},"captive_strap":{"id":"captive_strap","label":"Captive TPU strap","short_label":"Captive strap","material_name":"Green retention \u2014 captive strap","roughness":0.78,"printable":false,"note":"A hinged TPU strap stays attached when open, so there is no loose cover or clip. It is tolerant and secure, but the revised physical Green height puts it above the exact 44.45 mm / 1.750 in panel outline.","highlight":[0.6588235294117647,0.3333333333333333,0.9686274509803922,1.0]},"x_cage":{"id":"x_cage","label":"X-brace cage + removable rear cap","short_label":"X-brace cage","material_name":"Green retention \u2014 X-brace cage + rear cap","roughness":0.6,"printable":false,"note":"Inspired by MakerWorld 590818: the Green slides into a full open cage, diagonal top braces prevent lift, and a separate rear frame closes the sleeve. Very secure, but heavier and less open; one user reported thin truss nodes breaking.","highlight":[0.054901960784313725,0.4549019607843137,0.5647058823529412,1.0]},"hybrid_clips":{"id":"hybrid_clips","label":"Hybrid top clips \u00b7 Green + TP-Link","short_label":"Hybrid clips","material_name":"Device retention \u2014 hybrid top clips","roughness":0.56,"printable":false,"note":"Community-informed prototype: smooth one-piece catches overlap the Green's clear top by 1.2 mm. The TP-Link uses matched 1.2 mm rigid catches grown directly from continuous, mirrored mini walls, with no spring tongues or relief slots. The lower guides account for the Green's measured 111.13 mm bottom, 107.95 mm top plateau, 6.35 mm taper start, and the TP-Link's lower bevel. Existing low stops take fore/aft loads. Print the combined two-device clip coupon before production.","highlight":[0.1450980392156863,0.38823529411764707,0.9215686274509803,1.0]},"ventilated_sleeves":{"id":"ventilated_sleeves","label":"Rounded vent-frame cages \u00b7 Green + PoE","short_label":"Rounded frames","material_name":"Device retention \u2014 rounded vent-frame cages","roughness":0.66,"printable":false,"note":"Mauker/UCG-inspired rear-loading concept for TP-Link layouts: thick rounded side frames surround one long capsule vent beside each device. Both thin honeycomb floors and the connecting bridge share the Green's seating height, eliminating separate riser columns. Both cages keep the same snug profile from front to rear. There are no relief cuts, springs, or moving latches. Physical coupons validate snug fits for both devices: the Green uses 0.30 mm side and 0.10 mm roof clearance, while the TP-Link uses 0.10 mm side and 0.05 mm roof clearance. Without moving the Green or LEDs, its 1.60 mm roof finishes at 44.0625 mm, leaving 0.3875 mm below the exact 44.45 mm / 1.750 in panel top. Print the combined Green + PoE 5 mm solid-band vent-frame coupon before committing to a full plate.","highlight":[0.03137254901960784,0.5686274509803921,0.6980392156862745,1.0]},"dovetail_gates":{"id":"dovetail_gates","label":"Vent-frame cages + padless dovetail gates","short_label":"Padless dovetails","material_name":"Device retention \u2014 dovetail rear H-gates","roughness":0.62,"printable":true,"note":"Viewer prototype based on the rounded vent-frame cages. The devices load from the rear, then separate H-shaped gates slide vertically into captured dovetail rails to block withdrawal. The receiver tracks are buried inside locally thickened rear sidewall ends. Each H-frame seats in a matching shallow pocket, so its rear face finishes flush with the cage instead of adding an external block or brim. Each gate uses straight vertical rails and one smooth lower crossbeam instead of separate pads. The crossbeam sits only 0.05 mm behind the solid lower rear face, has a continuous insertion bevel, and leaves the connector field open. Its narrow travel opening is covered by the seated gate's thin stepped top cap, leaving only a 0.02 mm separation while keeping the cage roof visually continuous. The final 7 mm of rail travel still wedges to a nominal line fit, so the seated gate does not lift or rattle freely. Disconnect rear cables before sliding a gate. The full-height gates need about 38 mm (Green) and 25 mm (TP-Link) of clearance above them during installation or removal. The one-piece dovetail-ready mount and a separate two-gate plate are now exported. The friction cages remain the primary retention when the gates are omitted; the gate sliding fit is still physically unvalidated.","highlight":[0.8509803921568627,0.4666666666666667,0.023529411764705882,1.0]},"friction_sleeve":{"id":"friction_sleeve","label":"Integrated raised-tray friction fit","short_label":"Tray friction fit","material_name":"Green tray friction \u2014 unified raised deck","roughness":0.62,"printable":true,"note":"Selected production retention: smooth continuous side walls and shallow front/rear stops are built into the tray and hold the Green with a close interference fit. A 3 mm lead-in chamfer guides insertion without localized ribs, tabs, or clips. The support remains fused into the tray at the normal LED height, with Unified raised deck selected and full-honeycomb, four-pad, and open-frame variants available for comparison. There is no separate sleeve to print. Print the fit coupon before the full plate and check for surface scuffing and long-term PETG relaxation.","highlight":[0.06274509803921569,0.7254901960784313,0.5058823529411764,1.0]}} /* RETENTION_OPTIONS_END */;
+  const FRICTION_SUPPORT_OPTIONS = /* FRICTION_SUPPORT_OPTIONS_START */ {"raised":{"id":"raised","label":"Unified raised deck","material_name":"Green tray friction \u2014 unified raised deck","roughness":0.62,"note":"The original thin honeycomb is lifted directly to the Green's seating plane. It removes the four riser columns and aligns with the raised TP-Link floor and bridge. This is the production choice."},"full":{"id":"full","label":"Full honeycomb","material_name":"Green tray friction \u2014 full honeycomb","roughness":0.62,"note":"The continuous raised honeycomb/perimeter deck supports the whole underside. This remains available as the higher-material compatibility comparison."},"pads":{"id":"pads","label":"Four pads","material_name":"Green tray friction \u2014 four pads","roughness":0.62,"note":"The original 3 mm honeycomb floor stays low while four broad lands at the factory mounting locations carry the Green at its normal height. Retained as the previous production comparison."},"skeletal":{"id":"skeletal","label":"Open frame","material_name":"Green tray friction \u2014 open frame","roughness":0.62,"note":"An exact perimeter, two crossbars, a center spine, and four support lands replace the full floor for the most open, lowest-material comparison."}} /* FRICTION_SUPPORT_OPTIONS_END */;
+  RETENTION_OPTIONS.friction_sleeve.note = "Inspired by Etsy 4430188404: smooth continuous side walls and shallow front/rear stops hold the Green with a close interference fit. A 3 mm lead-in chamfer guides insertion without localized ribs, tabs, or clips. The selected thin honeycomb deck sits directly at device height, with no riser columns; earlier full-honeycomb, four-pad, and open-frame versions remain available for comparison. There is no separate sleeve to print. The concept remains sensitive to print tolerance, surface scuffing, and long-term PETG relaxation.";
+  if (!RETENTION_OPTIONS.ventilated_sleeves) {
+    RETENTION_OPTIONS.ventilated_sleeves = {
+      id: "ventilated_sleeves",
+      label: "Rounded vent-frame cages · Green + PoE",
+      short_label: "Rounded frames",
+      material_name: "Device retention — rounded vent-frame cages",
+      roughness: 0.66,
+      printable: false,
+      note: "Mauker/UCG-inspired rear-loading concept for TP-Link layouts: thick rounded side frames surround one long capsule vent beside each device. Both thin honeycomb floors and the connecting bridge share the Green's seating height, eliminating separate riser columns. Both cages keep the same snug profile from front to rear. There are no relief cuts, springs, or moving latches. After the first physical coupon proved tight, both cages use 0.10 mm nominal clearance per side and above the measured devices. Without moving the Green or LEDs, its 1.60 mm roof finishes at 44.0625 mm, leaving 0.3875 mm below the exact 44.45 mm / 1.750 in panel top. Print the combined Green + PoE 5 mm solid-band vent-frame coupon before committing to a full plate.",
+      highlight: [8 / 255, 145 / 255, 178 / 255, 1],
+    };
+  }
   const viewer = document.querySelector("#rack");
-  const MODEL_VARIANTS = /* MODEL_VARIANTS_START */ {"compact":{"id":"compact","device":"tplink","device_name":"TP-Link TL-PD30G-M2","label":"Compact","setback":"35 mm splitter setback","dimensions":"254 W \u00d7 43 H \u00d7 120 D mm","note":"Collision-aware mockup keeps cable meshes out of the panel, but it can do so only by tightening the RJ45 bend to about 3.7 mm and the DC bend to about 7.6 mm. Orange cables flag those bend-radius violations; this is not a production choice.","filename":"home-assistant-green-rack-compact.glb","no_shutter_filename":"home-assistant-green-rack-compact-no_shutter.glb","src":"home-assistant-green-rack-compact.glb","no_shutter_src":"home-assistant-green-rack-compact-no_shutter.glb"},"balanced":{"id":"balanced","device":"tplink","device_name":"TP-Link TL-PD30G-M2","label":"Balanced","setback":"47.5 mm splitter setback","dimensions":"254 W \u00d7 43 H \u00d7 131.2 D mm","note":"The DC route clears at its full 10 mm radius. The orange Ethernet route clears the panel only at about 16.2 mm rather than the published 21 mm target, so treat this as a slim-cable test fit.","filename":"home-assistant-green-rack-balanced.glb","no_shutter_filename":"home-assistant-green-rack-balanced-no_shutter.glb","src":"home-assistant-green-rack-balanced.glb","no_shutter_src":"home-assistant-green-rack-balanced-no_shutter.glb"},"cable_friendly":{"id":"cable_friendly","device":"tplink","device_name":"TP-Link TL-PD30G-M2","label":"Cable-friendly","setback":"60 mm splitter setback","dimensions":"254 W \u00d7 43 H \u00d7 143.7 D mm","note":"Current printable and straight-cable baseline. Separate X/Z lanes keep both jumpers clear of the panel, devices, and each other while preserving the full 21 mm RJ45 and 10 mm DC bends.","filename":"home-assistant-green-rack-cable_friendly.glb","no_shutter_filename":"home-assistant-green-rack-cable_friendly-no_shutter.glb","src":"home-assistant-green-rack-cable_friendly.glb","no_shutter_src":"home-assistant-green-rack-cable_friendly-no_shutter.glb"},"front_ethernet_right":{"id":"front_ethernet_right","device":"tplink","device_name":"TP-Link TL-PD30G-M2","label":"Front Ethernet \u2014 center gap","setback":"60 mm splitter setback \u00b7 centered gap keystone","dimensions":"254 W \u00d7 43 H \u00d7 143.7 D mm printed mount","note":"Compact front-entry edition: the vertically centered keystone sits in the device gap. Layered LAN/DC/PoE routes preserve their modeled bend radii without increasing printed depth. Use 0.4 m minimum / 0.5 m preferred for both Ethernet jumpers; a 350 mm DC lead is safer than 300 mm.","filename":"home-assistant-green-rack-front_ethernet_right.glb","no_shutter_filename":"home-assistant-green-rack-front_ethernet_right-no_shutter.glb","src":"home-assistant-green-rack-front_ethernet_right.glb","no_shutter_src":"home-assistant-green-rack-front_ethernet_right-no_shutter.glb"},"front_ethernet_far_right":{"id":"front_ethernet_far_right","device":"tplink","device_name":"TP-Link TL-PD30G-M2","label":"Front Ethernet \u2014 HA right","setback":"60 mm splitter setback \u00b7 jack right of HA Green","dimensions":"254 W \u00d7 43 H \u00d7 143.7 D mm \u00b7 one-piece only","note":"The vertically centered keystone sits on the physical right side of the Home Assistant Green. With shutter hardware installed, the flush actuator moves to the window's left side. The incoming PoE jumper keeps a full 21 mm bend radius; use 0.4 m minimum / 0.5 m preferred. This edition is one-piece only because the jack occupies the detachable right-ear joint zone.","filename":"home-assistant-green-rack-front_ethernet_far_right.glb","no_shutter_filename":"home-assistant-green-rack-front_ethernet_far_right-no_shutter.glb","src":"home-assistant-green-rack-front_ethernet_far_right.glb","no_shutter_src":"home-assistant-green-rack-front_ethernet_far_right-no_shutter.glb"},"front_ethernet_left":{"id":"front_ethernet_left","device":"tplink","device_name":"TP-Link TL-PD30G-M2","label":"Front Ethernet \u2014 left","setback":"89 mm splitter setback \u00b7 centered left keystone","dimensions":"254 W \u00d7 43 H \u00d7 172.7 D mm printed mount","note":"Alternate front-entry edition with the vertically centered jack in the left face area. The splitter moves 29 mm rearward so an ordinary straight plug can rise over it with at least the modeled 21 mm bend radius. The cable envelope reaches about 218.3 mm. Use 0.4 m minimum / 0.5 m preferred for the front PoE jumper.","filename":"home-assistant-green-rack-front_ethernet_left.glb","no_shutter_filename":"home-assistant-green-rack-front_ethernet_left-no_shutter.glb","src":"home-assistant-green-rack-front_ethernet_left.glb","no_shutter_src":"home-assistant-green-rack-front_ethernet_left-no_shutter.glb"},"sics_angled":{"id":"sics_angled","device":"sics","device_name":"SICSOLINK SL-FLQ-POE48K","label":"SICSOLINK rear-angle","setback":"40\u00b0 rear-input placement","dimensions":"254 W \u00d7 43 H \u00d7 202 D mm mount","note":"Cable-valid comparison for the seller-stated 180 mm captive leads. The visible LAN/DC routes consume about 165\u2013170 mm, leaving roughly 10\u201315 mm tolerance; a tighter direct route was previously estimated at 125\u2013130 mm. Its PoE input points diagonally rear-left. Viewer mockup only\u2014not a current printable export.","filename":"home-assistant-green-rack-sics_angled.glb","no_shutter_filename":"home-assistant-green-rack-sics_angled-no_shutter.glb","src":"home-assistant-green-rack-sics_angled.glb","no_shutter_src":"home-assistant-green-rack-sics_angled-no_shutter.glb"}} /* MODEL_VARIANTS_END */;
+  const MODEL_VARIANTS = /* MODEL_VARIANTS_START */ {"compact":{"id":"compact","device":"tplink","device_name":"TP-Link TL-PD30G-M2","label":"Compact","setback":"35 mm splitter setback","dimensions":"254 W \u00d7 44.45 H \u00d7 120 D mm","note":"Collision-aware mockup keeps cable meshes out of the panel, but it can do so only by tightening the RJ45 bend to about 3.7 mm and the DC bend to about 7.6 mm. Orange cables flag those bend-radius violations; this is not a production choice.","measurements":{"width_mm":254.0,"height_mm":44.45,"depth_mm":120.0,"chassis_depth_mm":185.0,"clearance_label":"Panel \u2192 PoE face","clearance_mm":32.0,"clearance_detail":"After 25 mm boot","clearance_detail_mm":7.0},"filename":"home-assistant-green-rack-compact.glb","no_shutter_filename":"home-assistant-green-rack-compact-no_shutter.glb","src":"home-assistant-green-rack-compact.glb","no_shutter_src":"home-assistant-green-rack-compact-no_shutter.glb"},"balanced":{"id":"balanced","device":"tplink","device_name":"TP-Link TL-PD30G-M2","label":"Balanced","setback":"47.5 mm setback \u00b7 44.5 mm / 1.75 in inside clearance","dimensions":"254 W \u00d7 44.45 H \u00d7 131.2 D mm","note":"The measured cable reaches a comfortable bend at 44.5 mm / 1.75 in from the panel's inside face to the splitter. The generic viewer cable remains orange because its conservative 21 mm bend target is larger than the physical cable requires.","measurements":{"width_mm":254.0,"height_mm":44.45,"depth_mm":131.2,"chassis_depth_mm":185.0,"clearance_label":"Panel \u2192 PoE face","clearance_mm":44.5,"clearance_detail":"After 25 mm boot","clearance_detail_mm":19.5},"filename":"home-assistant-green-rack-balanced.glb","no_shutter_filename":"home-assistant-green-rack-balanced-no_shutter.glb","src":"home-assistant-green-rack-balanced.glb","no_shutter_src":"home-assistant-green-rack-balanced-no_shutter.glb"},"cable_friendly":{"id":"cable_friendly","device":"tplink","device_name":"TP-Link TL-PD30G-M2","label":"Cable-friendly","setback":"60 mm splitter setback","dimensions":"254 W \u00d7 44.45 H \u00d7 143.7 D mm","note":"Current printable and straight-cable baseline. Separate X/Z lanes keep both jumpers clear of the panel, devices, and each other while preserving the full 21 mm RJ45 and 10 mm DC bends.","measurements":{"width_mm":254.0,"height_mm":44.45,"depth_mm":143.7,"chassis_depth_mm":185.0,"clearance_label":"Panel \u2192 PoE face","clearance_mm":57.0,"clearance_detail":"After 25 mm boot","clearance_detail_mm":32.0},"filename":"home-assistant-green-rack-cable_friendly.glb","no_shutter_filename":"home-assistant-green-rack-cable_friendly-no_shutter.glb","src":"home-assistant-green-rack-cable_friendly.glb","no_shutter_src":"home-assistant-green-rack-cable_friendly-no_shutter.glb"},"unified_roof":{"id":"unified_roof","device":"tplink","device_name":"TP-Link TL-PD30G-M2","label":"Bottom-aligned unified frame","setback":"60 mm setback \u00b7 device floors aligned","dimensions":"254 W \u00d7 44.45 H \u00d7 143.7 D mm","note":"Recommended rigidity study. Both cages remain bottom-aligned on the shared raised deck. Two hollow lower box bridges join their floors, two lightweight sloped hollow-box ties join their unequal roof heights, and four corner L-rails continue forward to the faceplate.","measurements":{"width_mm":254.0,"height_mm":44.45,"depth_mm":143.7,"chassis_depth_mm":185.0,"clearance_label":"Panel \u2192 PoE face","clearance_mm":57.0,"clearance_detail":"Green roof above PoE roof","clearance_detail_mm":8.78125},"filename":"home-assistant-green-rack-unified_roof.glb","no_shutter_filename":"home-assistant-green-rack-unified_roof-no_shutter.glb","src":"home-assistant-green-rack-unified_roof.glb","no_shutter_src":"home-assistant-green-rack-unified_roof-no_shutter.glb"},"stacked_center":{"id":"stacked_center","device":"tplink","device_name":"TP-Link TL-PD30G-M2","label":"Centered stacked","setback":"Green centered \u00b7 TP-Link transverse behind","dimensions":"254 W \u00d7 44.45 H \u00d7 202.4 D mm printed mount","note":"Viewer-only centered study. The TP-Link rotates 90\u00b0 behind the Green, keeping both device bottoms on the unified 9.025 mm seating plane. Its right-facing LAN output aligns with the Green Ethernet jack for a full-radius R21 turn; the PoE input turns toward the rack rear from the left side.","measurements":{"width_mm":254.0,"height_mm":44.45,"depth_mm":202.4,"chassis_depth_mm":225.0,"clearance_label":"Panel \u2192 PoE body","clearance_mm":142.6,"clearance_detail":"Green rear \u2192 PoE body","clearance_detail_mm":29.1},"filename":"home-assistant-green-rack-stacked_center.glb","no_shutter_filename":"home-assistant-green-rack-stacked_center-no_shutter.glb","src":"home-assistant-green-rack-stacked_center.glb","no_shutter_src":"home-assistant-green-rack-stacked_center-no_shutter.glb"},"front_ethernet_right":{"id":"front_ethernet_right","device":"tplink","device_name":"TP-Link TL-PD30G-M2","label":"Front Ethernet \u2014 center gap","setback":"60 mm splitter setback \u00b7 centered gap keystone","dimensions":"254 W \u00d7 44.45 H \u00d7 143.7 D mm printed mount","note":"Compact front-entry edition: the vertically centered keystone sits in the device gap. Layered LAN/DC/PoE routes preserve their modeled bend radii without increasing printed depth. Use 0.4 m minimum / 0.5 m preferred for both Ethernet jumpers; a 350 mm DC lead is safer than 300 mm.","measurements":{"width_mm":254.0,"height_mm":44.45,"depth_mm":143.7,"chassis_depth_mm":205.0,"clearance_label":"Panel \u2192 PoE face","clearance_mm":57.0,"clearance_detail":"After 25 mm boot","clearance_detail_mm":32.0},"filename":"home-assistant-green-rack-front_ethernet_right.glb","no_shutter_filename":"home-assistant-green-rack-front_ethernet_right-no_shutter.glb","src":"home-assistant-green-rack-front_ethernet_right.glb","no_shutter_src":"home-assistant-green-rack-front_ethernet_right-no_shutter.glb"},"front_ethernet_far_right":{"id":"front_ethernet_far_right","device":"tplink","device_name":"TP-Link TL-PD30G-M2","label":"Front Ethernet \u2014 HA right","setback":"60 mm splitter setback \u00b7 jack right of HA Green","dimensions":"254 W \u00d7 44.45 H \u00d7 143.7 D mm \u00b7 one-piece only","note":"The vertically centered keystone sits on the physical right side of the Home Assistant Green. With shutter hardware installed, the flush actuator moves to the window's left side. The incoming PoE jumper keeps a full 21 mm bend radius; use 0.4 m minimum / 0.5 m preferred. This edition is one-piece only because the jack occupies the detachable right-ear joint zone.","measurements":{"width_mm":254.0,"height_mm":44.45,"depth_mm":143.7,"chassis_depth_mm":205.0,"clearance_label":"Panel \u2192 PoE face","clearance_mm":57.0,"clearance_detail":"After 25 mm boot","clearance_detail_mm":32.0},"filename":"home-assistant-green-rack-front_ethernet_far_right.glb","no_shutter_filename":"home-assistant-green-rack-front_ethernet_far_right-no_shutter.glb","src":"home-assistant-green-rack-front_ethernet_far_right.glb","no_shutter_src":"home-assistant-green-rack-front_ethernet_far_right-no_shutter.glb"},"front_ethernet_left":{"id":"front_ethernet_left","device":"tplink","device_name":"TP-Link TL-PD30G-M2","label":"Front Ethernet \u2014 left","setback":"89 mm splitter setback \u00b7 centered left keystone","dimensions":"254 W \u00d7 44.45 H \u00d7 172.7 D mm printed mount","note":"Alternate front-entry edition with the vertically centered jack in the left face area. The splitter moves 29 mm rearward so an ordinary straight plug can rise over it with at least the modeled 21 mm bend radius. The cable envelope reaches about 218.3 mm. Use 0.4 m minimum / 0.5 m preferred for the front PoE jumper.","measurements":{"width_mm":254.0,"height_mm":44.45,"depth_mm":172.7,"chassis_depth_mm":225.0,"clearance_label":"Panel \u2192 PoE face","clearance_mm":86.0,"clearance_detail":"After 25 mm boot","clearance_detail_mm":61.0},"filename":"home-assistant-green-rack-front_ethernet_left.glb","no_shutter_filename":"home-assistant-green-rack-front_ethernet_left-no_shutter.glb","src":"home-assistant-green-rack-front_ethernet_left.glb","no_shutter_src":"home-assistant-green-rack-front_ethernet_left-no_shutter.glb"},"sics_angled":{"id":"sics_angled","device":"sics","device_name":"SICSOLINK SL-FLQ-POE48K","label":"SICSOLINK rear-angle","setback":"40\u00b0 rear-input placement","dimensions":"254 W \u00d7 44.45 H \u00d7 202 D mm mount","note":"Cable-valid comparison for the seller-stated 180 mm captive leads. The visible LAN/DC routes consume about 165\u2013170 mm, leaving roughly 10\u201315 mm tolerance; a tighter direct route was previously estimated at 125\u2013130 mm. Its PoE input points diagonally rear-left. Viewer mockup only\u2014not a current printable export.","measurements":{"width_mm":254.0,"height_mm":44.45,"depth_mm":202.0,"chassis_depth_mm":238.0,"clearance_label":"Panel \u2192 PoE output","clearance_mm":127.0,"clearance_detail":"Angled viewer study"},"filename":"home-assistant-green-rack-sics_angled.glb","no_shutter_filename":"home-assistant-green-rack-sics_angled-no_shutter.glb","src":"home-assistant-green-rack-sics_angled.glb","no_shutter_src":"home-assistant-green-rack-sics_angled-no_shutter.glb"}} /* MODEL_VARIANTS_END */;
   const variantNote = document.querySelector("#variant-note");
   const retentionNote = document.querySelector("#retention-note");
   const frictionSupportNote = document.querySelector("#friction-support-note");
   const protectionNote = document.querySelector("#protection-note");
   const dimensions = document.querySelector("#dimensions");
+  const poeClearance = document.querySelector("#poe-clearance");
+  const measureWidth = document.querySelector("#measure-width");
+  const measureHeight = document.querySelector("#measure-height");
+  const measureDepth = document.querySelector("#measure-depth");
+  const measureDepthLabel = document.querySelector("#measure-depth-label");
+  const measurementClearanceRow = document.querySelector("#measurement-clearance-row");
+  const measurementClearanceLabel = document.querySelector("#measurement-clearance-label");
+  const measurementClearanceValue = document.querySelector("#measurement-clearance-value");
+  const measurementClearanceDetail = document.querySelector("#measurement-clearance-detail");
   const layoutDownload = document.querySelector("#layout-download");
   const onePieceDownload = document.querySelector("#one-piece-download");
   const logoDownload = document.querySelector("#logo-download");
@@ -1297,6 +1378,7 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
   const rotationToggle = document.querySelector("#rotation-toggle");
   const windowKitDownload = document.querySelector("#window-kit-download");
   const spacingSection = document.querySelector("#spacing-section");
+  const arrangementSection = document.querySelector("#arrangement-section");
   const entrySection = document.querySelector("#entry-section");
   const frontPositionControls = document.querySelector("#front-position-controls");
   const frictionSupportSection = document.querySelector("#friction-support-section");
@@ -1304,6 +1386,9 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
 
   const MATERIAL_NAMES = {
     standardTray: "Green tray — standard",
+    splitterFloor: "TP-Link cradle floor",
+    splitterEndStops: "TP-Link cradle end stops",
+    splitterWalls: "TP-Link cradle side walls",
     airframe: "Optional protection — ventilated 1U chassis",
     logo: "Home Assistant logo",
     window: "LED window insert",
@@ -1342,17 +1427,23 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
   let shutterOpen = true;
   let ledSimulationVisible = true;
   let mechanismHighlighted = false;
-  let activeRetentionId = "friction_sleeve";
+  let activeRetentionId = "dovetail_gates";
+  const STACKED_UNSUPPORTED_RETENTIONS = new Set(["dovetail_gates"]);
+  const UNIFIED_ROOF_RETENTIONS = new Set([
+    "ventilated_sleeves",
+    "dovetail_gates",
+  ]);
   let retentionHighlighted = false;
-  let frictionSupportStyle = "pads";
+  let frictionSupportStyle = "raised";
   let enclosureProtection = "open";
   let airframeHighlighted = false;
   let autoRotateEnabled = false;
   let splitterChoice = "tplink";
-  let rearSpacing = "cable_friendly";
+  let deviceArrangement = "side_by_side";
+  let rearSpacing = "unified_roof";
   let ethernetEntry = "rear";
   let frontPosition = "center";
-  let activeVariantId = "cable_friendly";
+  let activeVariantId = "unified_roof";
   let materialCache = {};
   let lastLightUpdate = 0;
   let restoringHash = false;
@@ -1364,24 +1455,46 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
     ha_right: "front_ethernet_far_right",
     left: "front_ethernet_left",
   };
-  const REAR_SPACINGS = new Set(["compact", "balanced", "cable_friendly"]);
+  const REAR_SPACINGS = new Set([
+    "compact",
+    "balanced",
+    "cable_friendly",
+    "unified_roof",
+  ]);
   const PROTECTION_MODES = new Set(["open", "airframe"]);
   const CHASSIS_INCOMPATIBLE_RETENTIONS = new Set([
     "captive_strap",
     "x_cage",
+    "ventilated_sleeves",
+    "dovetail_gates",
   ]);
-  const CHASSIS_DEPTHS = {
-    compact: 185,
-    balanced: 185,
-    cable_friendly: 185,
-    front_ethernet_right: 205,
-    front_ethernet_far_right: 205,
-    front_ethernet_left: 225,
-    sics_angled: 238,
-  };
+
+  function usesReplacementGreenTray(retentionId) {
+    return retentionId === "friction_sleeve"
+      || retentionId === "hybrid_clips"
+      || retentionId === "ventilated_sleeves"
+      || retentionId === "dovetail_gates";
+  }
+  function inches(mm, digits = 2) {
+    return (mm / 25.4).toFixed(digits);
+  }
+
+  function millimeters(mm) {
+    return Number(mm.toFixed(4)).toString();
+  }
+
+  function dualUnitText(mm, inchDigits = 2) {
+    return `${millimeters(mm)} mm / ${inches(mm, inchDigits)} in`;
+  }
+
+  function setDualUnitValue(element, mm, inchDigits = 2) {
+    element.innerHTML = `${millimeters(mm)} mm <small>/ ${inches(mm, inchDigits)} in</small>`;
+  }
 
   function currentVariantId() {
     if (splitterChoice === "sics") return "sics_angled";
+    if (deviceArrangement === "stacked_center") return "stacked_center";
+    if (rearSpacing === "unified_roof") return "unified_roof";
     if (ethernetEntry === "front") return FRONT_VARIANTS[frontPosition];
     return rearSpacing;
   }
@@ -1400,6 +1513,12 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
     document.querySelectorAll("button[data-spacing]").forEach(button => {
       button.setAttribute("aria-pressed", String(button.dataset.spacing === rearSpacing));
     });
+    document.querySelectorAll("button[data-arrangement]").forEach(button => {
+      button.setAttribute(
+        "aria-pressed",
+        String(button.dataset.arrangement === deviceArrangement)
+      );
+    });
     document.querySelectorAll("button[data-entry]").forEach(button => {
       button.setAttribute("aria-pressed", String(button.dataset.entry === ethernetEntry));
     });
@@ -1408,9 +1527,41 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
     });
 
     const sicsSelected = splitterChoice === "sics";
-    const frontSelected = !sicsSelected && ethernetEntry === "front";
-    setSectionDisabled(entrySection, sicsSelected);
-    setSectionDisabled(spacingSection, sicsSelected || frontSelected);
+    const stackedSelected = !sicsSelected
+      && deviceArrangement === "stacked_center";
+    const unifiedRoofSelected = !sicsSelected && !stackedSelected
+      && rearSpacing === "unified_roof";
+    const frontSelected = !sicsSelected && !stackedSelected
+      && !unifiedRoofSelected
+      && ethernetEntry === "front";
+    setSectionDisabled(arrangementSection, sicsSelected);
+    setSectionDisabled(entrySection,
+      sicsSelected || stackedSelected || unifiedRoofSelected);
+    setSectionDisabled(spacingSection,
+      sicsSelected || frontSelected || stackedSelected);
+    document.querySelectorAll("button[data-retention]").forEach(button => {
+      const retentionId = button.dataset.retention;
+      const sicsUnsupported = sicsSelected
+        && [
+          "hybrid_clips",
+          "ventilated_sleeves",
+          "dovetail_gates",
+        ].includes(retentionId);
+      const stackedUnsupported = stackedSelected
+        && STACKED_UNSUPPORTED_RETENTIONS.has(retentionId);
+      const unifiedRoofUnsupported = unifiedRoofSelected
+        && !UNIFIED_ROOF_RETENTIONS.has(retentionId);
+      button.disabled = sicsUnsupported
+        || stackedUnsupported
+        || unifiedRoofUnsupported;
+      button.title = sicsUnsupported
+        ? "This retention study is shaped for the HA Green and TP-Link."
+        : (stackedUnsupported
+            ? "The removable dovetail gates are currently modeled only for side-by-side layouts."
+            : (unifiedRoofUnsupported
+                ? "The unified-roof study requires the rounded cages."
+                : ""));
+    });
     frontPositionControls.hidden = !frontSelected;
     frontPositionControls.setAttribute("aria-hidden", String(!frontSelected));
 
@@ -1418,6 +1569,7 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
       compact: "compact 35 mm",
       balanced: "balanced 47.5 mm",
       cable_friendly: "cable-friendly 60 mm",
+      unified_roof: "bottom-aligned unified cage frame",
     };
     const frontLabels = {
       center: "center-gap",
@@ -1426,6 +1578,10 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
     };
     layoutStatus.textContent = sicsSelected
       ? "SICSOLINK angled study · fixed rear entry; TP-Link controls disabled."
+      : stackedSelected
+      ? "Centered stacked study · Green centered, TP-Link rotated behind; rear cable entry."
+      : unifiedRoofSelected
+      ? "Bottom-aligned rigidity study · lower box bridges plus sloped upper hollow boxes; rear cable entry."
       : (frontSelected
           ? `TP-Link · front ${frontLabels[frontPosition]} keystone · fixed validated spacing.`
           : `TP-Link · rear entry · ${spacingLabels[rearSpacing]}; cable-friendly is recommended.`);
@@ -1434,10 +1590,28 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
   function syncChoicesFromVariant(variantId) {
     if (variantId === "sics_angled") {
       splitterChoice = "sics";
+      deviceArrangement = "side_by_side";
+      return true;
+    }
+    if (variantId === "stacked_center") {
+      splitterChoice = "tplink";
+      deviceArrangement = "stacked_center";
+      ethernetEntry = "rear";
+      return true;
+    }
+    if (variantId === "unified_roof") {
+      splitterChoice = "tplink";
+      deviceArrangement = "side_by_side";
+      ethernetEntry = "rear";
+      rearSpacing = "unified_roof";
+      if (!UNIFIED_ROOF_RETENTIONS.has(activeRetentionId)) {
+        activeRetentionId = "ventilated_sleeves";
+      }
       return true;
     }
     if (REAR_SPACINGS.has(variantId)) {
       splitterChoice = "tplink";
+      deviceArrangement = "side_by_side";
       ethernetEntry = "rear";
       rearSpacing = variantId;
       return true;
@@ -1446,6 +1620,7 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
       .find(([, mappedVariant]) => mappedVariant === variantId);
     if (frontEntry) {
       splitterChoice = "tplink";
+      deviceArrangement = "side_by_side";
       ethernetEntry = "front";
       frontPosition = frontEntry[0];
       return true;
@@ -1474,6 +1649,10 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
       if (legacyVariant) syncChoicesFromVariant(legacyVariant);
       const splitter = params.get("splitter");
       if (["tplink", "sics"].includes(splitter)) splitterChoice = splitter;
+      const arrangement = params.get("layout");
+      if (["side_by_side", "stacked_center"].includes(arrangement)) {
+        deviceArrangement = arrangement;
+      }
       const spacing = params.get("spacing");
       if (REAR_SPACINGS.has(spacing)) rearSpacing = spacing;
       const entry = params.get("entry");
@@ -1508,6 +1687,34 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
         airframeHighlighted = false;
         restoredStateNeedsPersist = true;
       }
+      if (splitterChoice === "sics"
+          && [
+            "hybrid_clips",
+            "ventilated_sleeves",
+            "dovetail_gates",
+          ].includes(activeRetentionId)) {
+        activeRetentionId = "friction_sleeve";
+        restoredStateNeedsPersist = true;
+      }
+      if (deviceArrangement === "stacked_center"
+          && STACKED_UNSUPPORTED_RETENTIONS.has(activeRetentionId)) {
+        activeRetentionId = "friction_sleeve";
+        restoredStateNeedsPersist = true;
+      }
+      if (rearSpacing === "unified_roof") {
+        if (!UNIFIED_ROOF_RETENTIONS.has(activeRetentionId)) {
+          activeRetentionId = "ventilated_sleeves";
+          restoredStateNeedsPersist = true;
+        }
+        if (ethernetEntry !== "rear") {
+          ethernetEntry = "rear";
+          restoredStateNeedsPersist = true;
+        }
+      }
+      if (splitterChoice === "sics" && deviceArrangement !== "side_by_side") {
+        deviceArrangement = "side_by_side";
+        restoredStateNeedsPersist = true;
+      }
       if (enclosureProtection !== "airframe") airframeHighlighted = false;
       autoRotateEnabled = boolFromHash(params, "rotate", autoRotateEnabled);
       return true;
@@ -1522,6 +1729,7 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
     const params = new URLSearchParams(existing.includes("=") ? existing : "");
     params.set("variant", currentVariantId());
     params.set("splitter", splitterChoice);
+    params.set("layout", deviceArrangement);
     params.set("spacing", rearSpacing);
     params.set("entry", ethernetEntry);
     params.set("front", frontPosition);
@@ -1647,9 +1855,9 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
         ? "Optional protection: Open tray — default and lowest-filament option."
         : "Optional protection: Open tray — default and lowest-filament option; no added side frame.";
     } else if (splitterChoice === "sics") {
-      protectionNote.textContent = "Optional protection: Ventilated full-width 1U chassis — a removable perforated top-and-side cover surrounds the complete SICSOLINK study while leaving the rear open for cables.";
+      protectionNote.textContent = "Optional protection: Ventilated full-width chassis study — its 0.8 mm roof retains 1.0875 mm nominal clearance over the measured Green, but the enclosure assembly and cable access remain unvalidated.";
     } else {
-      protectionNote.textContent = "Optional protection: Ventilated full-width 1U chassis — a removable perforated top-and-side cover surrounds both devices while leaving the rear open for cables.";
+      protectionNote.textContent = "Optional protection: Ventilated full-width chassis study — its 0.8 mm roof retains 1.0875 mm nominal clearance over the measured Green, but the enclosure assembly and cable access remain unvalidated.";
     }
     updateDisplayedDimensions();
   }
@@ -1657,9 +1865,45 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
   function updateDisplayedDimensions() {
     const variant = MODEL_VARIANTS[activeVariantId];
     if (!variant) return;
-    dimensions.textContent = enclosureProtection === "airframe"
-      ? `254 W × 43 H × ${CHASSIS_DEPTHS[activeVariantId]} D mm · ventilated chassis envelope`
-      : `${variant.dimensions} · gold rulers use 10 mm ticks`;
+    const measurement = variant.measurements;
+    if (!measurement) return;
+    const chassisSelected = enclosureProtection === "airframe";
+    const depthMm = chassisSelected
+      ? measurement.chassis_depth_mm
+      : measurement.depth_mm;
+    const widthText = dualUnitText(measurement.width_mm);
+    const heightText = dualUnitText(measurement.height_mm, 3);
+    const depthText = dualUnitText(depthMm);
+    dimensions.textContent =
+      `X width ${widthText} · Z height ${heightText} · Y ${chassisSelected ? "chassis" : "mount"} depth ${depthText}`;
+
+    setDualUnitValue(measureWidth, measurement.width_mm);
+    setDualUnitValue(measureHeight, measurement.height_mm, 3);
+    setDualUnitValue(measureDepth, depthMm);
+    measureDepthLabel.textContent = chassisSelected
+      ? "Chassis depth"
+      : "Mount depth";
+
+    const hasClearance = Number.isFinite(measurement.clearance_mm);
+    poeClearance.hidden = !hasClearance;
+    measurementClearanceRow.hidden = !hasClearance;
+    if (!hasClearance) {
+      measurementClearanceDetail.hidden = true;
+      return;
+    }
+
+    const clearanceText = dualUnitText(measurement.clearance_mm);
+    measurementClearanceLabel.textContent = measurement.clearance_label;
+    measurementClearanceValue.textContent = clearanceText;
+    poeClearance.textContent = `${measurement.clearance_label}: ${clearanceText}`;
+
+    const hasDetailValue = Number.isFinite(measurement.clearance_detail_mm);
+    const detailText = hasDetailValue
+      ? `${measurement.clearance_detail}: ${dualUnitText(measurement.clearance_detail_mm)}`
+      : measurement.clearance_detail;
+    measurementClearanceDetail.hidden = !detailText;
+    measurementClearanceDetail.textContent = detailText || "";
+    if (detailText) poeClearance.textContent += ` · ${detailText}`;
   }
 
   function updateRetentionControls() {
@@ -1698,7 +1942,13 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
         ? "This is the legacy screw-retained fallback; physically test fit before the full print."
         : (activeRetentionId === "friction_sleeve"
                 ? "The selected fused support geometry holds the normal LED height; print a fit coupon before committing to the full tray."
-                : "Viewer concept only; lower-base measurements and a fit coupon are required before printing.");
+                : (activeRetentionId === "hybrid_clips"
+                    ? "Viewer prototype only; separate Green and TP-Link clip coupons are required before changing the production tray."
+                    : (activeRetentionId === "ventilated_sleeves"
+                        ? "Viewer prototype only; verify rear insertion and snug wall clearance with fit coupons before a full plate."
+                        : (activeRetentionId === "dovetail_gates"
+                            ? "Printable optional branch: the friction cages work without gates; test the rail coupon before relying on the separately printed gates."
+                            : "Viewer concept only; lower-base measurements and a fit coupon are required before printing."))));
       retentionNote.textContent = `${option.label} — ${option.note} ${status}`;
     }
     annotateRetentionDownload();
@@ -1781,12 +2031,39 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
     setSurfaceFinish(materialCache.shutterRetainer, 0.72);
 
     const frictionSelected = activeRetentionId === "friction_sleeve";
+    const replacementTraySelected = usesReplacementGreenTray(
+      activeRetentionId
+    );
     setMaterial(
       materialCache.standardTray,
-      frictionSelected ? [0, 0, 0, 0] : MOUNT_WHITE,
-      frictionSelected ? "MASK" : "OPAQUE"
+      replacementTraySelected ? [0, 0, 0, 0] : MOUNT_WHITE,
+      replacementTraySelected ? "MASK" : "OPAQUE"
     );
     setSurfaceFinish(materialCache.standardTray, 0.72);
+
+    const hybridSelected = activeRetentionId === "hybrid_clips";
+    const cageRetentionSelected = [
+      "ventilated_sleeves",
+      "dovetail_gates",
+    ].includes(activeRetentionId);
+    setMaterial(
+      materialCache.splitterFloor,
+      cageRetentionSelected ? [0, 0, 0, 0] : MOUNT_WHITE,
+      cageRetentionSelected ? "MASK" : "OPAQUE"
+    );
+    setSurfaceFinish(materialCache.splitterFloor, 0.72);
+    setMaterial(
+      materialCache.splitterEndStops,
+      cageRetentionSelected ? [0, 0, 0, 0] : MOUNT_WHITE,
+      cageRetentionSelected ? "MASK" : "OPAQUE"
+    );
+    setSurfaceFinish(materialCache.splitterEndStops, 0.72);
+    setMaterial(
+      materialCache.splitterWalls,
+      hybridSelected || cageRetentionSelected ? [0, 0, 0, 0] : MOUNT_WHITE,
+      hybridSelected || cageRetentionSelected ? "MASK" : "OPAQUE"
+    );
+    setSurfaceFinish(materialCache.splitterWalls, 0.72);
 
     for (const [id, option] of Object.entries(RETENTION_OPTIONS)) {
       if (id === "friction_sleeve") continue;
@@ -1801,7 +2078,7 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
     }
 
     const frictionColor = retentionHighlighted
-      ? RETENTION_OPTIONS.friction_sleeve.highlight
+      ? RETENTION_OPTIONS[activeRetentionId].highlight
       : MOUNT_WHITE;
     for (const [id, option] of Object.entries(FRICTION_SUPPORT_OPTIONS)) {
       const active = frictionSelected && id === frictionSupportStyle;
@@ -1951,9 +2228,45 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
   }
 
   function annotateRetentionDownload() {
+    if (activeVariantId === "unified_roof") {
+      const unifiedDovetail = activeRetentionId === "dovetail_gates";
+      const filename = unifiedDovetail
+        ? "one_piece_rear_cable_friendly_unified_frame_dovetail_ready.3mf"
+        : "one_piece_rear_cable_friendly_unified_frame_no_dovetail.3mf";
+      onePieceDownload.href = `../exports/${filename}`;
+      onePieceDownload.download = filename;
+      onePieceDownload.removeAttribute("aria-disabled");
+      onePieceDownload.textContent = unifiedDovetail
+        ? "Download unified-frame dovetail-ready mount (3MF)"
+        : "Download unified-frame friction-cage mount (3MF)";
+      onePieceDownload.title = unifiedDovetail
+        ? "The validated friction cages hold both devices; print the optional gate plate separately only if you want the backup rear locks."
+        : "One-piece bottom-aligned cage frame with lower box bridges and sloped upper ties.";
+      return;
+    }
     const selectedTrayIsPrintable = activeRetentionId === "friction_sleeve"
-      && frictionSupportStyle === "pads";
-    if (enclosureProtection === "airframe"
+      && frictionSupportStyle === "raised";
+    const selectedVentFrameCoupon =
+      activeRetentionId === "ventilated_sleeves";
+    const selectedDovetailCoupon =
+      activeRetentionId === "dovetail_gates";
+    if (selectedDovetailCoupon) {
+      onePieceDownload.href = "../exports/one_piece_rear_cable_friendly_vent_frame_dovetail_ready.3mf";
+      onePieceDownload.download = "one_piece_rear_cable_friendly_vent_frame_dovetail_ready.3mf";
+      onePieceDownload.removeAttribute("aria-disabled");
+      onePieceDownload.textContent =
+        "Download one-piece dovetail-ready mount (3MF)";
+      onePieceDownload.title =
+        "The friction cages work without the optional gates. Print dovetail_gates_optional_plate.3mf separately if you want the backup rear locks; their sliding fit remains physically unvalidated.";
+    } else if (selectedVentFrameCoupon) {
+      onePieceDownload.href = "../exports/vent_frame_coupon.3mf";
+      onePieceDownload.download = "vent_frame_coupon.3mf";
+      onePieceDownload.removeAttribute("aria-disabled");
+      onePieceDownload.textContent =
+        "Download Green + PoE vent-frame fit coupon (3MF)";
+      onePieceDownload.title =
+        "Print this compact 5 mm solid-band coupon to verify both rounded cages, bevel clearance, roof contact, and insertion fit before printing the full rack mount.";
+    } else if (enclosureProtection === "airframe"
         && !onePieceDownload.hasAttribute("aria-disabled")) {
       onePieceDownload.textContent = "Current open-tray STL · chassis not included";
       onePieceDownload.title = "The ventilated 1U chassis is currently a viewer concept and is not included in this printable STL.";
@@ -1961,14 +2274,14 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
         && !onePieceDownload.hasAttribute("aria-disabled")) {
       onePieceDownload.textContent = shutterInstalled
         ? "Download optional shutter comparison STL"
-        : "Download selected Four pads production STL";
+        : "Download selected unified raised-deck STL";
       onePieceDownload.removeAttribute("title");
     } else if (!onePieceDownload.hasAttribute("aria-disabled")) {
       onePieceDownload.removeAttribute("href");
       onePieceDownload.removeAttribute("download");
       onePieceDownload.setAttribute("aria-disabled", "true");
       onePieceDownload.textContent = "Viewer comparison — selected geometry not in production STL";
-      onePieceDownload.title = "The canonical download uses the Four pads friction tray. Clearly named legacy and comparison files are listed in the README.";
+      onePieceDownload.title = "The canonical download uses the unified raised friction deck. Clearly named legacy and comparison files are listed in the README.";
     } else {
       onePieceDownload.removeAttribute("title");
     }
@@ -1976,7 +2289,21 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
 
   function selectRetention(retentionId) {
     if (!RETENTION_OPTIONS[retentionId]) return;
+    if (splitterChoice === "sics"
+        && [
+          "hybrid_clips",
+          "ventilated_sleeves",
+          "dovetail_gates",
+        ].includes(retentionId)) return;
+    if (deviceArrangement === "stacked_center"
+        && STACKED_UNSUPPORTED_RETENTIONS.has(retentionId)) return;
+    if (rearSpacing === "unified_roof"
+        && !UNIFIED_ROOF_RETENTIONS.has(retentionId)) return;
     activeRetentionId = retentionId;
+    if (CHASSIS_INCOMPATIBLE_RETENTIONS.has(activeRetentionId)) {
+      enclosureProtection = "open";
+      airframeHighlighted = false;
+    }
     selectVariant(currentVariantId());
     persistState();
   }
@@ -2054,6 +2381,30 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
   document.querySelectorAll("button[data-splitter]").forEach(button => {
     button.addEventListener("click", () => {
       splitterChoice = button.dataset.splitter;
+      if (splitterChoice === "sics") deviceArrangement = "side_by_side";
+      if (splitterChoice === "sics"
+          && [
+            "hybrid_clips",
+            "ventilated_sleeves",
+            "dovetail_gates",
+          ].includes(activeRetentionId)) {
+        activeRetentionId = "friction_sleeve";
+      }
+      selectVariant(currentVariantId());
+      persistState();
+    });
+  });
+
+  document.querySelectorAll("button[data-arrangement]").forEach(button => {
+    button.addEventListener("click", () => {
+      deviceArrangement = button.dataset.arrangement;
+      if (deviceArrangement === "stacked_center") {
+        splitterChoice = "tplink";
+        ethernetEntry = "rear";
+        if (STACKED_UNSUPPORTED_RETENTIONS.has(activeRetentionId)) {
+          activeRetentionId = "friction_sleeve";
+        }
+      }
       selectVariant(currentVariantId());
       persistState();
     });
@@ -2062,6 +2413,14 @@ var Dx=function(t,e,i,n){for(var r,s=arguments.length,a=s<3?e:null===n?n=Object.
   document.querySelectorAll("button[data-spacing]").forEach(button => {
     button.addEventListener("click", () => {
       rearSpacing = button.dataset.spacing;
+      if (rearSpacing === "unified_roof") {
+        splitterChoice = "tplink";
+        deviceArrangement = "side_by_side";
+        ethernetEntry = "rear";
+        if (!UNIFIED_ROOF_RETENTIONS.has(activeRetentionId)) {
+          activeRetentionId = "ventilated_sleeves";
+        }
+      }
       selectVariant(currentVariantId());
       persistState();
     });

@@ -70,9 +70,12 @@ core_width = rack_width - 2 * ear_width;
 face_thickness = 3.0;
 base_thickness = 3.0;
 
-// Home Assistant Green (official: 112 x 112 x 32 mm)
-green_w = 112.0;
-green_d = 112.0;
+// Home Assistant lists 112 x 112 x 32 mm. Richard's physical enclosure
+// measures 4 5/16 in (109.5375 mm) in both horizontal axes at the tray's
+// contact height, so use that measured footprint for the friction interface.
+// The centered placement preserves the previous LED window and screw pattern.
+green_w = 109.5375;
+green_d = 109.5375;
 green_h = 32.0;
 green_inner_w = green_w + 2 * green_clearance;
 green_inner_d = green_d + 2 * green_clearance;
@@ -89,8 +92,8 @@ green_spacer_tip_h = 1.475;
 green_spacer_h = green_standoff + green_spacer_tip_h;
 // The Green moves right to leave a straight, full-depth splitter bay on the
 // left. This also puts the HA badge on the left, matching the visual reference.
-green_x = 88.0;
-green_y = 4.5;
+green_x = 88.0 + (112.0 - green_w) / 2;
+green_y = 4.5 + (112.0 - green_d) / 2;
 green_mount_x = [green_x + (green_w - green_mount_pitch_x) / 2,
                  green_x + (green_w + green_mount_pitch_x) / 2];
 green_mount_y = [green_y + (green_d - green_mount_pitch_y) / 2,
@@ -2523,7 +2526,8 @@ module friction_side_walls_local(interference = friction_interference) {
         union() {
             // The two walls are continuous along the enclosure instead of
             // relying on localized tabs. At the contact section their inner
-            // faces sit exactly `interference` inside the 112 mm envelope.
+            // faces sit exactly `interference` inside the measured enclosure
+            // footprint.
             translate([outer_left, wall_y, wall_z])
                 rounded_prism_z(
                     left_w, wall_d, grip_top - wall_z, 0.55);
