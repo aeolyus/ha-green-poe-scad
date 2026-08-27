@@ -16,7 +16,7 @@
 
 $fn = 48;
 
-// [assembly_preview, assembly, one_piece, one_piece_logo_inlay, x2d_plate, core, logo_inlay, left_ear, right_ear, led_insert, led_shutter, led_shutter_retainer, led_shutter_kit, led_fixed_window_kit, green_spacer, green_spacers_4x, fit_test, friction_fit_coupon, green_hybrid_clip_coupon, splitter_fit_coupon, splitter_hybrid_clip_coupon, keystone_fit_test, viewer_mount, viewer_mount_without_green_tray, viewer_green_tray_standard, viewer_green_tray_friction, viewer_green_tray_friction_full, viewer_green_tray_friction_pads, viewer_green_tray_friction_skeletal, viewer_insert, viewer_shutter_open, viewer_shutter_closed, viewer_shutter_retainer, viewer_logo, viewer_green, viewer_splitter, viewer_ports, viewer_green_ports, viewer_splitter_ports, viewer_keystone_ports, viewer_data_cables, viewer_internal_data_cable, viewer_input_data_cable, viewer_dc_cable, viewer_fasteners, viewer_retention_factory_screws, viewer_retention_slide_latch, viewer_retention_corner_gate, viewer_retention_sled_gate, viewer_retention_padded_rails, viewer_retention_captive_strap, viewer_retention_x_cage, viewer_retention_hybrid_clips, viewer_retention_friction_sleeve, viewer_enclosure_airframe, viewer_rulers, viewer_led_power, viewer_led_activity, viewer_led_health]
+// [assembly_preview, assembly, one_piece, one_piece_logo_inlay, x2d_plate, core, logo_inlay, left_ear, right_ear, led_insert, led_shutter, led_shutter_retainer, led_shutter_kit, led_fixed_window_kit, green_spacer, green_spacers_4x, fit_test, friction_fit_coupon, green_hybrid_clip_coupon, splitter_fit_coupon, splitter_hybrid_clip_coupon, hybrid_clip_coupon, keystone_fit_test, viewer_mount, viewer_mount_without_green_tray, viewer_green_tray_standard, viewer_green_tray_friction, viewer_green_tray_friction_full, viewer_green_tray_friction_pads, viewer_green_tray_friction_skeletal, viewer_insert, viewer_shutter_open, viewer_shutter_closed, viewer_shutter_retainer, viewer_logo, viewer_green, viewer_splitter, viewer_ports, viewer_green_ports, viewer_splitter_ports, viewer_keystone_ports, viewer_data_cables, viewer_internal_data_cable, viewer_input_data_cable, viewer_dc_cable, viewer_fasteners, viewer_retention_factory_screws, viewer_retention_slide_latch, viewer_retention_corner_gate, viewer_retention_sled_gate, viewer_retention_padded_rails, viewer_retention_captive_strap, viewer_retention_x_cage, viewer_retention_hybrid_clips, viewer_retention_friction_sleeve, viewer_enclosure_airframe, viewer_rulers, viewer_led_power, viewer_led_activity, viewer_led_health]
 part = "assembly_preview";
 
 // Production geometry uses the TP-Link. Viewer-only builds may override this
@@ -3137,63 +3137,100 @@ module friction_fit_coupon() {
                 interference = values[index], marker_count = index + 1);
 }
 
-// Single-edge Green clip gauges preserve the real 9.025 mm device seat and
-// full spring length without printing three complete 112 mm-wide channels.
-// Hole count maps to 1.4 / 1.8 / 2.2 mm reach; test the shallowest first.
-module green_hybrid_clip_coupon_single(reach = 1.80,
-                                       marker_count = 1) {
-    coupon_len = 18.0;
+// Compact single-edge Green clip gauge. Keep the production 18 mm catch,
+// full-height spring and 9.025 mm device seat, but carry the device on two
+// printable ribs instead of a solid 10 mm-deep pedestal. The 3 mm margin at
+// each end and broad root rail prevent the coupon itself from twisting and
+// making the spring appear softer than it will be in the complete tray.
+module green_hybrid_clip_coupon_single(reach = 1.80) {
+    coupon_len = hybrid_green_clip_len + 6.0;
+    clip_y0 = (coupon_len - hybrid_green_clip_len) / 2;
     cover_outset = (green_cover_w - green_w) / 2;
     inner = -cover_outset - hybrid_green_cover_clearance;
     outer = inner - hybrid_green_spring_arm_t;
-    shelf_inset = 10.0;
+    // Match the production perimeter floor; the reinforced root hull below
+    // extends farther outward only beneath the active spring.
+    root_outer = -3.50;
+    root_inner = 4.00;
+    seat_x0 = 0.0;
+    seat_x1 = 10.0;
+    seat_pad_t = 1.40;
+    seat_pad_len = 6.0;
+    seat_under_z = green_device_z - seat_pad_t;
+    rib_z0 = base_thickness - 0.20;
+    rib_top_z = seat_under_z + 0.20;
+    rib_foot_x0 = 4.50;
+    rib_foot_x1 = 5.50;
+    tongue_x0 = 3.80;
+    tongue_x1 = 5.70;
     catch_z = green_device_z + green_h + hybrid_green_clip_clearance;
     flat_x = inner + reach - hybrid_green_catch_flat;
     tip_x = inner + reach;
     lower_z = catch_z - (flat_x - inner);
     anchor_x = inner - 0.25;
 
-    difference() {
-        union() {
-            translate([outer, 0, 0])
+    union() {
+        // Full-length root strip matches the production floor thickness while
+        // omitting the unused solid floor beneath the device.
+        translate([root_outer, 0, 0])
+            rounded_prism_z(
+                root_inner - root_outer, coupon_len,
+                base_thickness, 0.55);
+
+        // Mirror the production spring's reinforced root so the measured
+        // insertion/release force is representative of the complete tray.
+        hull() {
+            translate([outer - 0.90, clip_y0, 0])
                 rounded_prism_z(
-                    shelf_inset - outer, coupon_len,
-                    base_thickness, 0.55);
-            translate([0, 0, base_thickness - 0.20])
+                    hybrid_green_spring_arm_t + 1.80,
+                    hybrid_green_clip_len, 1.40, 0.55);
+            translate([outer, clip_y0, 3.80])
                 rounded_prism_z(
-                    shelf_inset, coupon_len,
-                    green_device_z - base_thickness + 0.20, 0.55);
-            translate([outer, 0, 0])
-                rounded_prism_z(
-                    hybrid_green_spring_arm_t, coupon_len,
-                    catch_z + hybrid_green_top_ramp_h, 0.55);
-            extrude_xz_profile_y([
-                [anchor_x, lower_z],
-                [flat_x, catch_z],
-                [tip_x, catch_z],
-                [anchor_x, catch_z + hybrid_green_top_ramp_h]
-            ], 0, coupon_len);
-            extrude_xz_profile_y([
-                [outer + 0.15, catch_z - 3.2],
-                [outer - 1.05, catch_z - 2.0],
-                [outer - 1.05, catch_z - 0.2],
-                [outer + 0.15, catch_z - 0.2]
-            ], 1.0, coupon_len - 2.0);
+                    hybrid_green_spring_arm_t,
+                    hybrid_green_clip_len, 0.40, 0.55);
         }
 
-        for (mark = [0 : marker_count - 1])
-            translate([3.0 + mark * 2.6, coupon_len / 2, -epsilon])
-                cylinder(h = green_device_z + 2 * epsilon,
-                         d = 1.8, $fn = 20);
+        // Two known-height pads locate the bottom plane. Their printable ribs
+        // overlap small floor tongues connected to the root rail.
+        for (y0 = [clip_y0,
+                   clip_y0 + hybrid_green_clip_len - seat_pad_len]) {
+            translate([tongue_x0, y0, 0])
+                rounded_prism_z(
+                    tongue_x1 - tongue_x0, seat_pad_len,
+                    base_thickness, 0.35);
+            extrude_xz_profile_y([
+                [rib_foot_x0, rib_z0],
+                [rib_foot_x1, rib_z0],
+                [seat_x1, rib_top_z],
+                [seat_x0, rib_top_z]
+            ], y0, seat_pad_len);
+            translate([seat_x0, y0, seat_under_z])
+                rounded_prism_z(
+                    seat_x1 - seat_x0, seat_pad_len,
+                    seat_pad_t, 0.40);
+        }
+
+        translate([outer, clip_y0, 0])
+            rounded_prism_z(
+                hybrid_green_spring_arm_t, hybrid_green_clip_len,
+                catch_z + hybrid_green_top_ramp_h, 0.55);
+        extrude_xz_profile_y([
+            [anchor_x, lower_z],
+            [flat_x, catch_z],
+            [tip_x, catch_z],
+            [anchor_x, catch_z + hybrid_green_top_ramp_h]
+        ], clip_y0, hybrid_green_clip_len);
+        extrude_xz_profile_y([
+            [outer + 0.15, catch_z - 3.2],
+            [outer - 1.05, catch_z - 2.0],
+            [outer - 1.05, catch_z - 0.2],
+            [outer + 0.15, catch_z - 0.2]
+        ], clip_y0 + 1.0, hybrid_green_clip_len - 2.0);
     }
 }
 
 module green_hybrid_clip_coupon() {
-    reaches = [1.40, 1.80, 2.20];
-    for (index = [0 : len(reaches) - 1])
-        translate([0, index * 24.0, 0])
-            green_hybrid_clip_coupon_single(
-                reach = reaches[index], marker_count = index + 1);
+    green_hybrid_clip_coupon_single(reach = 1.80);
 }
 
 module splitter_fit_coupon_single(interference = 0.05,
@@ -3255,15 +3292,18 @@ module splitter_fit_coupon() {
                 interference = values[index], marker_count = index + 1);
 }
 
-// Experimental positive-catch coupon. Each short section reproduces the
-// bevel-aware TP-Link guide walls plus the external flexible arm and fixed
-// bridge-side catch. The fixed lips stay at 1.2 mm while hole count maps the
-// flexible-arm reach to 0.8 / 1.2 / 1.6 mm.
-module splitter_hybrid_clip_coupon_single(reach = 1.20,
-                                          marker_count = 1) {
-    slice_d = 18.0;
+// Compact production-fit coupon for the selected TP-Link hybrid retention.
+// It preserves the exact 1.2 mm fixed catch, 0.8 mm spring catch, full-height
+// wall profiles, and both clip roots. Two narrow transverse seat bars hold the
+// production spacing and device height without printing a non-load-bearing
+// solid floor across the open center of this short test section.
+module splitter_hybrid_clip_coupon_single() {
+    slice_d = 20.0;
+    seat_bar_d = 5.0;
+    root_rail_w = 6.0;
     clip_y0 = (splitter_d - hybrid_splitter_clip_len) / 2;
-    slice_y0 = clip_y0 - 2.0;
+    slice_y0 = clip_y0
+               - (slice_d - hybrid_splitter_clip_len) / 2;
     outer_left = -splitter_clearance - wall_thickness;
     outer_right = splitter_w + splitter_clearance + wall_thickness;
     arm_inner = outer_left - hybrid_splitter_arm_gap;
@@ -3271,44 +3311,68 @@ module splitter_hybrid_clip_coupon_single(reach = 1.20,
     coupon_left = arm_outer - 0.35;
     coupon_right = outer_right;
 
-    difference() {
-        translate([-coupon_left, -slice_y0, 0])
-            intersection() {
-                union() {
-                    translate([coupon_left, slice_y0, 0])
-                        cube([
-                            coupon_right - coupon_left,
-                            slice_d,
-                            base_thickness
-                        ]);
-                    splitter_side_walls_local();
-                    retention_splitter_hybrid_clips_local(
-                        spring_reach = reach,
-                        fixed_reach = hybrid_splitter_fixed_reach,
-                        clip_y_override = clip_y0);
-                }
-                translate([coupon_left - epsilon,
-                           slice_y0 - epsilon, -epsilon])
+    translate([-coupon_left, -slice_y0, 0])
+        intersection() {
+            union() {
+                // Two crossbars preserve the production wall spacing and give
+                // the device two coplanar seats at the normal 3 mm height.
+                translate([coupon_left, slice_y0, 0])
                     cube([
-                        coupon_right - coupon_left + 2 * epsilon,
-                        slice_d + 2 * epsilon,
-                        rack_height + 2 * epsilon
+                        coupon_right - coupon_left,
+                        seat_bar_d,
+                        base_thickness
                     ]);
-            }
+                translate([coupon_left,
+                           slice_y0 + slice_d - seat_bar_d, 0])
+                    cube([
+                        coupon_right - coupon_left,
+                        seat_bar_d,
+                        base_thickness
+                    ]);
 
-        for (mark = [0 : marker_count - 1])
-            translate([9.0 + mark * 4.0, slice_d / 2, -epsilon])
-                cylinder(h = base_thickness + 2 * epsilon,
-                         d = 2.0, $fn = 20);
-    }
+                // Full-length root rails support the cropped production walls
+                // between the crossbars. The external spring's own 4 mm-high
+                // outrigger remains unchanged inside the retention module.
+                translate([outer_left, slice_y0, 0])
+                    cube([
+                        root_rail_w,
+                        slice_d,
+                        base_thickness
+                    ]);
+                translate([outer_right - root_rail_w,
+                           slice_y0, 0])
+                    cube([
+                        root_rail_w,
+                        slice_d,
+                        base_thickness
+                    ]);
+
+                splitter_side_walls_local();
+                retention_splitter_hybrid_clips_local(
+                    spring_reach = hybrid_splitter_spring_reach,
+                    fixed_reach = hybrid_splitter_fixed_reach,
+                    clip_y_override = clip_y0);
+            }
+            translate([coupon_left - epsilon,
+                       slice_y0 - epsilon, -epsilon])
+                cube([
+                    coupon_right - coupon_left + 2 * epsilon,
+                    slice_d + 2 * epsilon,
+                    rack_height + 2 * epsilon
+                ]);
+        }
 }
 
 module splitter_hybrid_clip_coupon() {
-    reaches = [0.80, 1.20, 1.60];
-    for (index = [0 : len(reaches) - 1])
-        translate([0, index * 22.0, 0])
-            splitter_hybrid_clip_coupon_single(
-                reach = reaches[index], marker_count = index + 1);
+    splitter_hybrid_clip_coupon_single();
+}
+
+// One small print containing the selected Green and TP-Link clip gauges. The
+// 12 mm gap leaves room for a 5 mm brim around the tall Green spring without
+// joining the two roots and changing their flex behavior.
+module hybrid_clip_coupon() {
+    splitter_hybrid_clip_coupon();
+    translate([80.0, 0, 0]) green_hybrid_clip_coupon();
 }
 
 // Extrude a Z/Y profile through X. The profile's first coordinate maps to Z.
@@ -3818,6 +3882,8 @@ if (part == "assembly_preview") {
     splitter_fit_coupon();
 } else if (part == "splitter_hybrid_clip_coupon") {
     splitter_hybrid_clip_coupon();
+} else if (part == "hybrid_clip_coupon") {
+    hybrid_clip_coupon();
 } else if (part == "keystone_fit_test") {
     keystone_fit_test();
 } else if (part == "viewer_mount") {

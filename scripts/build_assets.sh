@@ -61,6 +61,7 @@ canonical_stl_parts=(
   green_hybrid_clip_coupon
   splitter_fit_coupon
   splitter_hybrid_clip_coupon
+  hybrid_clip_coupon
 )
 for part_name in "${canonical_stl_parts[@]}"; do
   run_openscad -o "exports/${part_name}.stl" \
@@ -183,7 +184,7 @@ for part_name in x2d_plate one_piece fit_test friction_fit_coupon splitter_fit_c
   run_openscad -o "exports/${part_name}.3mf" \
     -D "part=\"${part_name}\"" ha_green_rack.scad
 done
-for part_name in green_hybrid_clip_coupon splitter_hybrid_clip_coupon; do
+for part_name in green_hybrid_clip_coupon splitter_hybrid_clip_coupon hybrid_clip_coupon; do
   # These tall snap gauges contain short fit-critical catch faces. CGAL avoids
   # the degenerate facets that some Manifold 3MF exports retain at those seams.
   run_openscad --backend=CGAL -o "exports/${part_name}.3mf" \

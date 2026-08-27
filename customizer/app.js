@@ -2,7 +2,7 @@
 
 import { validateBinaryStl } from "./mesh-codec.js";
 
-const SOURCE_VERSION = "ab59e923b5fbc37b4587e7d84936d6a23461ad2ec7fcb5a7a06fbb2a248eb484";
+const SOURCE_VERSION = "5526c115a9e0679f1cae11c0268749a49025e5ff64816a9ae13c1df58a81c4cf";
 const GENERATOR_CACHE_VERSION = "2";
 const CACHE_DATABASE = "ha-green-rack-customizer-v1";
 const CACHE_STORE = "artifacts";

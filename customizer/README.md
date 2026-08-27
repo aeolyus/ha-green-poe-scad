@@ -42,9 +42,10 @@ with Manifold in under a second.
 ## Safety boundaries
 
 The browser validates mesh topology and dimensions but cannot prove physical
-fit, cable clearance, material shrinkage, or printer calibration. Print the
-Green and TP-Link fit coupons before committing to a full plate. Custom setback
-values and comparison layouts remain test-fit choices.
+fit, cable clearance, material shrinkage, or printer calibration. For the
+top-clip option, print `exports/hybrid_clip_coupon.3mf`; it combines the selected
+Green and TP-Link gauges in one low-material plate. Custom setback values and
+comparison layouts remain test-fit choices.
 
 ## Runtime provenance
 

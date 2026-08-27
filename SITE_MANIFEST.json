@@ -16,8 +16,8 @@
     "sha256": "8b1e7dbafeea23aaec7e65da9fe89d58d56f3164b1ab081ad1fa0b4a81d98010"
   },
   "README.md": {
-    "bytes": 31142,
-    "sha256": "270e03cbb10456fdd4ade01b1f0dc21a4900c72b777f2e33cd06fb6f944bc372"
+    "bytes": 31769,
+    "sha256": "97a3f671a71b1b29b6a6fb37fb32af655a22b95a54ce06a943e30a1897c6ffa9"
   },
   "assets/home-assistant-logo.svg": {
     "bytes": 678,
@@ -28,16 +28,16 @@
     "sha256": "31fb13fb5c1230600fb7c59ca627f954ddd9f51c762de6376b40038f9754699a"
   },
   "customizer/README.md": {
-    "bytes": 2356,
-    "sha256": "6f65b77edf309c1968bdbc27fed79c32728dd46ae428c593c5aa1faf089dd9b4"
+    "bytes": 2423,
+    "sha256": "aa7913a78f47c9a1229be7e2519a5a6c41c8dbacd4d2669e9a0a8dbc5551865d"
   },
   "customizer/app.js": {
     "bytes": 25503,
-    "sha256": "7eafd36089d71c5af3db53f42e38c7a5ef70af33062957fc8c59d2dbd843ffd7"
+    "sha256": "098b79c6332eb098de7f00742e38d86e031ab28ce2e56adaeabed910808f5382"
   },
   "customizer/index.html": {
-    "bytes": 12989,
-    "sha256": "33eb27fbbdad5786a707d4749bcc4e1fcd83b420685f6327e6c0b83bb00be519"
+    "bytes": 13096,
+    "sha256": "68dcaaa4cad6814706454be2061f839da2e28ca278b2769cdabf1977ae5c642d"
   },
   "customizer/mesh-codec.js": {
     "bytes": 10911,
@@ -164,12 +164,12 @@
     "sha256": "bf09399ea5ea279eae885f27cef55ea80fd44c5a9668df3d39b874caf16a3f68"
   },
   "exports/green_hybrid_clip_coupon.3mf": {
-    "bytes": 26973,
-    "sha256": "5aafe3d5f3a9422e2de96b951ecdd3a348de448b485982ecf3160f5c90e10fb5"
+    "bytes": 23347,
+    "sha256": "e0e4cd36255d8e80d3dd2a83067684d932527dd4f555125cf2af43cb00cbd018"
   },
   "exports/green_hybrid_clip_coupon.stl": {
-    "bytes": 118284,
-    "sha256": "6ae79de070d3c6559b1122a97f417e109d6361749b67f4665de066d3c1831d7d"
+    "bytes": 95484,
+    "sha256": "d7fd04a3aff7b40de8a0c55642d45c04793d4815c70f90d3e985c6c5ada90f53"
   },
   "exports/green_spacer_legacy_screw_tray.stl": {
     "bytes": 20884,
@@ -182,6 +182,14 @@
   "exports/green_spacers_4x_legacy_screw_tray.stl": {
     "bytes": 83284,
     "sha256": "e4f74eefc39417588c1bfe196fae1e468a837cd29b9a58ef87bedee63f333ae9"
+  },
+  "exports/hybrid_clip_coupon.3mf": {
+    "bytes": 36210,
+    "sha256": "7d5b7fdf0d23792b9206b4877c230d6ce74e91f378e2cb7d013fae8d5c96fd69"
+  },
+  "exports/hybrid_clip_coupon.stl": {
+    "bytes": 135684,
+    "sha256": "bb42364d76ec7d16e0037af7331ccff39e07ec199731fdd229f54685198b9201"
   },
   "exports/keystone_fit_test.3mf": {
     "bytes": 4622,
@@ -352,12 +360,12 @@
     "sha256": "9c27af5dac67a4afc26a672bf62ed1410d4e53ebc5e0e0f443cd082d66befcbb"
   },
   "exports/splitter_hybrid_clip_coupon.3mf": {
-    "bytes": 44268,
-    "sha256": "b064afa90909aaacbbe8d4ae1dacf81d363d230166683de3c7688d55738514f5"
+    "bytes": 14109,
+    "sha256": "53c7d7f01459df414d5625d5646a24b504fad45facfaf92aeff006cc18851ddf"
   },
   "exports/splitter_hybrid_clip_coupon.stl": {
-    "bytes": 171084,
-    "sha256": "ce3086b72b3d4fd71165c95dbac40d25a26ffd72bd1f9efb17ceed55618dd701"
+    "bytes": 49684,
+    "sha256": "ca385de9733a4e3b11eadf7d9ea62832b2fe8ea84c160e43db75d4e34e5c43b1"
   },
   "exports/x2d_plate.3mf": {
     "bytes": 150918,
@@ -432,8 +440,8 @@
     "sha256": "c3e1d1deaa744fd64c7330d8b178ca006aa2b5f8397b2027e94859eef9ae5d02"
   },
   "ha_green_rack.scad": {
-    "bytes": 156875,
-    "sha256": "ab59e923b5fbc37b4587e7d84936d6a23461ad2ec7fcb5a7a06fbb2a248eb484"
+    "bytes": 159595,
+    "sha256": "5526c115a9e0679f1cae11c0268749a49025e5ff64816a9ae13c1df58a81c4cf"
   },
   "index.html": {
     "bytes": 417,
@@ -499,17 +507,21 @@
     "bytes": 56272,
     "sha256": "571538c87a04e5fe3ffef6de9004d697ee75ea63dcc49e11f58c88929a288323"
   },
+  "result.json": {
+    "bytes": 205,
+    "sha256": "6a20e65d81537c7ee09fe12c00fc5b169b586f09a28df65add15badebadfd6f5"
+  },
   "screwless-retention-research.md": {
-    "bytes": 10091,
-    "sha256": "fac6e4914914602c31d1c028f2ffd0043510ab033c768021e28653b9c0ba7e02"
+    "bytes": 10498,
+    "sha256": "1471620a9fc8e30520f1f849248e317eeb4a00ffec88624a38a4f867d5336d30"
   },
   "scripts/build.sh": {
     "bytes": 8005,
     "sha256": "fd543b8b39e564e5192feaa0f2f6dd3253414f5d6cfcc6a1864ccaccf37c6c8b"
   },
   "scripts/build_assets.sh": {
-    "bytes": 18127,
-    "sha256": "4b86e256e812d2e48f4534cffdcfc5d47668ded369567bf7a16a58ee8b8ab484"
+    "bytes": 18167,
+    "sha256": "54b660642a2d5646e49770734959131afb20dd61dc4d48122be324a752c12b2c"
   },
   "scripts/build_viewer.py": {
     "bytes": 32299,

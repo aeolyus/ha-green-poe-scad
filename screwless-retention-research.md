@@ -45,12 +45,12 @@ The browser overlays are form and force-path studies, not finished printable mec
 - Green lower guide: 0.20 mm/side nominal interference against the measured 109.5375 mm lower footprint, held for only 2.5 mm above the device seat before flaring around the 112 mm cover.
 - Green upper clearance: 0.35 mm/side around the published cover envelope.
 - Green catches: two per side, 18 mm long; 2.4 mm fixed arms on the left and 2.8 mm spring arms on the accessible right side.
-- Green clip coupon: 1.4, 1.8, and 2.2 mm reach, identified by one, two, and three holes. The 1.8 mm viewer value is provisional.
+- Green clip coupon: one 1.8 mm-reach screening gauge with a production-height spring root and two rib-supported seating pads. It verifies local overlap, whitening, and release while avoiding a solid pedestal.
 - Green catch underside: 0.30 mm above the modeled top; 0.30 mm nearly-flat nose with a 45-degree lower support face. Maximum prototype height is 42.55 mm.
 - TP-Link lower bevel: 0.50 mm/side relief at the floor, transitioning to the 0.05 mm/side body-band fit over 3.5 mm.
 - TP-Link clip: 14 mm long, 1.6 mm thick external arm with a 0.60 mm gap from the existing wall, 0.50 mm top clearance, and a 0.30 mm catch nose.
-- TP-Link clip coupon: fixed catches remain 1.2 mm while the spring catches test 0.8, 1.2, and 1.6 mm reach, identified by one, two, and three holes. The four-clip viewer uses 0.8 mm spring catches.
-- Print tray-down in PETG or ASA at 0.20 mm layers with 4–5 walls. The tall Green coupon pieces need a 5 mm slicer brim.
+- TP-Link clip coupon: one full-width open-frame section using the selected 1.2 mm fixed catch and 0.8 mm spring catch. Five-millimeter transverse seating bars and six-millimeter root rails prevent the coupon from twisting more easily than the complete tray.
+- Print tray-down in PETG or ASA at 0.20 mm layers with 4–5 walls. The tall Green gauge needs a 5 mm slicer brim.
 
 Design target: at least 25–30 N extraction resistance and 20 N lift/tilt resistance. The Green weighs about 340 g, or 3.34 N statically.
 
@@ -75,10 +75,10 @@ No complete official Green enclosure CAD was found. The closest device-part refe
 
 ## Validation sequence
 
-1. Print `green_hybrid_clip_coupon` and test the one-hole 1.4 mm catch first, then 1.8 and 2.2 mm only as needed.
-2. Print `splitter_hybrid_clip_coupon` and test the one-hole 0.8 mm spring catch first, then 1.2 and 1.6 mm.
-3. Select the first variant that visibly overlaps the top edge, holds when gently inverted, and releases without whitening or surface scuffing.
-4. After the coupon fit is chosen, generate one complete hybrid tray and perform at least 50 install/remove cycles plus a warm cable-pull test before promoting it to the canonical print.
+1. Print the combined `hybrid_clip_coupon`; it contains the selected 1.8 mm Green spring gauge and the TP-Link 1.2 mm fixed / 0.8 mm spring gauge as separate, mechanically independent pieces.
+2. Tuck each device edge under the fixed side and press the spring side down. Do not slide the open-ended gauges longitudinally onto the devices, because that bypasses the snap action being tested.
+3. Confirm that each selected catch visibly overlaps the top edge, holds when gently inverted, and releases without whitening or surface scuffing.
+4. If either selected fit fails, generate only a nearby reach variant rather than reprinting another three-setting coupon. Once both pass, generate one complete hybrid tray and perform at least 50 install/remove cycles plus a warm cable-pull test before promoting it to the canonical print.
 
 ## Sources
 

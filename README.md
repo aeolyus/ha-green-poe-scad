@@ -112,9 +112,10 @@ The viewer is a hand-built HTML page using Google's open-source `<model-viewer>`
 - `left_ear.stl` / `right_ear.stl` — detachable rack ears for `core.stl`
 - `led_insert_optional.stl` and `led_fixed_window_kit_optional.stl` / `.3mf` — optional self-retaining translucent insert comparison
 - `friction_fit_coupon.stl` / `.3mf` — follow-up smooth-wall channels at 0.25, 0.30, and 0.35 mm interference per side. The original three-hole 0.20 mm/side coupon was a near-perfect clearance fit but did not grip, so test these in order and use the first one that holds without scuffing.
-- `green_hybrid_clip_coupon.stl` / `.3mf` — three full-height single-edge gauges testing 1.4, 1.8, and 2.2 mm Green top-catch reach. Test one hole first and use a 5 mm slicer brim because the gauges are intentionally tall and narrow.
+- `green_hybrid_clip_coupon.stl` / `.3mf` — one compact full-height Green spring-catch gauge at the selected 1.8 mm reach. Its open ribbed seat preserves the production clip root and 9.025 mm device height while using about 4.1 g of PETG. Use a 5 mm slicer brim because the gauge is intentionally tall and narrow.
 - `splitter_fit_coupon.stl` / `.3mf` — three short open-ended smooth-wall test channels at 0.00, 0.05, and 0.10 mm interference per side for the TP-Link body; use the least aggressive level that holds before committing to its full-length friction cradle
-- `splitter_hybrid_clip_coupon.stl` / `.3mf` — three bevel-aware cradle sections with 1.2 mm fixed catches and 0.8, 1.2, or 1.6 mm spring-catch reach; the full four-clip concept uses the shallow 0.8 mm spring option
+- `splitter_hybrid_clip_coupon.stl` / `.3mf` — one compact open-frame TP-Link section with the selected 1.2 mm fixed catch and 0.8 mm spring catch, using about 6.2 g of PETG
+- `hybrid_clip_coupon.stl` / `.3mf` — the recommended single print containing both compact top-clip gauges, about 10.3 g of PETG total and roughly 72% less material than the previous two three-setting coupon files
 - `assembly.stl` — reference assembly only; print the separate parts above
 - `fit_test.stl` / `.3mf` — general device-clearance check
 
@@ -169,7 +170,7 @@ The supplied 3MF is geometry-only, not a pre-sliced Bambu project. In Bambu Stud
 
 The production LED window is intentionally left open, so there is no lens, shutter blade, or retainer to print or assemble. The optional translucent insert can still be generated for comparison if dust protection is preferred later.
 
-For the current friction baseline, print `friction_fit_coupon.stl` and `splitter_fit_coupon.stl`. For the positive-catch study, print `green_hybrid_clip_coupon.stl` and `splitter_hybrid_clip_coupon.stl`; test the one-hole sample first in each set and advance only if it does not overlap securely. Use PETG or ASA, 0.20 mm layers, and 4–5 walls. Add a 5 mm slicer brim to the tall Green clip gauges. Printer calibration, material, and long-term creep all affect these fits.
+For the current friction baseline, print `friction_fit_coupon.stl` and `splitter_fit_coupon.stl`. If top clips are preferred, print only `hybrid_clip_coupon.stl` or `.3mf`; it places the selected Green and TP-Link gauges together without joining their roots. Use PETG or ASA, 0.20 mm layers, and 4–5 walls. Keep the exported tray-down orientation and add a 5 mm slicer brim around the tall Green gauge. Tuck each device under the rigid catch first, then press its flexible side down rather than sliding the open-ended coupon along the device. Printer calibration, material, and long-term creep all affect these fits. The single-edge Green gauge screens local overlap and release; the completed tray still needs a pull/rattle test before production use.
 
 ## Electrical safety
 
@@ -198,6 +199,7 @@ openscad -o exports/friction_fit_coupon.stl -D 'part="friction_fit_coupon"' ha_g
 openscad -o exports/green_hybrid_clip_coupon.stl -D 'part="green_hybrid_clip_coupon"' ha_green_rack.scad
 openscad -o exports/splitter_fit_coupon.stl -D 'part="splitter_fit_coupon"' ha_green_rack.scad
 openscad -o exports/splitter_hybrid_clip_coupon.stl -D 'part="splitter_hybrid_clip_coupon"' ha_green_rack.scad
+openscad -o exports/hybrid_clip_coupon.stl -D 'part="hybrid_clip_coupon"' ha_green_rack.scad
 
 # Clearly named optional comparisons.
 openscad -o exports/one_piece_legacy_screw_tray.stl -D 'part="one_piece"' -D 'green_tray_style="standard"' ha_green_rack.scad
