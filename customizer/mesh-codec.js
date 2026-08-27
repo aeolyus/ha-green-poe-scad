@@ -144,6 +144,12 @@ export function validateBinaryStl(input, expected = {}) {
     sums.set(root, state);
   }
   for (const state of sums.values()) assert(state.sum > 1e-6, "Mesh contains a zero-volume or inward-wound component");
+  if (expected.componentCount != null) {
+    assert(
+      sums.size === expected.componentCount,
+      `Unexpected component count: ${sums.size}`,
+    );
+  }
 
   return {
     bytes,

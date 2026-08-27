@@ -17,7 +17,7 @@ function tetrahedron() {
 }
 
 const bytes = tetrahedron();
-const mesh = validateBinaryStl(bytes, { extent: [1, 1, 1] });
+const mesh = validateBinaryStl(bytes, { extent: [1, 1, 1], componentCount: 1 });
 assert.equal(mesh.triangleCount, 4);
 assert.equal(mesh.componentCount, 1);
 assert.ok(Math.abs(mesh.volumeMm3 - 1 / 6) < 1e-7);
@@ -32,6 +32,9 @@ assert.equal(new DataView(threeMf.buffer).getUint32(0, true), 0x04034b50);
 const broken = bytes.slice();
 new DataView(broken.buffer).setUint32(80, 5, true);
 assert.throws(() => validateBinaryStl(broken), /length/);
+assert.throws(
+  () => validateBinaryStl(bytes, { componentCount: 2 }),
+  /component count/,
+);
 
 console.log("mesh-codec tests pass");
-

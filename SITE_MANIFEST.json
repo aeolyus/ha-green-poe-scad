@@ -32,16 +32,16 @@
     "sha256": "6f65b77edf309c1968bdbc27fed79c32728dd46ae428c593c5aa1faf089dd9b4"
   },
   "customizer/app.js": {
-    "bytes": 22580,
-    "sha256": "10d5fe0a65028f5a40cb6db48580ec125527886108f1127d5031322618832e9e"
+    "bytes": 25503,
+    "sha256": "487458cc8342ad8baf83aea054d7a1f0dc1f606fc631e6248157064bca8d2746"
   },
   "customizer/index.html": {
-    "bytes": 12981,
-    "sha256": "749af505d1d1a9eba7fa2aa3ac289fe0604b849e6718d48741a7878eb9f6eccc"
+    "bytes": 12989,
+    "sha256": "33eb27fbbdad5786a707d4749bcc4e1fcd83b420685f6327e6c0b83bb00be519"
   },
   "customizer/mesh-codec.js": {
-    "bytes": 10752,
-    "sha256": "ee9c9adc2deb91d8876d0efd9b0dd3d17ee96844941966e8a573ef1dd10d79cb"
+    "bytes": 10911,
+    "sha256": "83a763f94b1cb1e8ef4837f48c19031a2521cd0da324b524575bb57bbaaccb37"
   },
   "customizer/mesh-worker.js": {
     "bytes": 4449,
@@ -52,8 +52,8 @@
     "sha256": "d63fd700d79e0715e799887d22b891dabc1f35cb40f93ddb6d24f0e4837852bc"
   },
   "customizer/test-mesh-codec.mjs": {
-    "bytes": 1256,
-    "sha256": "4215ed67c7f9ab41d9431bffde9cc00c7679aac5079cebf4fdbf109c3f7d490e"
+    "bytes": 1370,
+    "sha256": "631174dd9d804963067326c948b92e3533be643ba9a8655235c431578eb52674"
   },
   "customizer/vendor/COPYING.openscad-wasm": {
     "bytes": 18092,

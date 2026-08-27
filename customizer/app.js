@@ -1,6 +1,9 @@
 "use strict";
 
+import { validateBinaryStl } from "./mesh-codec.js";
+
 const SOURCE_VERSION = "d948a97c330ad59be91687204cc1c771b1eb901333ef23fdaafc845d98ff1d2e";
+const GENERATOR_CACHE_VERSION = "2";
 const CACHE_DATABASE = "ha-green-rack-customizer-v1";
 const CACHE_STORE = "artifacts";
 
@@ -250,6 +253,76 @@ function viewerHash(config, embedded = false) {
   return `../viewer/interactive_viewer.html${embedded ? "?embed=1" : ""}#${params}`;
 }
 
+function configHash(config) {
+  const g = config.geometry;
+  const v = config.viewer;
+  return new URLSearchParams({
+    v: "1",
+    part: g.part,
+    spacing: g.spacing,
+    setback: String(effectiveSetback(config)),
+    entry: g.ethernetEntry,
+    front: g.frontKeystoneSide,
+    tray: g.greenTrayStyle,
+    green_clearance: String(g.greenClearanceMmPerSide),
+    green_interference: String(g.greenFrictionInterferenceMmPerSide),
+    splitter_clearance: String(g.splitterClearanceMmPerSide),
+    splitter_interference: String(g.splitterFrictionInterferenceMmPerSide),
+    logo: g.faceLogoEnabled ? "1" : "0",
+    shutter: g.ledShutterEnabled ? "1" : "0",
+    green: v.showGreen ? "1" : "0",
+    poe: v.showSplitter ? "1" : "0",
+    cables: v.showCables ? "1" : "0",
+    leds: v.simulateLeds ? "1" : "0",
+    rotate: v.autoRotate ? "1" : "0",
+  }).toString();
+}
+
+function configFromHash() {
+  const raw = decodeURIComponent(location.hash.slice(1));
+  if (!raw) return null;
+  if (!raw.includes("=")) {
+    const padding = "=".repeat((4 - raw.length % 4) % 4);
+    return JSON.parse(atob(raw + padding));
+  }
+
+  const params = new URLSearchParams(raw);
+  const number = (name, fallback) => {
+    const value = Number(params.get(name));
+    return Number.isFinite(value) ? value : fallback;
+  };
+  const enabled = (name, fallback) => {
+    const value = params.get(name);
+    return value === null ? fallback : value === "1";
+  };
+  const spacing = params.get("spacing") || DEFAULTS.spacing;
+  return {
+    geometry: {
+      part: params.get("part") || DEFAULTS.part,
+      spacing,
+      splitterSetbackMm: spacing === "custom"
+        ? number("setback", DEFAULTS.customSetback)
+        : null,
+      ethernetEntry: params.get("entry") || DEFAULTS.ethernetEntry,
+      frontKeystoneSide: params.get("front") || DEFAULTS.frontPosition,
+      greenTrayStyle: params.get("tray") || DEFAULTS.trayStyle,
+      greenClearanceMmPerSide: number("green_clearance", DEFAULTS.greenClearance),
+      greenFrictionInterferenceMmPerSide: number("green_interference", DEFAULTS.greenInterference),
+      splitterClearanceMmPerSide: number("splitter_clearance", DEFAULTS.splitterClearance),
+      splitterFrictionInterferenceMmPerSide: number("splitter_interference", DEFAULTS.splitterInterference),
+      faceLogoEnabled: enabled("logo", DEFAULTS.faceLogo),
+      ledShutterEnabled: enabled("shutter", DEFAULTS.ledShutter),
+    },
+    viewer: {
+      showGreen: enabled("green", DEFAULTS.showGreen),
+      showSplitter: enabled("poe", DEFAULTS.showSplitter),
+      showCables: enabled("cables", DEFAULTS.showCables),
+      simulateLeds: enabled("leds", DEFAULTS.showLeds),
+      autoRotate: enabled("rotate", DEFAULTS.autoRotate),
+    },
+  };
+}
+
 function validate(config) {
   const messages = [];
   const g = config.geometry;
@@ -304,7 +377,7 @@ function updateSummary() {
     liveViewer.setAttribute("src", embeddedViewerUrl);
   const signature = JSON.stringify(scadParameters(config));
   if (generatedSignature && generatedSignature !== signature) clearGeneratedDownloads();
-  history.replaceState(null, "", `#${encodeURIComponent(btoa(JSON.stringify(config)).replaceAll("=", ""))}`);
+  history.replaceState(null, "", `#${configHash(config)}`);
 }
 
 function setRadio(name, value) {
@@ -397,6 +470,7 @@ function expectedGeometry(config) {
     extent: [part === "one_piece" ? 254 : 220, part === "x2d_plate" ? null : mountDepth, 43],
     extentTolerance: 0.08,
     maxTriangles: 250000,
+    componentCount: part === "x2d_plate" ? 3 : 1,
   };
 }
 
@@ -445,17 +519,22 @@ async function startGeneration() {
   clearGeneratedDownloads();
   const config = getConfig();
   const requestId = ++generationRequestId;
-  const cacheKey = `${SOURCE_VERSION}:${JSON.stringify(scadParameters(config))}`;
+  const cacheKey = `${SOURCE_VERSION}:${GENERATOR_CACHE_VERSION}:${JSON.stringify(scadParameters(config))}`;
   generateButton.disabled = true;
   cancelButton.disabled = false;
   setGenerationStatus("running", 1, "Checking the local cache…", "Previously validated builds can be reused instantly.");
   const cached = await cachedArtifact(cacheKey);
   if (requestId !== generationRequestId) return;
   if (cached) {
-    generateButton.disabled = false;
-    cancelButton.disabled = true;
-    finishGeneration({ ...cached, backend: `${cached.backend} cache`, elapsedMs: 0 }, config);
-    return;
+    try {
+      validateBinaryStl(new Uint8Array(cached.stl), expectedGeometry(config));
+      generateButton.disabled = false;
+      cancelButton.disabled = true;
+      finishGeneration({ ...cached, backend: `${cached.backend} cache`, elapsedMs: 0 }, config);
+      return;
+    } catch {
+      // Ignore stale or malformed cached output and regenerate it below.
+    }
   }
   meshWorker = new Worker("mesh-worker.js", { type: "module" });
   setGenerationStatus("running", 1, "Starting OpenSCAD…", "The first run loads and initializes the 14 MB engine.");
@@ -539,9 +618,8 @@ generateButton.addEventListener("click", startGeneration);
 cancelButton.addEventListener("click", () => cancelGeneration());
 
 try {
-  const encoded = decodeURIComponent(location.hash.slice(1));
-  const padding = "=".repeat((4 - encoded.length % 4) % 4);
-  if (encoded) applyConfig(JSON.parse(atob(encoded + padding)));
+  const config = configFromHash();
+  if (config) applyConfig(config);
   else resetDefaults();
 } catch {
   resetDefaults();
