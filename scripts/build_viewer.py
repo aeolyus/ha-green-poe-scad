@@ -414,6 +414,8 @@ TPLINK_ONLY_RETENTION_FILENAMES = {
     "viewer_retention_ventilated_sleeves.stl",
 }
 
+STACKED_VARIANT_ID = "stacked_center"
+
 SHUTTER_CONFIGURATION = "shutter"
 NO_SHUTTER_CONFIGURATION = "no_shutter"
 SHUTTER_CONFIGURATIONS = (SHUTTER_CONFIGURATION, NO_SHUTTER_CONFIGURATION)
@@ -458,6 +460,21 @@ VARIANTS = [
             "Current printable and straight-cable baseline. Separate X/Z "
             "lanes keep both jumpers clear of the panel, devices, and each "
             "other while preserving the full 21 mm RJ45 and 10 mm DC bends."
+        ),
+    },
+    {
+        "id": STACKED_VARIANT_ID,
+        "device": "tplink",
+        "device_name": "TP-Link TL-PD30G-M2",
+        "label": "Centered stacked",
+        "setback": "Green centered · TP-Link transverse behind",
+        "dimensions": "254 W × 43 H × 202.4 D mm printed mount",
+        "note": (
+            "Viewer-only centered study. The TP-Link rotates 90° behind the "
+            "Green, keeping both device bottoms on the unified 9.025 mm "
+            "seating plane. Its right-facing LAN output aligns with the "
+            "Green Ethernet jack for a full-radius R21 turn; the PoE input "
+            "turns toward the rack rear from the left side."
         ),
     },
     {
@@ -589,7 +606,9 @@ def load_variants(
                     name = "DC cable — bend-radius warning"
                     color = (232, 119, 34, 190)
                 source_path = (
-                    VIEWER / source_filename
+                    variant_dir / source_filename
+                    if variant["id"] == STACKED_VARIANT_ID
+                    else VIEWER / source_filename
                     if filename in SHARED_PART_FILENAMES
                     else variant_dir / source_filename
                 )
@@ -611,7 +630,17 @@ def load_variants(
                 if filename in TPLINK_ONLY_RETENTION_FILENAMES \
                         and variant["device"] != "tplink":
                     continue
-                if filename in VARIANT_RETENTION_FILENAMES:
+                if variant["id"] == STACKED_VARIANT_ID:
+                    source_path = variant_dir / filename
+                    if not source_path.is_file():
+                        if required_variant_retention is not None \
+                                and variant["id"] in required_variant_retention:
+                            raise FileNotFoundError(
+                                "Missing centered-stacked retention mesh: "
+                                f"{source_path}"
+                            )
+                        continue
+                elif filename in VARIANT_RETENTION_FILENAMES:
                     variant_path = variant_dir / filename
                     if variant_path.is_file():
                         source_path = variant_path
@@ -744,12 +773,17 @@ def atomic_write_text(path: Path, text: str) -> None:
                 pass
 
 
-def load_existing_glbs() -> dict[str, dict[str, bytes]]:
+def load_existing_glbs(
+    skip_variants: set[str] | None = None,
+) -> dict[str, dict[str, bytes]]:
     """Load already-built GLBs for a fast HTML-only or partial refresh."""
+    skipped = skip_variants or set()
     glbs: dict[str, dict[str, bytes]] = {}
     missing: list[Path] = []
     for variant in VARIANTS:
         variant_id = variant["id"]
+        if variant_id in skipped:
+            continue
         glbs[variant_id] = {}
         for configuration in SHUTTER_CONFIGURATIONS:
             path = glb_path(variant_id, configuration)
@@ -775,7 +809,7 @@ def build_glbs(selected_variants: set[str]) -> dict[str, dict[str, bytes]]:
     glbs = (
         {}
         if selected_variants == all_variant_ids
-        else load_existing_glbs()
+        else load_existing_glbs(selected_variants)
     )
 
     for variant in VARIANTS:

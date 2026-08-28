@@ -23,6 +23,12 @@ part = "assembly_preview";
 // with "sics" to show the user's existing captive-lead splitter.
 splitter_model = "tplink";
 
+// Viewer-only arrangement switch. The production files retain the selected
+// cable-friendly side-by-side layout; "stacked_center" centers the Green and
+// rotates the TP-Link across the rack directly behind it.
+device_layout = "side_by_side";  // [side_by_side, stacked_center]
+stacked_center_layout = device_layout == "stacked_center";
+
 // Cable-friendly production layout: rear PoE/Ethernet entry with the TP-Link
 // set back 60 mm from the face. Front-entry editions and other setbacks remain
 // available as explicit build overrides.
@@ -102,9 +108,11 @@ green_standoff = is_undef(green_standoff_override)
     ? green_standoff_default : green_standoff_override;
 green_spacer_tip_h = 1.475;
 green_spacer_h = green_standoff + green_spacer_tip_h;
-// The Green moves right to leave a straight, full-depth splitter bay on the
-// left. This also puts the HA badge on the left, matching the visual reference.
-green_x = 88.0 + (112.0 - green_w) / 2;
+// The normal layout moves the Green right to leave a full-depth splitter bay.
+// The viewer-only stacked study centers it on the complete 254 mm panel.
+green_x = stacked_center_layout
+    ? core_width / 2 - green_w / 2
+    : 88.0 + (112.0 - green_w) / 2;
 green_y = 4.5 + (112.0 - green_d) / 2;
 green_mount_x = [green_x + (green_w - green_mount_pitch_x) / 2,
                  green_x + (green_w + green_mount_pitch_x) / 2];
@@ -144,22 +152,30 @@ splitter_lower_bevel_inset = splitter_side_bevel_inset;
 splitter_upper_bevel_inset = splitter_side_bevel_inset;
 splitter_upper_end_bevel_inset =
     (splitter_d - splitter_top_flat_d) / 2;
+splitter_lan_local_x = 15.7;
+splitter_dc_local_x = 37.3;
+splitter_input_local_x = 31.9;
 splitter_x = 13.0;
+stacked_splitter_output_x = core_width / 2 + splitter_d / 2;
 // Production default is the cable-friendly 60 mm setback. Viewer builds can
 // override this to compare closer layouts without changing printable exports.
 splitter_y_override = undef;
 front_left_splitter_y = 89.0;
+stacked_splitter_y = green_y + green_d + 25.0 + 21.0
+                     - splitter_lan_local_x;
 splitter_y = !is_undef(splitter_y_override)
     ? splitter_y_override
-    : (front_ethernet_enabled && front_keystone_side == "left"
+    : (stacked_center_layout
+        ? stacked_splitter_y
+        : front_ethernet_enabled && front_keystone_side == "left"
         ? front_left_splitter_y : 60.0);
 
 // Approximate port centers used only for viewer cable mockups.
-splitter_lan_x = splitter_x + 15.7;
-splitter_dc_x = splitter_x + 37.3;
+splitter_lan_x = splitter_x + splitter_lan_local_x;
+splitter_dc_x = splitter_x + splitter_dc_local_x;
 splitter_device_z = unified_deck_raise + base_thickness;
 splitter_port_z = splitter_device_z + splitter_h / 2;
-splitter_input_x = splitter_x + 31.9;
+splitter_input_x = splitter_x + splitter_input_local_x;
 splitter_input_y = splitter_y + splitter_d;
 
 green_power_x = green_x + 11.0;
@@ -207,9 +223,11 @@ epsilon = 0.02;
 
 // Physical printed depth for the active splitter placement. The Green sets a
 // 119.8 mm floor; the splitter sets the deeper Balanced/Cable-friendly values.
-mount_depth = max(119.8,
-                  splitter_y + splitter_d + splitter_clearance
-                      + wall_thickness);
+mount_depth = stacked_center_layout
+    ? max(119.8,
+          splitter_y + splitter_w + splitter_clearance + wall_thickness)
+    : max(119.8,
+          splitter_y + splitter_d + splitter_clearance + wall_thickness);
 
 // SICSOLINK SL-FLQ-POE48K viewer-only geometry. The 40-degree mirrored
 // placement preserves the earlier cable-safe layout: captive outputs sit near
@@ -749,8 +767,14 @@ module green_spacers_4x() {
 }
 
 module splitter_transform() {
-    translate([splitter_x, splitter_y, unified_deck_raise])
-        children();
+    if (stacked_center_layout)
+        translate([stacked_splitter_output_x,
+                   splitter_y,
+                   unified_deck_raise])
+            rotate([0, 0, 90]) children();
+    else
+        translate([splitter_x, splitter_y, unified_deck_raise])
+            children();
 }
 
 module splitter_side_wall_left_local(
@@ -885,7 +909,7 @@ module splitter_tray_without_side_walls() {
 
 // Extrude a Z/Y structural profile through X. These ribs are deliberately
 // bounded below the straight-plug envelopes and use only vertical or
-// 45-degree surfaces for support-free tray-side-down printing.
+// 45-degree surfaces for support-free faceplate-down printing.
 module reinforcement_extrude_x(x0, thickness) {
     translate([x0 + thickness, 0, 0])
         rotate([0, -90, 0])
@@ -933,7 +957,7 @@ module device_bridge_web_2d(
         square([bridge_w, web_d]);
 }
 
-module device_bridges() {
+module side_by_side_device_bridges() {
     splitter_outer_right = splitter_x + splitter_w + splitter_clearance
                            + wall_thickness;
     green_outer_left = green_x - wall_thickness;
@@ -1012,6 +1036,56 @@ module device_bridges() {
                        unified_deck_z0 - epsilon])
                 cube([7.5, 3.2, base_thickness + 2 * epsilon]);
     }
+}
+
+module stacked_center_device_bridge() {
+    splitter_tray_left = stacked_splitter_output_x
+        - (splitter_d + splitter_clearance + wall_thickness);
+    splitter_tray_right = stacked_splitter_output_x
+        + splitter_clearance + wall_thickness;
+    splitter_tray_front = splitter_y
+        - splitter_clearance - wall_thickness;
+    green_tray_rear = green_y + green_inner_d + wall_thickness;
+    bridge_x = splitter_tray_left - 0.20;
+    bridge_y = green_tray_rear - 0.20;
+    bridge_w = splitter_tray_right - splitter_tray_left + 0.40;
+    bridge_d = splitter_tray_front - green_tray_rear + 0.40;
+    flange_t = 2.40;
+    flange_z0 = 1.20;
+
+    assert(bridge_d > 8.0,
+           "Centered stacked bridge needs a positive cable bay");
+
+    // The short honeycomb bridge lands flush with both raised floors. Three
+    // deep longitudinal return flanges resist sag without filling the volume
+    // below the common 9.025 mm device seating plane.
+    translate([0, 0, unified_deck_z0])
+        linear_extrude(height = base_thickness)
+            difference() {
+                translate([bridge_x, bridge_y])
+                    rounded_rect_2d(bridge_w, bridge_d, 2.5);
+                translate([bridge_x + 5.0, bridge_y + 4.0])
+                    honeycomb_openings_2d(
+                        bridge_w - 10.0, bridge_d - 8.0,
+                        12.0, 1.8);
+            }
+
+    for (x = [
+        bridge_x + 1.20,
+        (splitter_tray_left + splitter_tray_right) / 2 - flange_t / 2,
+        bridge_x + bridge_w - flange_t - 1.20
+    ])
+        translate([x, bridge_y, flange_z0])
+            cube([
+                flange_t,
+                bridge_d,
+                unified_deck_z0 + base_thickness - flange_z0
+            ]);
+}
+
+module device_bridges() {
+    if (stacked_center_layout) stacked_center_device_bridge();
+    else side_by_side_device_bridges();
 }
 
 module sics_transform() {
@@ -1569,6 +1643,13 @@ module right_ear_print() {
         translate([-(rack_width - ear_width - 14.0), 0, 0]) right_ear();
 }
 
+module core_face_down_print() {
+    // Put the front face directly on the build plate. Original Y (rack
+    // depth) becomes print Z, so every raised deck and bridge grows outward
+    // from the face instead of beginning as a floating horizontal surface.
+    translate([0, rack_height, 0]) rotate([90, 0, 0]) core();
+}
+
 module led_lens_print() {
     translate([2.0, 10.0, 0]) rotate([90, 0, 0]) led_insert();
 }
@@ -1621,23 +1702,24 @@ module led_fixed_window_kit() {
 }
 
 module x2d_plate() {
-    // Loose ears and the selected LED-window parts sit behind the core,
-    // keeping even the deeper left-front edition inside the X2D overlap area.
+    // The core and ears all sit front-face-down. Loose pieces occupy compact
+    // rows beside the 220 x 43 mm core footprint, while rack depth grows only
+    // in print Z. This keeps the unified raised decks support-free.
     // Green spacers are emitted only for the legacy screw-mounted tray; the
     // friction trays carry the device directly on their integrated support.
-    loose_parts_y = max(153.0, mount_depth + 8.0);
-    core();
-    translate([10.0, loose_parts_y, 0]) left_ear_print();
-    translate([55.0, loose_parts_y, 0]) right_ear_print();
+    loose_parts_y = 50.0;
+    core_face_down_print();
+    translate([0, loose_parts_y, 0]) left_ear_print();
+    translate([38.0, loose_parts_y, 0]) right_ear_print();
     if (led_shutter_enabled || led_window_insert_enabled)
-        translate([110.0, loose_parts_y + 3.0, 0]) led_lens_print();
+        translate([78.0, loose_parts_y, 0]) led_lens_print();
     if (led_shutter_enabled) {
-        translate([110.0, loose_parts_y + 18.0, 0]) led_shutter_print();
-        translate([110.0, loose_parts_y + 31.0, 0])
+        translate([1.0, loose_parts_y + 54.0, 0]) led_shutter_print();
+        translate([110.0, loose_parts_y + 54.0, 0])
             led_shutter_retainer_print();
     }
     if (green_tray_style == "standard")
-        translate([10.0, loose_parts_y + 47.0, 0]) green_spacers_4x();
+        translate([190.0, loose_parts_y, 0]) green_spacers_4x();
 }
 
 module cable_path(points, diameter = 3.0) {
@@ -1802,6 +1884,21 @@ module dc_plug(center, direction = 1) {
             cylinder(h = dc_plug_depth, d = 8.5, $fn = 28);
 }
 
+module ethernet_plug_x(center, direction = 1) {
+    // Same planning envelope rotated onto a side-facing TP-Link connector.
+    translate([
+        direction > 0 ? center[0] : center[0] - ethernet_plug_depth,
+        center[1] - 6.0,
+        center[2] - 4.5
+    ]) cube([ethernet_plug_depth, 12.0, 9.0]);
+}
+
+module dc_plug_x(center, direction = 1) {
+    translate(center)
+        rotate([0, direction > 0 ? 90 : -90, 0])
+            cylinder(h = dc_plug_depth, d = 8.5, $fn = 28);
+}
+
 module mockups() {
     // Visual aids only; never included in production STL exports.
     color([0.45, 0.95, 0.65, 0.48])
@@ -1861,6 +1958,28 @@ module viewer_splitter_ports(add_ear_offset = true) {
                 translate([sics_w / 2 - 8.0, sics_d - 0.9,
                            base_thickness + 7.0])
                     cube([16.0, 1.8, 14.0]);
+        } else if (stacked_center_layout) {
+            input_face_x = stacked_splitter_output_x - splitter_d;
+
+            // Rotated TP-Link: LAN/DC face right, while selector and PoE IN
+            // face left. The device remains centered behind the Green.
+            translate([stacked_splitter_output_x - 0.9,
+                       splitter_y + splitter_lan_local_x - 8.0,
+                       splitter_device_z + 5.0])
+                cube([1.8, 16.0, 14.0]);
+            translate([stacked_splitter_output_x - 0.9,
+                       splitter_y + splitter_dc_local_x,
+                       splitter_port_z])
+                rotate([0, 90, 0]) cylinder(h = 1.8, d = 8.5, $fn = 28);
+
+            translate([input_face_x - 0.9,
+                       splitter_y + 8.0 - 4.5,
+                       splitter_device_z + 8.5])
+                cube([1.8, 9.0, 5.0]);
+            translate([input_face_x - 0.9,
+                       splitter_y + splitter_input_local_x - 8.0,
+                       splitter_device_z + 5.0])
+                cube([1.8, 16.0, 14.0]);
         } else {
             // TP-Link LAN OUT and DC OUT on the front-facing end.
             translate([splitter_lan_x - 8.0, splitter_y - 0.9,
@@ -1945,6 +2064,38 @@ module viewer_internal_data_cable(add_ear_offset = true) {
             ethernet_plug([green_ethernet_x, green_port_y,
                            green_port_z], 1);
 
+        } else if (stacked_center_layout) {
+            green_exit = [
+                green_ethernet_x,
+                green_port_y + ethernet_plug_depth,
+                green_port_z
+            ];
+            splitter_port = [
+                stacked_splitter_output_x,
+                splitter_y + splitter_lan_local_x,
+                splitter_port_z
+            ];
+            splitter_exit = splitter_port
+                + [ethernet_plug_depth, 0, 0];
+            bend_center = green_exit
+                + [ethernet_bend_radius, 0, 0];
+            bend = [for (index = [0 : 20])
+                let(angle = 180 - 90 * index / 20)
+                    [bend_center[0] + ethernet_bend_radius * cos(angle),
+                     bend_center[1] + ethernet_bend_radius * sin(angle),
+                     green_exit[2]]];
+            tail = cubic_bezier_points(
+                bend[len(bend) - 1],
+                bend[len(bend) - 1] + [3.0, 0, 0],
+                splitter_exit + [-3.0, 0, 0],
+                splitter_exit, 8, 1);
+
+            // Rotating the splitter aligns LAN closely enough with the
+            // Green Ethernet jack for one full-radius R21 quarter-turn.
+            cable_path(concat(bend, tail), ethernet_cable_diameter);
+            ethernet_plug(
+                [green_ethernet_x, green_port_y, green_port_z], 1);
+            ethernet_plug_x(splitter_port, 1);
         } else if (front_ethernet_enabled
                    && front_keystone_side == "right") {
             // The centered-right front jack occupies the original X=78 LAN
@@ -2018,6 +2169,21 @@ module viewer_input_data_cable(add_ear_offset = true) {
             cable_path(input_points, ethernet_cable_diameter);
             sics_transform()
                 ethernet_plug([sics_w / 2, sics_d, 20.0], 1);
+        } else if (stacked_center_layout) {
+            input_face_x = stacked_splitter_output_x - splitter_d;
+            input_y = splitter_y + splitter_input_local_x;
+            input_port = [input_face_x, input_y, splitter_port_z];
+            input_exit = input_port + [-ethernet_plug_depth, 0, 0];
+            input_points = cubic_bezier_points(
+                input_exit,
+                input_exit + [-18.0, 0, 0],
+                [input_exit[0] - 24.0, 212.0, splitter_port_z],
+                [input_exit[0] - 24.0, 232.0, splitter_port_z], 24);
+
+            // The side-facing PoE input turns toward the rack rear without
+            // crossing either device or its raised support bridge.
+            cable_path(input_points, ethernet_cable_diameter);
+            ethernet_plug_x(input_port, -1);
         } else if (front_ethernet_enabled) {
             // All front-entry editions use ordinary straight plugs and
             // verified R21-or-larger paths back to POWER+DATA IN.
@@ -2142,6 +2308,48 @@ module viewer_dc_cable(add_ear_offset = true) {
                     [99.0, 143.0, green_port_z], dc_end, 16, 1));
             cable_path(sics_dc_points, dc_cable_diameter);
             dc_plug([green_power_x, green_port_y, green_port_z], 1);
+        } else if (stacked_center_layout) {
+            green_port = [green_power_x, green_port_y, green_port_z];
+            green_exit = green_port + [0, dc_plug_depth, 0];
+            splitter_port = [
+                stacked_splitter_output_x,
+                splitter_y + splitter_dc_local_x,
+                splitter_port_z
+            ];
+            splitter_exit = splitter_port + [dc_plug_depth, 0, 0];
+            tray_rear_y = splitter_y + splitter_w
+                + splitter_clearance + wall_thickness;
+            left_turn_center = green_exit + [-dc_bend_radius, 0, 0];
+            rear_left_center = [
+                left_turn_center[0] + dc_bend_radius,
+                tray_rear_y,
+                splitter_port_z
+            ];
+            rear_right_center = [
+                splitter_exit[0] - dc_bend_radius,
+                tray_rear_y,
+                splitter_port_z
+            ];
+            dc_points = concat(
+                arc_points_xy(
+                    left_turn_center, dc_bend_radius,
+                    0, 90, splitter_port_z, 12),
+                [[left_turn_center[0], tray_rear_y, splitter_port_z]],
+                arc_points_xy(
+                    rear_left_center, dc_bend_radius,
+                    180, 90, splitter_port_z, 12),
+                [[rear_right_center[0],
+                  tray_rear_y + dc_bend_radius, splitter_port_z]],
+                arc_points_xy(
+                    rear_right_center, dc_bend_radius,
+                    90, 0, splitter_port_z, 12),
+                [splitter_exit]);
+
+            // Route around the splitter's left and rear edges with full R10
+            // corners, then descend its open right side to DC OUT.
+            cable_path(dc_points, dc_cable_diameter);
+            dc_plug(green_port, 1);
+            dc_plug_x(splitter_port, 1);
         } else if (front_ethernet_enabled
                    && front_keystone_side == "right") {
             // Layer the DC jumper below the centered-right Ethernet paths.
@@ -3101,7 +3309,7 @@ module friction_end_stops_local(
 // Pad and skeletal bases do not have a full-height lattice below the stops.
 // These webs fill only the existing stop footprints down to the 3 mm base, so
 // the visible stop outline and device clearances stay unchanged while the part
-// remains support-free when printed tray-side-down.
+// remains support-free when printed faceplate-down.
 module friction_end_stop_supports_local(
     include_front = true,
     include_rear = true) {
@@ -3496,7 +3704,7 @@ module airframe_extrude_x(x0, thickness) {
 // this does not clip partial cells at the aperture boundary: a clipped top
 // cell would create a flat bridge in a vertical wall. The short shoulders make
 // each opening read as a hexagon, while the upper edges stay steeper than 45
-// degrees for support-free tray-side-down printing.
+// degrees for support-free faceplate-down printing.
 module airframe_honeycomb_openings_2d(w, h, pitch, wall) {
     hole_z_r = (pitch - wall) / 2;
     hole_y_r = hole_z_r * 0.88;
@@ -4004,6 +4212,7 @@ module retention_ventilated_sleeves_local() {
 
 function chassis_depth_for_layout() =
     splitter_model == "sics" ? 238.0
+    : stacked_center_layout ? 225.0
     : (front_ethernet_enabled && front_keystone_side == "left") ? 225.0
     : front_ethernet_enabled ? 205.0
     : 185.0;
@@ -4464,6 +4673,18 @@ assert(abs(unified_deck_z0 + base_thickness - green_device_z) < 0.001,
        "Unified raised deck must finish at the Green seating plane");
 assert(abs(splitter_device_z - green_device_z) < 0.001,
        "Green and TP-Link bottoms must share the unified deck height");
+assert(device_layout == "side_by_side"
+       || device_layout == "stacked_center",
+       str("Unknown device_layout: ", device_layout));
+assert(!stacked_center_layout || !front_ethernet_enabled,
+       "Centered stacked layout supports rear Ethernet entry only");
+assert(!stacked_center_layout
+       || abs(green_x + green_w / 2 - core_width / 2) < 0.001,
+       "Centered stacked Green must remain centered on the rack panel");
+assert(!stacked_center_layout
+       || abs(stacked_splitter_output_x - splitter_d / 2
+              - core_width / 2) < 0.001,
+       "Centered stacked TP-Link must remain centered behind the Green");
 
 assert(!(front_ethernet_enabled
          && front_keystone_side == "far_right"

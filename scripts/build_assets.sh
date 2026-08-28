@@ -181,7 +181,14 @@ done
 run_openscad -o exports/keystone_fit_test.stl \
   -D 'part="keystone_fit_test"' ha_green_rack.scad
 
-for part_name in x2d_plate one_piece fit_test friction_fit_coupon splitter_fit_coupon; do
+for part_name in x2d_plate one_piece; do
+  # Manifold currently leaves zero-area triangle fragments in these large
+  # multi-feature 3MFs even when the corresponding STL fallback is clean.
+  # Force CGAL so the downloadable production meshes remain watertight.
+  run_openscad --backend=CGAL -o "exports/${part_name}.3mf" \
+    -D "part=\"${part_name}\"" ha_green_rack.scad
+done
+for part_name in fit_test friction_fit_coupon splitter_fit_coupon; do
   run_openscad -o "exports/${part_name}.3mf" \
     -D "part=\"${part_name}\"" ha_green_rack.scad
 done
@@ -194,13 +201,14 @@ done
 cp exports/one_piece.3mf \
    exports/one_piece_rear_cable_friendly_friction_raised_no_shutter_flat_face.3mf
 for part_name in x2d_plate one_piece; do
-  run_openscad -o "exports/${part_name}_legacy_screw_tray.3mf" \
+  run_openscad --backend=CGAL \
+    -o "exports/${part_name}_legacy_screw_tray.3mf" \
     -D "part=\"${part_name}\"" \
     -D 'green_tray_style="standard"' ha_green_rack.scad
-  run_openscad -o "exports/${part_name}_with_logo.3mf" \
+  run_openscad --backend=CGAL -o "exports/${part_name}_with_logo.3mf" \
     -D "part=\"${part_name}\"" \
     -D 'face_logo_enabled=true' ha_green_rack.scad
-  run_openscad -o "exports/${part_name}_with_shutter.3mf" \
+  run_openscad --backend=CGAL -o "exports/${part_name}_with_shutter.3mf" \
     -D "part=\"${part_name}\"" \
     -D 'led_shutter_enabled=true' ha_green_rack.scad
 done
@@ -212,11 +220,13 @@ run_openscad -o exports/led_shutter_kit_optional.3mf \
   ha_green_rack.scad
 for front_spec in "right:60" "left:89"; do
   IFS=: read -r front_side front_y <<< "$front_spec"
-  run_openscad -o "exports/one_piece_front_ethernet_${front_side}.3mf" \
+  run_openscad --backend=CGAL \
+    -o "exports/one_piece_front_ethernet_${front_side}.3mf" \
     -D 'part="one_piece"' -D 'front_ethernet_enabled=true' \
     -D "front_keystone_side=\"${front_side}\"" \
     -D "splitter_y_override=${front_y}" ha_green_rack.scad
-  run_openscad -o "exports/x2d_plate_front_ethernet_${front_side}.3mf" \
+  run_openscad --backend=CGAL \
+    -o "exports/x2d_plate_front_ethernet_${front_side}.3mf" \
     -D 'part="x2d_plate"' -D 'front_ethernet_enabled=true' \
     -D "front_keystone_side=\"${front_side}\"" \
     -D "splitter_y_override=${front_y}" ha_green_rack.scad
@@ -233,11 +243,13 @@ for front_spec in "right:60" "left:89"; do
     -D "splitter_y_override=${front_y}" \
     -D 'led_shutter_enabled=true' ha_green_rack.scad
 done
-run_openscad -o exports/one_piece_front_ethernet_far_right.3mf \
+run_openscad --backend=CGAL \
+  -o exports/one_piece_front_ethernet_far_right.3mf \
   -D 'part="one_piece"' -D 'front_ethernet_enabled=true' \
   -D 'front_keystone_side="far_right"' -D 'splitter_y_override=60' \
   ha_green_rack.scad
-run_openscad -o exports/one_piece_front_ethernet_far_right_with_shutter.3mf \
+run_openscad --backend=CGAL \
+  -o exports/one_piece_front_ethernet_far_right_with_shutter.3mf \
   -D 'part="one_piece"' -D 'front_ethernet_enabled=true' \
   -D 'front_keystone_side="far_right"' -D 'splitter_y_override=60' \
   -D 'led_shutter_enabled=true' ha_green_rack.scad
@@ -278,20 +290,21 @@ done
 # Viewer comparison layouts. The far-right Ethernet edition is one-piece-only;
 # SICSOLINK remains viewer-only.
 viewer_variants=(
-  "compact:tplink:35:false:right"
-  "balanced:tplink:47.5:false:right"
-  "cable_friendly:tplink:60:false:right"
-  "front_ethernet_right:tplink:60:true:right"
-  "front_ethernet_far_right:tplink:60:true:far_right"
-  "front_ethernet_left:tplink:89:true:left"
-  "sics_angled:sics:60:false:right"
+  "compact:tplink:35:false:right:side_by_side"
+  "balanced:tplink:47.5:false:right:side_by_side"
+  "cable_friendly:tplink:60:false:right:side_by_side"
+  "stacked_center:tplink:145.56875:false:right:stacked_center"
+  "front_ethernet_right:tplink:60:true:right:side_by_side"
+  "front_ethernet_far_right:tplink:60:true:far_right:side_by_side"
+  "front_ethernet_left:tplink:89:true:left:side_by_side"
+  "sics_angled:sics:60:false:right:side_by_side"
 )
 
 build_viewer_variant() {
   local variant_spec="$1"
-  local variant_id variant_model variant_y variant_front variant_side
+  local variant_id variant_model variant_y variant_front variant_side variant_layout
   local variant_dir part_name
-  IFS=: read -r variant_id variant_model variant_y variant_front variant_side \
+  IFS=: read -r variant_id variant_model variant_y variant_front variant_side variant_layout \
     <<< "$variant_spec"
   variant_dir="viewer/variants/${variant_id}"
   mkdir -p "$variant_dir"
@@ -301,6 +314,7 @@ build_viewer_variant() {
       -D "part=\"viewer_${part_name}\"" \
       -D "splitter_model=\"${variant_model}\"" \
       -D "splitter_y_override=${variant_y}" \
+      -D "device_layout=\"${variant_layout}\"" \
       -D "front_ethernet_enabled=${variant_front}" \
       -D "front_keystone_side=\"${variant_side}\"" \
       -D 'led_shutter_enabled=true' ha_green_rack.scad
@@ -312,6 +326,7 @@ build_viewer_variant() {
         -D "part=\"viewer_${part_name}\"" \
         -D "splitter_model=\"${variant_model}\"" \
         -D "splitter_y_override=${variant_y}" \
+        -D "device_layout=\"${variant_layout}\"" \
         -D "front_ethernet_enabled=${variant_front}" \
         -D "front_keystone_side=\"${variant_side}\"" \
         -D 'led_shutter_enabled=true' ha_green_rack.scad
@@ -323,6 +338,7 @@ build_viewer_variant() {
       -D 'part="viewer_keystone_ports"' \
       -D "splitter_model=\"${variant_model}\"" \
       -D "splitter_y_override=${variant_y}" \
+      -D "device_layout=\"${variant_layout}\"" \
       -D "front_ethernet_enabled=${variant_front}" \
       -D "front_keystone_side=\"${variant_side}\"" \
       -D 'led_shutter_enabled=true' ha_green_rack.scad
@@ -334,10 +350,25 @@ build_viewer_variant() {
       -D "part=\"viewer_${part_name}\"" \
       -D "splitter_model=\"${variant_model}\"" \
       -D "splitter_y_override=${variant_y}" \
+      -D "device_layout=\"${variant_layout}\"" \
       -D "front_ethernet_enabled=${variant_front}" \
       -D "front_keystone_side=\"${variant_side}\"" \
       -D 'led_shutter_enabled=false' ha_green_rack.scad
   done
+
+  if [[ "$variant_layout" == "stacked_center" ]]; then
+    for part_name in green_tray_standard green_tray_friction green_tray_friction_raised green_tray_friction_full green_tray_friction_pads green_tray_friction_skeletal; do
+      run_openscad -o "${variant_dir}/viewer_${part_name}.stl" \
+        -D "part=\"viewer_${part_name}\"" \
+        -D "device_layout=\"${variant_layout}\"" ha_green_rack.scad
+    done
+    for part_name in factory_screws slide_latch corner_gate sled_gate padded_rails captive_strap x_cage; do
+      run_openscad -o "${variant_dir}/viewer_retention_${part_name}.stl" \
+        -D "part=\"viewer_retention_${part_name}\"" \
+        -D "device_layout=\"${variant_layout}\"" \
+        -D "splitter_y_override=${variant_y}" ha_green_rack.scad
+    done
+  fi
 
 }
 

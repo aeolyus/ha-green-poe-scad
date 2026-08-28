@@ -39,11 +39,12 @@ The production splitter setback is not determined by the incoming PoE lead. Its 
 
 The updated mockups use a conservative 25 mm external straight-RJ45 boot envelope, Ubiquiti's published 21 mm minimum bend radius for its current patch cable, a 22 mm straight DC plug envelope, and rounded cable turns. These are precomputed static clearance routes—not an interactive physics simulation—and are planning envelopes rather than exact geometry for every cable Richard owns.
 
-The webpage compares three rear-entry TP-Link placements, three front-Ethernet editions, and one SICSOLINK cable-routing mockup:
+The webpage compares three side-by-side rear-entry TP-Link placements, one centered-stacked TP-Link study, three front-Ethernet editions, and one SICSOLINK cable-routing mockup:
 
 - **Compact, 35 mm setback:** 32 mm / 1.26 in from the panel's inside face to the splitter, leaving about 7 mm / 0.28 in after the modeled 25 mm boot; the collision-aware orange mockups require approximately 3.7 mm Ethernet and 7.6 mm DC bend radii, so this remains a visual comparison
 - **Balanced, 47.5 mm setback:** 44.5 mm / 1.75 in of inside clearance, leaving about 19.5 mm / 0.77 in after the modeled boot; Richard's actual flexible cable was comfortable at this spacing, although the conservative generic Ethernet mockup remains orange because it targets a larger 21 mm bend radius
 - **Cable-friendly, 60 mm setback:** current printable layout; 57 mm / 2.24 in of inside clearance leaves about 32 mm / 1.26 in after the modeled boot, and separate cable lanes preserve the full 21 mm Ethernet and 10 mm DC bend radii
+- **Centered stacked:** viewer-only study with the Green centered on the panel and the TP-Link rotated 90° directly behind it; both sit on the 9.025 mm unified deck, the printed depth is 202.4 mm / 7.97 in, and the side-facing LAN port permits a full-radius R21 turn to the Green
 - **Front Ethernet — center gap, 60 mm setback:** the jack sits between the plain left face area and LED window while three layered cable paths preserve the modeled bend radii without increasing printed depth
 - **Front Ethernet — HA right, 60 mm setback:** the jack sits physically to the right of the Green, while a full-radius PoE route loops behind the devices; this is a one-piece-only edition because the keystone occupies the detachable right-ear joint zone
 - **Front Ethernet — left, 89 mm setback:** alternate jack in the left face area; the splitter moves 29 mm rearward so the straight PoE jumper can rise over it safely
@@ -73,7 +74,7 @@ Status: the generated geometry is manifold and dimensionally checked, but the fi
 
 ## Interactive preview
 
-Open `viewer/interactive_viewer.html` in a web browser and choose the splitter, rear/front Ethernet entry, applicable spacing or front-jack position, retention, and optional protection. Those decisions map to the seven modeled layouts: Compact, Balanced, Cable-friendly, Front–center gap, Front–HA right, Front–left, and the angled SICSOLINK cable example. SICSOLINK is an advanced viewer-only study; choosing it disables the TP-Link-only controls without erasing their dormant selections. You can rotate, zoom, or jump between front, rear, top, perspective, retention-detail, and LED-window views. The page is fully self-contained, works offline, and records its selections in the URL hash so a configuration can be bookmarked or shared.
+Open `viewer/interactive_viewer.html` in a web browser and choose the splitter, side-by-side or centered-stacked arrangement, rear/front Ethernet entry, applicable spacing or front-jack position, retention, and optional protection. Those decisions map to eight modeled layouts: Compact, Balanced, Cable-friendly, Centered stacked, Front–center gap, Front–HA right, Front–left, and the angled SICSOLINK cable example. Centered stacked and SICSOLINK are viewer-only studies. You can rotate, zoom, or jump between front, rear, top, perspective, retention-detail, and LED-window views. The page is fully self-contained, works offline, and records its selections in the URL hash so a configuration can be bookmarked or shared.
 
 The default view matches the production choice: TP-Link, rear Ethernet, Cable-friendly spacing, tray friction retention with **Unified raised deck**, open trays with no chassis, no logo, no shutter hardware, visible simulated LEDs, and auto-rotation off. The comparison controls can still show the alternate supports, logo, captive shutter, front-entry layouts, other retention studies, and ventilated chassis. Those toggles do not change which files are canonical.
 
@@ -98,7 +99,7 @@ work when the HTML file is opened directly, but browsers block module workers
 under `file://`. Review `customizer/vendor/README.md` before public distribution
 of the experimental GPL-2.0 runtime.
 
-The cable models use straight—not right-angle—RJ45 and DC plugs. Orange internal cables identify bend-radius violations; normal blue/black cables meet the modeled envelope. When visible, the window simulates the Green's steady white power light, irregular green activity, and a two-flash yellow heartbeat; timing is illustrative rather than a diagnostic code. Gold three-dimensional rulers use 10 mm ticks, and the page reports the exact 254 mm width, 43 mm height, layout-specific printed depth, and panel-to-splitter clearance in millimeters and inches. The viewer depicts the one-piece faceplate, so it has no detachable-ear joining bosses. Each of the seven layouts has two GLBs—shutter comparison and open-window/no-shutter—for 14 primary comparison models. Every GLB contains the standard tray, all four mutually exclusive friction-tray meshes, the other retention overlays, and its layout-specific optional airframe at the same normal Green/LED coordinates, so switching retention, support style, or protection does not reload or reposition the model. The no-shutter GLBs omit the insert and shutter meshes entirely, leaving the bare aperture. `viewer/home-assistant-green-rack-preview.glb` is the cable-friendly open-window alias; `viewer/home-assistant-green-rack-preview-no_shutter.glb` is retained for compatibility, and `viewer/home-assistant-green-rack-preview-with_shutter.glb` is explicit.
+The cable models use straight—not right-angle—RJ45 and DC plugs. Orange internal cables identify bend-radius violations; normal blue/black cables meet the modeled envelope. When visible, the window simulates the Green's steady white power light, irregular green activity, and a two-flash yellow heartbeat; timing is illustrative rather than a diagnostic code. Gold three-dimensional rulers use 10 mm ticks, and the page reports the exact 254 mm width, 43 mm height, layout-specific printed depth, and panel-to-splitter clearance in millimeters and inches. The viewer depicts the one-piece faceplate, so it has no detachable-ear joining bosses. Each of the eight layouts has two GLBs—shutter comparison and open-window/no-shutter—for 16 primary comparison models. Every GLB contains the standard tray, all four mutually exclusive friction-tray meshes, the other retention overlays, and its layout-specific optional airframe at the same normal Green/LED coordinates, so switching retention, support style, or protection does not reload or reposition the model. The no-shutter GLBs omit the insert and shutter meshes entirely, leaving the bare aperture. `viewer/home-assistant-green-rack-preview.glb` is the cable-friendly open-window alias; `viewer/home-assistant-green-rack-preview-no_shutter.glb` is retained for compatibility, and `viewer/home-assistant-green-rack-preview-with_shutter.glb` is explicit.
 
 The colored Home Assistant Green, TP-Link splitter, connector faces, and cables in these preview files are dimensional mockups only and are not part of the printable plate.
 
@@ -134,6 +135,7 @@ Viewer and render artifacts:
 - `viewer/home-assistant-green-rack-compact.glb` — 35 mm setback comparison mockup
 - `viewer/home-assistant-green-rack-balanced.glb` — 47.5 mm setback comparison mockup
 - `viewer/home-assistant-green-rack-cable_friendly-no_shutter.glb` — GLB used by the production-default viewer state
+- `viewer/home-assistant-green-rack-stacked_center.glb` — viewer-only centered Green with a transverse TP-Link directly behind it
 - `viewer/home-assistant-green-rack-front_ethernet_right.glb`, `viewer/home-assistant-green-rack-front_ethernet_far_right.glb`, and `viewer/home-assistant-green-rack-front_ethernet_left.glb` — center-gap, HA-right, and left front-keystone mockups with their internal cabling
 - Every viewer layout has both a shutter comparison GLB and a paired `-no_shutter.glb` bare-aperture GLB with no lens mesh
 - `viewer/home-assistant-green-rack-front_ethernet.glb` and its no-shutter counterpart are compatibility aliases of the center-gap GLBs
@@ -143,7 +145,7 @@ Viewer and render artifacts:
 - `viewer/viewer_retention_ventilated_sleeves.stl` — layout-specific rear-loading sleeve study with aligned raised honeycomb floors and thick rounded side frames around large capsule vents; no riser columns, springs, or relief slots
 - `viewer/variants/*/viewer_enclosure_airframe.stl` — viewer-only ventilated 1U chassis study; it is not part of the printable production files
 
-The canonical core is approximately 220 × 144 mm. The one-piece faceplate is 254 mm wide and nominally fits the X2D's 256 mm main-nozzle area with only 1 mm per side; center it carefully and do not use a brim. It does not fit the 235.5 mm dual-nozzle overlap area, so `x2d_plate` remains the lower-risk fallback. The printed tray and modeled cable exits stay within the RackMate T2's approximately 240 mm internal depth.
+The canonical core is approximately 220 × 144 mm. The one-piece faceplate is 254 mm wide and nominally fits the X2D's 256 mm main-nozzle area with only 1 mm per side; center it carefully and do not use a brim. It does not fit the 235.5 mm dual-nozzle overlap area, so `x2d_plate` remains the lower-risk fallback. `x2d_plate` now emits the core and both ears faceplate-down; its normal no-shutter envelope is about 220 × 93 × 143.7 mm, and the raised decks grow from the plate instead of floating above it. The printed production tray and modeled cable exits stay within the RackMate T2's approximately 240 mm internal depth.
 
 ## Hardware
 
@@ -223,11 +225,13 @@ nix shell --impure --expr 'with import <nixpkgs> {}; buildEnv { name = "ha-rack-
 
 STL builds try OpenSCAD's Manifold backend first and validate the binary STL
 before replacing an existing artifact. A failed export, open edge, over-shared
-edge, or inconsistent winding automatically retries with CGAL. 3MF and PNG
-exports keep OpenSCAD's normal rendering behavior and are also replaced
-atomically. Build logs show the selected backend, elapsed time, and fallback
-reason. Set `OPENSCAD_BIN` to use a different OpenSCAD executable; older builds
-without backend selection run through their normal CGAL path.
+edge, or inconsistent winding automatically retries with CGAL. The large
+printable 3MF variants explicitly use CGAL because the current Manifold 3MF
+export can retain zero-area triangle fragments; PNG and small accessory exports
+keep OpenSCAD's normal rendering behavior. Outputs are replaced atomically.
+Build logs show the selected backend, elapsed time, and fallback reason. Set
+`OPENSCAD_BIN` to use a different OpenSCAD executable; older builds without
+backend selection run through their normal CGAL path.
 
 For faster iteration, use the incremental wrapper after at least one full build:
 
@@ -240,6 +244,7 @@ bash scripts/build.sh glb
 
 # Rebuild one layout's viewer geometry, both shutter states, GLBs, and HTML.
 bash scripts/build.sh viewer cable_friendly
+bash scripts/build.sh viewer stacked_center
 
 # Rebuild every layout after changing per-layout geometry such as the optional airframe or TP-Link hybrid clips.
 bash scripts/build.sh viewer
@@ -252,7 +257,7 @@ bash scripts/build.sh retention slide_latch
 bash scripts/build.sh full
 ```
 
-`viewer` and `glb` accept multiple variant names; omit them to rebuild every comparison layout. `glb` repacks both shutter states for each selected layout. `retention friction_sleeve` rebuilds all four shared friction support styles plus the compatibility alias. `retention hybrid_clips` rebuilds a separate overlay for every splitter setback so Compact, Balanced, and Cable-friendly cannot drift out of alignment. OpenSCAD viewer jobs run four at a time by default, adjustable with `VIEWER_BUILD_JOBS`. Partial outputs are written to temporary files and moved into place only after a successful build.
+`viewer` and `glb` accept multiple variant names; omit them to rebuild every comparison layout. `glb` repacks both shutter states for each selected layout. `retention friction_sleeve` rebuilds all four shared friction support styles plus the centered-layout copies and compatibility alias. Layout-specific retention meshes keep the side-by-side and centered-stacked geometry aligned independently. OpenSCAD viewer jobs run four at a time by default, adjustable with `VIEWER_BUILD_JOBS`. Partial outputs are written to temporary files and moved into place only after a successful build.
 
 ## Licensing and attribution
 

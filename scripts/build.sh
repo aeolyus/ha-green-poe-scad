@@ -10,6 +10,7 @@ variant_ids=(
   compact
   balanced
   cable_friendly
+  stacked_center
   front_ethernet_right
   front_ethernet_far_right
   front_ethernet_left
@@ -49,13 +50,14 @@ EOF
 
 variant_spec() {
   case "$1" in
-    compact) echo 'compact:tplink:35:false:right' ;;
-    balanced) echo 'balanced:tplink:47.5:false:right' ;;
-    cable_friendly) echo 'cable_friendly:tplink:60:false:right' ;;
-    front_ethernet_right) echo 'front_ethernet_right:tplink:60:true:right' ;;
-    front_ethernet_far_right) echo 'front_ethernet_far_right:tplink:60:true:far_right' ;;
-    front_ethernet_left) echo 'front_ethernet_left:tplink:89:true:left' ;;
-    sics_angled) echo 'sics_angled:sics:60:false:right' ;;
+    compact) echo 'compact:tplink:35:false:right:side_by_side' ;;
+    balanced) echo 'balanced:tplink:47.5:false:right:side_by_side' ;;
+    cable_friendly) echo 'cable_friendly:tplink:60:false:right:side_by_side' ;;
+    stacked_center) echo 'stacked_center:tplink:145.56875:false:right:stacked_center' ;;
+    front_ethernet_right) echo 'front_ethernet_right:tplink:60:true:right:side_by_side' ;;
+    front_ethernet_far_right) echo 'front_ethernet_far_right:tplink:60:true:far_right:side_by_side' ;;
+    front_ethernet_left) echo 'front_ethernet_left:tplink:89:true:left:side_by_side' ;;
+    sics_angled) echo 'sics_angled:sics:60:false:right:side_by_side' ;;
     *) return 1 ;;
   esac
 }
@@ -142,14 +144,14 @@ finish_scad_jobs() {
 
 build_variant_hybrid_overlay() {
   local requested_id="$1"
-  local spec variant_id variant_model variant_y variant_front variant_side
+  local spec variant_id variant_model variant_y variant_front variant_side variant_layout
   local variant_dir
   if ! spec="$(variant_spec "$requested_id")"; then
     echo "Unknown viewer variant: $requested_id" >&2
     usage >&2
     exit 2
   fi
-  IFS=: read -r variant_id variant_model variant_y variant_front variant_side \
+  IFS=: read -r variant_id variant_model variant_y variant_front variant_side variant_layout \
     <<< "$spec"
   variant_dir="viewer/variants/${variant_id}"
   mkdir -p "$variant_dir"
@@ -158,20 +160,21 @@ build_variant_hybrid_overlay() {
     -D 'part="viewer_retention_hybrid_clips"' \
     -D "splitter_model=\"${variant_model}\"" \
     -D "splitter_y_override=${variant_y}" \
+    -D "device_layout=\"${variant_layout}\"" \
     -D "front_ethernet_enabled=${variant_front}" \
     -D "front_keystone_side=\"${variant_side}\""
 }
 
 build_variant_ventilated_sleeves_overlay() {
   local requested_id="$1"
-  local spec variant_id variant_model variant_y variant_front variant_side
+  local spec variant_id variant_model variant_y variant_front variant_side variant_layout
   local variant_dir
   if ! spec="$(variant_spec "$requested_id")"; then
     echo "Unknown viewer variant: $requested_id" >&2
     usage >&2
     exit 2
   fi
-  IFS=: read -r variant_id variant_model variant_y variant_front variant_side \
+  IFS=: read -r variant_id variant_model variant_y variant_front variant_side variant_layout \
     <<< "$spec"
   if [[ "$variant_model" != "tplink" ]]; then
     return
@@ -183,20 +186,21 @@ build_variant_ventilated_sleeves_overlay() {
     -D 'part="viewer_retention_ventilated_sleeves"' \
     -D "splitter_model=\"${variant_model}\"" \
     -D "splitter_y_override=${variant_y}" \
+    -D "device_layout=\"${variant_layout}\"" \
     -D "front_ethernet_enabled=${variant_front}" \
     -D "front_keystone_side=\"${variant_side}\""
 }
 
 build_viewer_variant() {
   local requested_id="$1"
-  local spec variant_id variant_model variant_y variant_front variant_side
+  local spec variant_id variant_model variant_y variant_front variant_side variant_layout
   local variant_dir part_name
   if ! spec="$(variant_spec "$requested_id")"; then
     echo "Unknown viewer variant: $requested_id" >&2
     usage >&2
     exit 2
   fi
-  IFS=: read -r variant_id variant_model variant_y variant_front variant_side \
+  IFS=: read -r variant_id variant_model variant_y variant_front variant_side variant_layout \
     <<< "$spec"
   variant_dir="viewer/variants/${variant_id}"
   mkdir -p "$variant_dir"
@@ -206,6 +210,7 @@ build_viewer_variant() {
       -D "part=\"viewer_${part_name}\"" \
       -D "splitter_model=\"${variant_model}\"" \
       -D "splitter_y_override=${variant_y}" \
+      -D "device_layout=\"${variant_layout}\"" \
       -D "front_ethernet_enabled=${variant_front}" \
       -D "front_keystone_side=\"${variant_side}\"" \
       -D 'led_shutter_enabled=true'
@@ -217,6 +222,7 @@ build_viewer_variant() {
         -D "part=\"viewer_${part_name}\"" \
         -D "splitter_model=\"${variant_model}\"" \
         -D "splitter_y_override=${variant_y}" \
+        -D "device_layout=\"${variant_layout}\"" \
         -D "front_ethernet_enabled=${variant_front}" \
         -D "front_keystone_side=\"${variant_side}\"" \
         -D 'led_shutter_enabled=true'
@@ -228,6 +234,7 @@ build_viewer_variant() {
       -D 'part="viewer_keystone_ports"' \
       -D "splitter_model=\"${variant_model}\"" \
       -D "splitter_y_override=${variant_y}" \
+      -D "device_layout=\"${variant_layout}\"" \
       -D "front_ethernet_enabled=${variant_front}" \
       -D "front_keystone_side=\"${variant_side}\"" \
       -D 'led_shutter_enabled=true'
@@ -238,10 +245,26 @@ build_viewer_variant() {
       -D "part=\"viewer_${part_name}\"" \
       -D "splitter_model=\"${variant_model}\"" \
       -D "splitter_y_override=${variant_y}" \
+      -D "device_layout=\"${variant_layout}\"" \
       -D "front_ethernet_enabled=${variant_front}" \
       -D "front_keystone_side=\"${variant_side}\"" \
       -D 'led_shutter_enabled=false'
   done
+
+  if [[ "$variant_layout" == "stacked_center" ]]; then
+    for part_name in green_tray_standard green_tray_friction green_tray_friction_raised green_tray_friction_full green_tray_friction_pads green_tray_friction_skeletal; do
+      launch_scad "${variant_dir}/viewer_${part_name}.stl" \
+        -D "part=\"viewer_${part_name}\"" \
+        -D "device_layout=\"${variant_layout}\""
+    done
+
+    for part_name in factory_screws slide_latch corner_gate sled_gate padded_rails captive_strap x_cage; do
+      launch_scad "${variant_dir}/viewer_retention_${part_name}.stl" \
+        -D "part=\"viewer_retention_${part_name}\"" \
+        -D "device_layout=\"${variant_layout}\"" \
+        -D "splitter_y_override=${variant_y}"
+    done
+  fi
 
   build_variant_hybrid_overlay "$variant_id"
   build_variant_ventilated_sleeves_overlay "$variant_id"
@@ -264,6 +287,7 @@ build_friction_tray_variants() {
 build_retention_overlay() {
   local retention_id="$1"
   local variant_id
+  mkdir -p viewer/variants/stacked_center
   if ! retention_is_valid "$retention_id"; then
     echo "Unknown retention type: $retention_id" >&2
     usage >&2
@@ -271,6 +295,11 @@ build_retention_overlay() {
   fi
   if [[ "$retention_id" == "friction_sleeve" ]]; then
     build_friction_tray_variants
+    for part_name in green_tray_friction green_tray_friction_raised green_tray_friction_full green_tray_friction_pads green_tray_friction_skeletal; do
+      launch_scad "viewer/variants/stacked_center/viewer_${part_name}.stl" \
+        -D "part=\"viewer_${part_name}\"" \
+        -D 'device_layout="stacked_center"'
+    done
   elif [[ "$retention_id" == "hybrid_clips" ]]; then
     for variant_id in "${variant_ids[@]}"; do
       build_variant_hybrid_overlay "$variant_id"
@@ -282,6 +311,11 @@ build_retention_overlay() {
   else
     launch_scad "viewer/viewer_retention_${retention_id}.stl" \
       -D "part=\"viewer_retention_${retention_id}\""
+    launch_scad \
+      "viewer/variants/stacked_center/viewer_retention_${retention_id}.stl" \
+      -D "part=\"viewer_retention_${retention_id}\"" \
+      -D 'device_layout="stacked_center"' \
+      -D 'splitter_y_override=145.56875'
   fi
 }
 
@@ -326,7 +360,16 @@ case "$target" in
       selected_variants=("${variant_ids[@]}")
     fi
     trap cleanup_on_exit EXIT INT TERM
-    build_shared_viewer_trays
+    needs_shared_trays=false
+    for variant_id in "${selected_variants[@]}"; do
+      if [[ "$variant_id" != "stacked_center" ]]; then
+        needs_shared_trays=true
+        break
+      fi
+    done
+    if [[ "$needs_shared_trays" == "true" ]]; then
+      build_shared_viewer_trays
+    fi
     for variant_id in "${selected_variants[@]}"; do
       build_viewer_variant "$variant_id"
     done
