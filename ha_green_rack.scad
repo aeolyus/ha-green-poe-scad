@@ -130,18 +130,16 @@ splitter_friction_interference = 0.05;  // inward movement per side, mm
 splitter_friction_lead_relief = 0.50;   // opening gained per side at top, mm
 splitter_friction_grip_h = 8.0;         // contact above tray floor, mm
 splitter_friction_lead_h = 3.0;         // insertion chamfer height, mm
-// Measured vertical profile, bottom-to-top: 5/32 in lower bevel, 23/32 in
-// straight side band, then the remaining 1/16 in upper bevel. Horizontal
-// bevel insets still need a direct top/bottom-width measurement.
-splitter_lower_bevel_h = 3.96875;
+// The enclosure is vertically symmetric: equal lower/upper bevel traversals
+// around the measured 23/32 in straight side band. Preserving the measured
+// 15/16 in overall height makes each bevel 7/64 in (2.778125 mm).
 splitter_flat_side_h = 18.25625;
-splitter_upper_bevel_h = splitter_h
-                          - splitter_lower_bevel_h
-                          - splitter_flat_side_h;
-splitter_lower_bevel_relief = 0.50;
-splitter_lower_bevel_inset = 0.8;
-splitter_upper_bevel_inset =
-    (splitter_w - splitter_top_flat_w) / 2;
+splitter_bevel_h = (splitter_h - splitter_flat_side_h) / 2;
+splitter_lower_bevel_h = splitter_bevel_h;
+splitter_upper_bevel_h = splitter_bevel_h;
+splitter_side_bevel_inset = (splitter_w - splitter_top_flat_w) / 2;
+splitter_lower_bevel_inset = splitter_side_bevel_inset;
+splitter_upper_bevel_inset = splitter_side_bevel_inset;
 splitter_upper_end_bevel_inset =
     (splitter_d - splitter_top_flat_d) / 2;
 splitter_x = 13.0;
@@ -760,12 +758,12 @@ module splitter_side_wall_left_local(
     bevel_top = base_thickness + splitter_lower_bevel_h;
     grip_top = base_thickness + splitter_friction_grip_h;
     lead_top = grip_top + splitter_friction_lead_h;
-    lower_inner_left = inner_left - splitter_lower_bevel_relief;
+    lower_inner_left = inner_left + splitter_lower_bevel_inset;
 
     intersection() {
-        // The official housing imagery shows a lower bevel. Open the cradle
-        // by 0.50 mm at the floor, then converge to the conservative body-band
-        // grip. The top retreats again for a support-free insertion lead-in.
+        // Follow the measured lower bevel from the narrow bottom plateau to
+        // the full-width straight side band. The top retreats again for a
+        // support-free insertion lead-in.
         extrude_xz_profile_y([
             [outer_left, wall_z],
             [lower_inner_left, wall_z],
@@ -793,7 +791,7 @@ module splitter_side_wall_right_local(
     bevel_top = base_thickness + splitter_lower_bevel_h;
     grip_top = base_thickness + splitter_friction_grip_h;
     lead_top = grip_top + splitter_friction_lead_h;
-    lower_inner_right = inner_right + splitter_lower_bevel_relief;
+    lower_inner_right = inner_right - splitter_lower_bevel_inset;
 
     intersection() {
         extrude_xz_profile_y([
@@ -1815,7 +1813,9 @@ module mockups() {
                         splitter_w, splitter_d, splitter_h, 4.0,
                         lower_bevel_h = splitter_lower_bevel_h,
                         upper_bevel_h = splitter_upper_bevel_h,
-                        lower_inset = splitter_lower_bevel_inset,
+                        lower_inset_x = splitter_lower_bevel_inset,
+                        lower_inset_y =
+                            splitter_upper_end_bevel_inset,
                         upper_inset = splitter_upper_bevel_inset,
                         upper_inset_y =
                             splitter_upper_end_bevel_inset);
@@ -3861,12 +3861,14 @@ module retention_splitter_ventilated_sleeve_local() {
     outer_y = -splitter_clearance - wall_thickness;
     outer_depth = splitter_inner_d + 2 * wall_thickness;
     wall_z0 = base_thickness - 0.20;
-    lower_inner_left = inner_left - splitter_lower_bevel_relief;
-    lower_inner_right = inner_right + splitter_lower_bevel_relief;
+    lower_inner_left = inner_left + splitter_lower_bevel_inset;
+    lower_inner_right = inner_right - splitter_lower_bevel_inset;
     lower_bevel_top = base_thickness + splitter_lower_bevel_h;
     upper_bevel_bottom = lower_bevel_top + splitter_flat_side_h;
-    top_inner_left = splitter_upper_bevel_inset;
-    top_inner_right = splitter_w - splitter_upper_bevel_inset;
+    top_inner_left = splitter_upper_bevel_inset
+                     + splitter_friction_interference;
+    top_inner_right = splitter_w - splitter_upper_bevel_inset
+                      - splitter_friction_interference;
     roof_z0 = base_thickness + splitter_h;
     roof_top = roof_z0 + sleeve_roof_t;
     frame_openings = [[
@@ -4278,7 +4280,9 @@ module viewer_splitter() {
                         splitter_w, splitter_d, splitter_h, 4.0,
                         lower_bevel_h = splitter_lower_bevel_h,
                         upper_bevel_h = splitter_upper_bevel_h,
-                        lower_inset = splitter_lower_bevel_inset,
+                        lower_inset_x = splitter_lower_bevel_inset,
+                        lower_inset_y =
+                            splitter_upper_end_bevel_inset,
                         upper_inset = splitter_upper_bevel_inset,
                         upper_inset_y =
                             splitter_upper_end_bevel_inset);
@@ -4364,6 +4368,11 @@ assert(green_device_z + green_h + hybrid_green_clip_clearance
 assert(abs(splitter_lower_bevel_h + splitter_flat_side_h
            + splitter_upper_bevel_h - splitter_h) < 0.001,
        "TP-Link measured vertical profile must equal its total height");
+assert(abs(splitter_lower_bevel_h - splitter_upper_bevel_h) < 0.001,
+       "TP-Link upper and lower bevels must remain symmetric");
+assert(abs(splitter_lower_bevel_inset
+           - splitter_upper_bevel_inset) < 0.001,
+       "TP-Link upper and lower plateau widths must remain symmetric");
 assert(splitter_lower_bevel_h > 0 && splitter_upper_bevel_h > 0
            && splitter_flat_side_h > 0,
        "TP-Link measured vertical profile segments must be positive");
