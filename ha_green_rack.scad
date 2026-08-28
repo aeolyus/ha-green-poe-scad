@@ -337,10 +337,11 @@ splitter_honeycomb_end_inset = 5.0;
 // Viewer-only rear-loading device sleeves inspired by the UCG-Fiber, USW-Lite,
 // and Mauker Chromebox rack cases. Thin honeycomb floors/roofs are joined by
 // thick rounded side frames with large capsule-shaped ventilation openings.
-sleeve_roof_t = 1.20;
+sleeve_roof_t = 0.80;
 sleeve_rear_lead_len = 6.0;
 sleeve_rear_lead_relief = 0.50;
 sleeve_green_interference = 0.10;
+sleeve_green_vertical_interference = 0.40;
 sleeve_green_frame_t = 2.40;
 sleeve_green_roof_pitch = 15.0;
 sleeve_green_roof_wall = 1.80;
@@ -3983,7 +3984,12 @@ module retention_green_ventilated_sleeve_local() {
     sleeve_depth = green_inner_d + (green_y - face_thickness)
                    + wall_thickness;
     wall_z0 = unified_deck_z0 - 0.20;
-    roof_z0 = green_device_z + green_h;
+    // The broad honeycomb roof flexes upward over the measured top. Its
+    // 0.40 mm preload plus the thinner 0.80 mm roof keeps the complete cage
+    // below the 43 mm front-panel outline without moving the device or LEDs.
+    // The 0.50 mm rear lead-in still begins with 0.10 mm insertion clearance.
+    roof_z0 = green_device_z + green_h
+              - sleeve_green_vertical_interference;
     roof_top = roof_z0 + sleeve_roof_t;
     inner_left = green_x + friction_interference;
     inner_right = green_x + green_w - friction_interference;
@@ -4225,7 +4231,8 @@ function green_vent_coupon_outer_w() =
 function green_vent_coupon_outer_left() =
     green_x + green_w / 2 - green_vent_coupon_outer_w() / 2;
 function green_vent_coupon_roof_top() =
-    green_device_z + green_h + sleeve_roof_t;
+    green_device_z + green_h
+    - sleeve_green_vertical_interference + sleeve_roof_t;
 
 function splitter_vent_coupon_outer_left() =
     -splitter_clearance - wall_thickness;
@@ -4738,8 +4745,11 @@ assert(abs(hybrid_splitter_clip_clearance) < 0.001,
 assert(splitter_device_z + splitter_h + hybrid_splitter_clip_clearance
            + hybrid_splitter_catch_nose_t <= rack_height,
        "TP-Link hybrid catch exceeds the 1U panel envelope");
-assert(green_device_z + green_h + sleeve_roof_t <= rack_unit_pitch,
-       "Green sleeve roof exceeds the nominal 1U pitch");
+assert(green_device_z + green_h - sleeve_green_vertical_interference
+           + sleeve_roof_t <= rack_height,
+       "Green sleeve roof exceeds the 43 mm panel outline");
+assert(sleeve_rear_lead_relief > sleeve_green_vertical_interference,
+       "Green sleeve rear lead-in must open beyond the vertical preload");
 assert(splitter_device_z + splitter_h + sleeve_roof_t <= rack_height,
        "TP-Link sleeve roof exceeds the 1U panel envelope");
 assert(sleeve_rear_lead_len > 0
@@ -4748,7 +4758,8 @@ assert(sleeve_rear_lead_len > 0
 assert(sleeve_green_frame_t >= 2.20,
        "Green rounded side frames need at least 2.20 mm thickness");
 assert(sleeve_green_frame_open_h
-           < green_device_z + green_h + sleeve_roof_t
+           < green_device_z + green_h - sleeve_green_vertical_interference
+             + sleeve_roof_t
              - (unified_deck_z0 - 0.20),
        "Green capsule vents must fit inside the side-frame height");
 assert(sleeve_splitter_frame_open_h

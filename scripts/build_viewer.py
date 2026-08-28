@@ -341,8 +341,9 @@ RETENTION_OPTIONS = [
             "riser columns. The TP-Link bevel walls remain continuous from "
             "front to rear; only the roof keeps a shallow rear insertion "
             "flare. There are no relief cuts, springs, or moving latches. "
-            "The measured Green height puts its roof at 43.56 mm, inside the "
-            "44.45 mm nominal 1U pitch but above the 43 mm panel outline. "
+            "Without moving the Green or LEDs, its 0.8 mm roof uses 0.4 mm "
+            "nominal vertical preload and finishes at 42.76 mm, below the "
+            "43 mm panel outline. "
             "Print the combined Green + PoE rear-section vent-frame coupon "
             "before committing to a full plate."
         ),
