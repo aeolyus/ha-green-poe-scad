@@ -8,8 +8,8 @@ For the next prototype, use **light lower guide contact plus localized positive 
 
 The viewer prototype applies the same force-path idea to both devices:
 
-- **Home Assistant Green:** two fixed left catches and two releasable right spring catches overlap the clear lid edge. Short lower guides locate the measured 109.5375 mm base, then flare outward around the official 112 mm cover envelope.
-- **TP-Link:** the bevel-aware cradle opens at the lower bevel, grips only the widest side band, and uses two fixed bridge-side catches plus two external outboard spring arms.
+- **Home Assistant Green:** two fixed left catches and two releasable right spring catches follow the modeled upper taper, then overlap the clear lid edge by 0.8 mm. Short lower guides locate the measured 109.5375 mm base, then flare outward around the official 112 mm cover envelope.
+- **TP-Link:** the bevel-aware cradle opens at the lower bevel, grips only the widest side band, and uses two fixed bridge-side catches plus two external outboard spring arms. Both sides now use the same mirrored ramp and 0.8 mm nominal top overlap.
 - Existing low front/rear stops take cable-pull loads, so the spring features mainly resist lift and tilt rather than carrying constant preload.
 - The catches are short and broad instead of a thin X roof, and they leave the center of both devices open for airflow.
 - The Green prototype reaches 42.55 mm, leaving about 0.45 mm inside the modeled 43 mm 1U envelope. That is enough for a visual prototype, but too close to call production-ready without a rack fit check.
@@ -45,11 +45,11 @@ The browser overlays are form and force-path studies, not finished printable mec
 - Green lower guide: 0.20 mm/side nominal interference against the measured 109.5375 mm lower footprint, held for only 2.5 mm above the device seat before flaring around the 112 mm cover.
 - Green upper clearance: 0.35 mm/side around the published cover envelope.
 - Green catches: two per side, 18 mm long; 2.4 mm fixed arms on the left and 2.8 mm spring arms on the accessible right side.
-- Green clip coupon: one 1.8 mm-reach screening gauge with a production-height spring root, two rib-supported seating pads, a 0.8 mm bearing shoulder, and a 0.4 mm minimum leading tip. It verifies local overlap, whitening, and release while avoiding a solid pedestal.
-- Green catch underside: 0.30 mm above the modeled top; 0.30 mm nearly-flat nose with a 45-degree lower support face. Maximum prototype height is 42.55 mm.
+- Green clip coupon: one 2.38125 mm-reach screening gauge with a production-height spring root, two rib-supported seating pads, a taper-following underside, a 1.0 mm bearing land, a 0.8 mm shoulder, and a 0.4 mm minimum leading tip. Under the current image-derived taper model, it overlaps the top face by 0.8 mm.
+- Green catch underside: 0.30 mm above the modeled top and follows the assumed 2.4 mm upper taper before reaching its horizontal bearing land. Maximum prototype height is 42.55 mm.
 - TP-Link lower bevel: 0.50 mm/side relief at the floor, transitioning to the 0.05 mm/side body-band fit over 3.5 mm.
-- TP-Link clip: 14 mm long, 1.6 mm thick external arm with a 0.60 mm gap from the existing wall, 0.50 mm top clearance, and a 0.30 mm catch nose.
-- TP-Link clip coupon: one full-width open-frame section using selected 1.2 mm fixed and spring catches with 0.6 mm-thick noses. Five-millimeter transverse seating bars and six-millimeter root rails prevent the coupon from twisting more easily than the complete tray.
+- TP-Link clip: 14 mm long, 1.6 mm thick external arm with a 0.60 mm gap from the existing wall, 0.50 mm top clearance, and matching fixed/spring ramps. Each has a 1.0 mm bearing land, 0.8 mm nominal top overlap, 0.8 mm shoulder, and 0.4 mm leading tip.
+- TP-Link clip coupon: one full-width open-frame section using the exact mirrored production-study catches. Five-millimeter transverse seating bars and six-millimeter root rails prevent the coupon from twisting more easily than the complete tray.
 - Print tray-down in PETG or ASA at 0.20 mm layers with 4–5 walls. The tall Green gauge needs a 5 mm slicer brim.
 
 Design target: at least 25–30 N extraction resistance and 20 N lift/tilt resistance. The Green weighs about 340 g, or 3.34 N statically.
@@ -75,7 +75,7 @@ No complete official Green enclosure CAD was found. The closest device-part refe
 
 ## Validation sequence
 
-1. Print the combined `hybrid_clip_coupon`; it contains the selected 1.8 mm Green spring gauge and the TP-Link 1.2 mm fixed / 1.2 mm spring gauge as separate, mechanically independent pieces.
+1. Print the combined `hybrid_clip_coupon`; it contains the selected taper-following Green spring gauge and the TP-Link matched-ramp gauge as separate, mechanically independent pieces. Both target 0.8 mm nominal overlap under the current enclosure assumptions.
 2. Tuck each device edge under the fixed side and press the spring side down. Do not slide the open-ended gauges longitudinally onto the devices, because that bypasses the snap action being tested.
 3. Confirm that each selected catch visibly overlaps the top edge, holds when gently inverted, and releases without whitening or surface scuffing.
 4. If either selected fit fails, generate only a nearby reach variant rather than reprinting another three-setting coupon. Once both pass, generate one complete hybrid tray and perform at least 50 install/remove cycles plus a warm cable-pull test before promoting it to the canonical print.

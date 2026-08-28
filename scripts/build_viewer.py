@@ -278,9 +278,10 @@ RETENTION_OPTIONS = [
         "roughness": 0.56,
         "printable": False,
         "note": (
-            "Community-informed prototype: short fixed and flexible catches "
-            "capture the Green's clear top edge, while two tuck-and-snap "
-            "pairs capture the TP-Link's top bevel. The lower guides account for "
+            "Community-informed prototype: taper-following fixed and flexible "
+            "catches overlap the Green's clear top by 0.8 mm, while matched "
+            "tuck-and-snap ramps overlap the TP-Link top by 0.8 mm. The lower "
+            "guides account for "
             "the Green's measured 109.54 mm base, its published 112 mm cover "
             "envelope, and the TP-Link's lower bevel. Existing low stops take "
             "fore/aft loads. Print the combined two-device clip coupon before "
