@@ -308,19 +308,28 @@ splitter_honeycomb_wall = 1.6;
 splitter_honeycomb_side_inset = 6.0;
 splitter_honeycomb_end_inset = 5.0;
 
-// Viewer-only rear-loading device sleeves inspired by the UCG-Fiber and
-// USW-Lite rack cases. Thin honeycomb floors/roofs are joined by sparse
-// vertical posts, leaving the side bays almost completely open.
+// Viewer-only rear-loading device sleeves inspired by the UCG-Fiber, USW-Lite,
+// and Mauker Chromebox rack cases. Thin honeycomb floors/roofs are joined by
+// thick rounded side frames with large capsule-shaped ventilation openings.
 sleeve_roof_t = 1.20;
 sleeve_rear_lead_len = 6.0;
 sleeve_rear_lead_relief = 0.50;
 sleeve_green_interference = 0.10;
+sleeve_green_frame_t = 2.40;
 sleeve_green_roof_pitch = 15.0;
 sleeve_green_roof_wall = 1.80;
 sleeve_splitter_roof_pitch = 10.0;
 sleeve_splitter_roof_wall = 1.60;
-sleeve_roof_border = 3.5;
-sleeve_post_len = 6.0;
+sleeve_roof_border = 5.0;
+sleeve_green_frame_end_border = 8.0;
+sleeve_green_frame_center_web = 6.0;
+sleeve_splitter_frame_end_border = 7.0;
+sleeve_green_frame_open_z = 15.0;
+sleeve_green_frame_open_h = 21.0;
+sleeve_green_frame_outer_r = 2.75;
+sleeve_splitter_frame_open_z = 9.0;
+sleeve_splitter_frame_open_h = 13.0;
+sleeve_splitter_frame_outer_r = 2.50;
 
 // Viewer-only open protective shell. Thin point-up honeycomb shear walls add
 // stiffness and edge protection without consuming the Green's 1U top gap.
@@ -3587,7 +3596,8 @@ module airframe_splitter_wall_clipped(x0, y0, depth, z0, height) {
 // side. Center this comparison sleeve's floor on the measured Green instead,
 // so its roof, wall borders, and honeycomb are true left/right mirrors.
 module green_sleeve_outer_outline_2d() {
-    outer_w = green_inner_w + 2 * wall_thickness;
+    outer_w = green_cover_w - 2 * sleeve_green_interference
+              + 2 * sleeve_green_frame_t;
     outer_x = green_x + green_w / 2 - outer_w / 2;
     outer_y = face_thickness - 0.20;
     outer_d = green_inner_d + (green_y - face_thickness)
@@ -3662,21 +3672,46 @@ module green_sleeve_floor_pads() {
     }
 }
 
-// A vertical post uses the same taper-aware X/Z profile as the former side
-// panel, but only over a short Y span. The optional rear profile creates the
-// six-millimeter insertion flare without adding horizontal side rails.
-module sleeve_profiled_post_x(
-    profile, y0, length, rear_profile = undef) {
-    if (is_undef(rear_profile))
-        extrude_xz_profile_y(profile, y0, length);
-    else
-        hull() {
-            extrude_xz_profile_y(
-                profile, y0 - epsilon, 2 * epsilon);
-            extrude_xz_profile_y(
-                rear_profile,
-                y0 + length - epsilon, 2 * epsilon);
+// Mauker-style side frame: keep a substantial tapered wall profile, round its
+// outer Y/Z silhouette, then remove one or more large capsule windows. The
+// remaining perimeter and mullion form a strong, intentional frame rather
+// than a row of isolated rectangular posts.
+module sleeve_profiled_side_frame_x(
+    profile, y0, depth, cut_x0, cut_w,
+    z0, height, outer_corner_r, openings) {
+    difference() {
+        intersection() {
+            extrude_xz_profile_y(profile, y0, depth);
+            airframe_extrude_x(
+                cut_x0 - epsilon, cut_w + 2 * epsilon)
+                translate([z0, y0])
+                    rounded_rect_2d(
+                        height, depth, outer_corner_r);
         }
+
+        airframe_extrude_x(
+            cut_x0 - 2 * epsilon, cut_w + 4 * epsilon)
+            for (opening = openings)
+                translate([opening[0], opening[1]])
+                    rounded_rect_2d(
+                        opening[2], opening[3], opening[4]);
+    }
+}
+
+// The rear end frame keeps the same six-millimeter lateral insertion flare as
+// the earlier skeletal post design. This modifies only the cavity surface;
+// the rounded outer frame and its load paths remain continuous.
+module sleeve_rear_lead_cavity_local(
+    profile, rear_profile, y0, depth) {
+    lead_y = y0 + depth - sleeve_rear_lead_len;
+    rear_y = y0 + depth;
+
+    hull() {
+        extrude_xz_profile_y(
+            profile, lead_y - epsilon, 2 * epsilon);
+        extrude_xz_profile_y(
+            rear_profile, rear_y - epsilon, 2 * epsilon);
+    }
 }
 
 // Thin honeycomb roof with a shallow rear underside flare. The flare gives a
@@ -3708,14 +3743,11 @@ module sleeve_roof_panel_local(
     }
 }
 
-// UCG-Fiber-style rear-loading Green sleeve. The normal low honeycomb and four
-// short support pads replace the former full-height lattice. Three taper-aware
-// posts per side carry the roof, leaving two large open side bays with no
-// separate horizontal rails. Only the front stop remains.
+// Rear-loading Green sleeve with Mauker-style rounded side frames. Two large
+// capsule vents leave most of each side open while a thick lower rail, roof
+// rail, end blocks, and center mullion create a stronger continuous frame.
+// The low honeycomb and four short support pads remain beneath the device.
 module retention_green_ventilated_sleeve_local() {
-    outer_w = green_inner_w + 2 * wall_thickness;
-    outer_left = green_x + green_w / 2 - outer_w / 2;
-    outer_right = outer_left + outer_w;
     sleeve_y0 = face_thickness - 0.20;
     sleeve_depth = green_inner_d + (green_y - face_thickness)
                    + wall_thickness;
@@ -3729,11 +3761,24 @@ module retention_green_ventilated_sleeve_local() {
                  + sleeve_green_interference;
     cover_right = green_x + green_w + cover_outset
                   - sleeve_green_interference;
+    outer_left = cover_left - sleeve_green_frame_t;
+    outer_right = cover_right + sleeve_green_frame_t;
     base_grip_top = green_device_z + green_lower_base_h;
     cover_relief_top = base_grip_top + green_cover_relief_h;
-    front_post_y = sleeve_y0;
-    middle_post_y = green_y + green_d / 2 - sleeve_post_len / 2;
-    rear_post_y = sleeve_y0 + sleeve_depth - sleeve_rear_lead_len;
+    frame_height = roof_top - wall_z0;
+    opening_z0 = sleeve_green_frame_open_z;
+    opening_h = sleeve_green_frame_open_h;
+    opening_d = (
+        sleeve_depth - 2 * sleeve_green_frame_end_border
+        - sleeve_green_frame_center_web) / 2;
+    opening_y0 = sleeve_y0 + sleeve_green_frame_end_border;
+    frame_openings = [
+        [opening_z0, opening_y0,
+         opening_h, opening_d, opening_h / 2],
+        [opening_z0,
+         opening_y0 + opening_d + sleeve_green_frame_center_web,
+         opening_h, opening_d, opening_h / 2]
+    ];
     left_profile = [
         [outer_left, wall_z0],
         [inner_left, wall_z0],
@@ -3750,46 +3795,62 @@ module retention_green_ventilated_sleeve_local() {
         [cover_right, cover_relief_top],
         [inner_right, base_grip_top]
     ];
-    rear_left_profile = [
-        [outer_left, wall_z0],
-        [inner_left - sleeve_rear_lead_relief,
-         wall_z0],
-        [inner_left - sleeve_rear_lead_relief,
-         base_grip_top],
-        [cover_left - sleeve_rear_lead_relief,
-         cover_relief_top],
-        [cover_left - sleeve_rear_lead_relief,
-         roof_top],
-        [outer_left, roof_top]
-    ];
-    rear_right_profile = [
-        [inner_right + sleeve_rear_lead_relief, wall_z0],
-        [outer_right, wall_z0],
-        [outer_right, roof_top],
-        [cover_right + sleeve_rear_lead_relief, roof_top],
-        [cover_right + sleeve_rear_lead_relief,
-         cover_relief_top],
-        [inner_right + sleeve_rear_lead_relief,
-         base_grip_top]
-    ];
-
     union() {
         green_sleeve_floor_pads();
         friction_end_stop_supports_local(include_rear = false);
         friction_end_stops_local(include_rear = false);
 
-        for (post_y = [front_post_y, middle_post_y]) {
-            sleeve_profiled_post_x(
-                left_profile, post_y, sleeve_post_len);
-            sleeve_profiled_post_x(
-                right_profile, post_y, sleeve_post_len);
+        difference() {
+            union() {
+                sleeve_profiled_side_frame_x(
+                    left_profile,
+                    sleeve_y0, sleeve_depth,
+                    outer_left,
+                    max(inner_left, cover_left) - outer_left,
+                    wall_z0, frame_height,
+                    sleeve_green_frame_outer_r,
+                    frame_openings);
+                sleeve_profiled_side_frame_x(
+                    right_profile,
+                    sleeve_y0, sleeve_depth,
+                    min(inner_right, cover_right),
+                    outer_right - min(inner_right, cover_right),
+                    wall_z0, frame_height,
+                    sleeve_green_frame_outer_r,
+                    frame_openings);
+            }
+
+            sleeve_rear_lead_cavity_local(
+                [
+                    [inner_left, wall_z0 - epsilon],
+                    [inner_right, wall_z0 - epsilon],
+                    [inner_right, base_grip_top],
+                    [cover_right, cover_relief_top],
+                    [cover_right, roof_top + epsilon],
+                    [cover_left, roof_top + epsilon],
+                    [cover_left, cover_relief_top],
+                    [inner_left, base_grip_top]
+                ],
+                [
+                    [inner_left - sleeve_rear_lead_relief,
+                     wall_z0 - epsilon],
+                    [inner_right + sleeve_rear_lead_relief,
+                     wall_z0 - epsilon],
+                    [inner_right + sleeve_rear_lead_relief,
+                     base_grip_top],
+                    [cover_right + sleeve_rear_lead_relief,
+                     cover_relief_top],
+                    [cover_right + sleeve_rear_lead_relief,
+                     roof_top + epsilon],
+                    [cover_left - sleeve_rear_lead_relief,
+                     roof_top + epsilon],
+                    [cover_left - sleeve_rear_lead_relief,
+                     cover_relief_top],
+                    [inner_left - sleeve_rear_lead_relief,
+                     base_grip_top]
+                ],
+                sleeve_y0, sleeve_depth);
         }
-        sleeve_profiled_post_x(
-            left_profile, rear_post_y, sleeve_rear_lead_len,
-            rear_left_profile);
-        sleeve_profiled_post_x(
-            right_profile, rear_post_y, sleeve_rear_lead_len,
-            rear_right_profile);
 
         sleeve_roof_panel_local(
             outer_left, sleeve_y0,
@@ -3801,10 +3862,9 @@ module retention_green_ventilated_sleeve_local() {
     }
 }
 
-// Matching rear-loading TP-Link sleeve. Three posts per side follow all three
-// measured vertical bands and carry the zero-gap honeycomb roof. The large
-// open bays replace full perforated panels; front stops remain and the rear
-// posts flare outward for insertion.
+// Matching TP-Link sleeve with one long capsule vent in each side frame. Its
+// six-millimeter upper/lower rails and seven-millimeter end blocks follow the
+// measured bevels while leaving most of the small enclosure exposed.
 module retention_splitter_ventilated_sleeve_local() {
     outer_left = -splitter_clearance - wall_thickness;
     outer_right = splitter_w + splitter_clearance + wall_thickness;
@@ -3821,9 +3881,14 @@ module retention_splitter_ventilated_sleeve_local() {
     top_inner_right = splitter_w - splitter_upper_bevel_inset;
     roof_z0 = base_thickness + splitter_h;
     roof_top = roof_z0 + sleeve_roof_t;
-    front_post_y = outer_y;
-    middle_post_y = splitter_d / 2 - sleeve_post_len / 2;
-    rear_post_y = outer_y + outer_depth - sleeve_rear_lead_len;
+    frame_height = roof_top - wall_z0;
+    frame_openings = [[
+        sleeve_splitter_frame_open_z,
+        outer_y + sleeve_splitter_frame_end_border,
+        sleeve_splitter_frame_open_h,
+        outer_depth - 2 * sleeve_splitter_frame_end_border,
+        sleeve_splitter_frame_open_h / 2
+    ]];
     left_profile = [
         [outer_left, wall_z0],
         [lower_inner_left, wall_z0],
@@ -3842,49 +3907,67 @@ module retention_splitter_ventilated_sleeve_local() {
         [inner_right, upper_bevel_bottom],
         [inner_right, lower_bevel_top]
     ];
-    rear_left_profile = [
-        [outer_left, wall_z0],
-        [lower_inner_left - sleeve_rear_lead_relief,
-         wall_z0],
-        [inner_left - sleeve_rear_lead_relief,
-         lower_bevel_top],
-        [inner_left - sleeve_rear_lead_relief,
-         upper_bevel_bottom],
-        [top_inner_left - sleeve_rear_lead_relief,
-         roof_z0],
-        [top_inner_left - sleeve_rear_lead_relief,
-         roof_top],
-        [outer_left, roof_top]
-    ];
-    rear_right_profile = [
-        [lower_inner_right + sleeve_rear_lead_relief, wall_z0],
-        [outer_right, wall_z0],
-        [outer_right, roof_top],
-        [top_inner_right + sleeve_rear_lead_relief, roof_top],
-        [top_inner_right + sleeve_rear_lead_relief, roof_z0],
-        [inner_right + sleeve_rear_lead_relief,
-         upper_bevel_bottom],
-        [inner_right + sleeve_rear_lead_relief,
-         lower_bevel_top]
-    ];
-
     union() {
         linear_extrude(height = base_thickness)
             splitter_tray_floor_2d();
         splitter_end_stops_local(include_rear = false);
 
-        for (post_y = [front_post_y, middle_post_y]) {
-            sleeve_profiled_post_x(
-                left_profile, post_y, sleeve_post_len);
-            sleeve_profiled_post_x(
-                right_profile, post_y, sleeve_post_len);
+        difference() {
+            union() {
+                sleeve_profiled_side_frame_x(
+                    left_profile,
+                    outer_y, outer_depth,
+                    outer_left, top_inner_left - outer_left,
+                    wall_z0, frame_height,
+                    sleeve_splitter_frame_outer_r,
+                    frame_openings);
+                sleeve_profiled_side_frame_x(
+                    right_profile,
+                    outer_y, outer_depth,
+                    top_inner_right,
+                    outer_right - top_inner_right,
+                    wall_z0, frame_height,
+                    sleeve_splitter_frame_outer_r,
+                    frame_openings);
+            }
+
+            sleeve_rear_lead_cavity_local(
+                [
+                    [lower_inner_left, wall_z0 - epsilon],
+                    [lower_inner_right, wall_z0 - epsilon],
+                    [inner_right, lower_bevel_top],
+                    [inner_right, upper_bevel_bottom],
+                    [top_inner_right, roof_z0],
+                    [top_inner_right, roof_top + epsilon],
+                    [top_inner_left, roof_top + epsilon],
+                    [top_inner_left, roof_z0],
+                    [inner_left, upper_bevel_bottom],
+                    [inner_left, lower_bevel_top]
+                ],
+                [
+                    [lower_inner_left - sleeve_rear_lead_relief,
+                     wall_z0 - epsilon],
+                    [lower_inner_right + sleeve_rear_lead_relief,
+                     wall_z0 - epsilon],
+                    [inner_right + sleeve_rear_lead_relief,
+                     lower_bevel_top],
+                    [inner_right + sleeve_rear_lead_relief,
+                     upper_bevel_bottom],
+                    [top_inner_right + sleeve_rear_lead_relief,
+                     roof_z0],
+                    [top_inner_right + sleeve_rear_lead_relief,
+                     roof_top + epsilon],
+                    [top_inner_left - sleeve_rear_lead_relief,
+                     roof_top + epsilon],
+                    [top_inner_left - sleeve_rear_lead_relief,
+                     roof_z0],
+                    [inner_left - sleeve_rear_lead_relief,
+                     upper_bevel_bottom],
+                    [inner_left - sleeve_rear_lead_relief,
+                     lower_bevel_top]
+                ],
+                outer_y, outer_depth);
         }
-        sleeve_profiled_post_x(
-            left_profile, rear_post_y, sleeve_rear_lead_len,
-            rear_left_profile);
-        sleeve_profiled_post_x(
-            right_profile, rear_post_y, sleeve_rear_lead_len,
-            rear_right_profile);
 
         sleeve_roof_panel_local(
             outer_left, outer_y,
@@ -4337,9 +4420,16 @@ assert(base_thickness + splitter_h + sleeve_roof_t <= rack_height,
 assert(sleeve_rear_lead_len > 0
            && sleeve_rear_lead_len < min(green_d, splitter_d),
        "Sleeve rear lead-in must fit both device depths");
-assert(sleeve_post_len >= 4.0
-           && sleeve_post_len <= sleeve_rear_lead_len,
-       "Sleeve posts must remain printable and fit the rear lead-in");
+assert(sleeve_green_frame_t >= 2.20,
+       "Green rounded side frames need at least 2.20 mm thickness");
+assert(sleeve_green_frame_open_h
+           < green_device_z + green_h + sleeve_roof_t
+             - (base_thickness - 0.20),
+       "Green capsule vents must fit inside the side-frame height");
+assert(sleeve_splitter_frame_open_h
+           < base_thickness + splitter_h + sleeve_roof_t
+             - (base_thickness - 0.20),
+       "TP-Link capsule vents must fit inside the side-frame height");
 assert(sleeve_green_interference >= 0
            && sleeve_green_interference <= 0.20,
        "Green sleeve interference is outside the coupon-scale range");

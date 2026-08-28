@@ -312,22 +312,22 @@ RETENTION_OPTIONS = [
     },
     {
         "id": "ventilated_sleeves",
-        "label": "Skeletal sleeve cages · Green + PoE",
-        "short_label": "Skeletal cages",
+        "label": "Rounded vent-frame cages · Green + PoE",
+        "short_label": "Rounded frames",
         "filename": "viewer_retention_ventilated_sleeves.stl",
-        "material_name": "Device retention — skeletal sleeve cages",
+        "material_name": "Device retention — rounded vent-frame cages",
         "color": (8, 145, 178, 0),
         "highlight": (8, 145, 178, 255),
         "roughness": 0.66,
         "printable": False,
         "note": (
-            "UCG/USW-inspired rear-loading concept for TP-Link layouts: "
-            "honeycomb floors and roofs are joined by three short vertical "
-            "posts per side, with no separate horizontal side rails. The "
-            "Green returns to its low honeycomb and four raised support pads, "
-            "leaving two large open bays on every side. Rear posts and roof "
-            "flare over 6 mm for insertion; there are no relief cuts, "
-            "springs, or moving latches."
+            "Mauker/UCG-inspired rear-loading concept for TP-Link layouts: "
+            "thick rounded side frames surround two capsule vents beside the "
+            "Green and one long capsule vent beside the TP-Link. The broad "
+            "lower rails and 5 mm roof borders stiffen the honeycomb cage, "
+            "while the Green keeps its low honeycomb and four raised pads. "
+            "The rear cavity and roof flare over 6 mm for insertion; there "
+            "are no relief cuts, springs, or moving latches."
         ),
     },
     {
