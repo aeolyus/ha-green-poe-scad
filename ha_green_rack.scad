@@ -342,8 +342,8 @@ hybrid_green_transition_h = 1.50;
 hybrid_green_clip_len = 18.0;
 hybrid_green_clip_center_offset = 25.0;
 hybrid_green_clip_clearance = 0.30;
-hybrid_green_top_overlap = 0.80;
-hybrid_green_catch_flat = 1.00;      // starts 0.20 mm outside the top edge
+hybrid_green_top_overlap = 1.20;
+hybrid_green_catch_flat = 1.40;      // starts 0.20 mm outside the top edge
 hybrid_green_clip_reach = green_cover_top_inset
                           + hybrid_green_cover_clearance
                           + hybrid_green_top_overlap;
@@ -360,8 +360,8 @@ hybrid_splitter_clip_clearance = 0.50;
 hybrid_splitter_arm_t = 1.60;
 hybrid_splitter_clip_y_gap = 0.80;
 hybrid_splitter_root_top = 4.00;
-hybrid_splitter_top_overlap = 0.80;
-hybrid_splitter_catch_flat = 1.00;    // starts 0.20 mm outside the top edge
+hybrid_splitter_top_overlap = 1.20;
+hybrid_splitter_catch_flat = 1.40;    // starts 0.20 mm outside the top edge
 hybrid_splitter_fixed_reach = splitter_upper_bevel_inset
                               - splitter_friction_interference
                               + hybrid_splitter_top_overlap;
@@ -3880,6 +3880,9 @@ assert(hybrid_green_catch_tip_bevel <= hybrid_green_catch_flat,
        "Green catch lead-in bevel must fit within the bearing land");
 assert(hybrid_green_catch_flat > hybrid_green_top_overlap,
        "Green bearing land must begin outside the modeled top edge");
+assert(abs(hybrid_green_catch_flat
+           - (hybrid_green_top_overlap + 0.20)) < 0.001,
+       "Green bearing land must begin 0.20 mm outside the modeled top edge");
 assert(abs(hybrid_green_clip_reach
            - (green_cover_top_inset + hybrid_green_cover_clearance
               + hybrid_green_top_overlap)) < 0.001,
@@ -3902,6 +3905,9 @@ assert(hybrid_splitter_catch_tip_bevel
        "TP-Link catch lead-in bevel must fit within the bearing land");
 assert(hybrid_splitter_catch_flat > hybrid_splitter_top_overlap,
        "TP-Link bearing land must begin outside the modeled top edge");
+assert(abs(hybrid_splitter_catch_flat
+           - (hybrid_splitter_top_overlap + 0.20)) < 0.001,
+       "TP-Link bearing land must begin 0.20 mm outside the modeled top edge");
 assert(abs(hybrid_splitter_fixed_reach
            - (splitter_upper_bevel_inset
               - splitter_friction_interference

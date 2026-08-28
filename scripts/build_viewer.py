@@ -286,7 +286,7 @@ RETENTION_OPTIONS = [
         "printable": False,
         "note": (
             "Community-informed prototype: smooth one-piece catches overlap "
-            "the Green's clear top by 0.8 mm. The TP-Link uses matched 0.8 mm "
+            "the Green's clear top by 1.2 mm. The TP-Link uses matched 1.2 mm "
             "catches grown directly from its mini side walls; relief slots "
             "let the accessible wall tongue flex. The lower guides account for "
             "the Green's measured 109.54 mm base, its published 112 mm cover "
