@@ -283,7 +283,8 @@ RETENTION_OPTIONS = [
             "pairs capture the TP-Link's top bevel. The lower guides account for "
             "the Green's measured 109.54 mm base, its published 112 mm cover "
             "envelope, and the TP-Link's lower bevel. Existing low stops take "
-            "fore/aft loads. Print both clip coupons before production."
+            "fore/aft loads. Print the combined two-device clip coupon before "
+            "production."
         ),
     },
     {
@@ -338,6 +339,13 @@ NO_SHUTTER_FILE_OVERRIDES = {
 SHARED_PART_FILENAMES = {
     "viewer_green_tray_standard.stl",
     *(option["filename"] for option in FRICTION_SUPPORT_OPTIONS),
+}
+
+# Unlike the other retention studies, the hybrid overlay contains TP-Link
+# catches as well as Green geometry. Its splitter coordinates therefore follow
+# each layout's setback and cannot be shared across Compact/Balanced/etc.
+VARIANT_RETENTION_FILENAMES = {
+    "viewer_retention_hybrid_clips.stl",
 }
 
 SHUTTER_CONFIGURATION = "shutter"
@@ -473,7 +481,9 @@ Part = tuple[
 ]
 
 
-def load_variants() -> dict[str, dict[str, list[Part]]]:
+def load_variants(
+    required_variant_retention: set[str] | None = None,
+) -> dict[str, dict[str, list[Part]]]:
     loaded: dict[str, dict[str, list[Part]]] = {}
     for variant in VARIANTS:
         variant_dir = VIEWER / "variants" / variant["id"]
@@ -518,9 +528,27 @@ def load_variants() -> dict[str, dict[str, list[Part]]]:
                      load_mesh(source_path))
                 )
             for filename, name, color, roughness, emissive in RETENTION_PARTS:
+                if filename in VARIANT_RETENTION_FILENAMES:
+                    variant_path = variant_dir / filename
+                    if variant_path.is_file():
+                        source_path = variant_path
+                    elif required_variant_retention is not None \
+                            and variant["id"] in required_variant_retention:
+                        raise FileNotFoundError(
+                            "Missing variant-specific retention mesh: "
+                            f"{variant_path}"
+                        )
+                    else:
+                        # Partial viewer rebuilds reuse existing GLBs for
+                        # unselected variants. Their raw meshes are loaded only
+                        # to preserve the common scene transform, so the legacy
+                        # cable-friendly overlay is an acceptable fallback.
+                        source_path = VIEWER / filename
+                else:
+                    source_path = VIEWER / filename
                 loaded_parts.append(
                     (filename, name, color, roughness, emissive,
-                     load_mesh(VIEWER / filename))
+                     load_mesh(source_path))
                 )
             configurations[configuration] = loaded_parts
         loaded[variant["id"]] = configurations
@@ -655,7 +683,7 @@ def load_existing_glbs() -> dict[str, dict[str, bytes]]:
 
 def build_glbs(selected_variants: set[str]) -> dict[str, dict[str, bytes]]:
     """Build selected GLBs and reuse existing files for unselected variants."""
-    raw_variants = load_variants()
+    raw_variants = load_variants(selected_variants)
     transform = common_transform(raw_variants)
     all_variant_ids = {variant["id"] for variant in VARIANTS}
     glbs = (

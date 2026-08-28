@@ -340,7 +340,10 @@ hybrid_green_clip_len = 18.0;
 hybrid_green_clip_center_offset = 25.0;
 hybrid_green_clip_reach = 1.80;
 hybrid_green_clip_clearance = 0.30;
-hybrid_green_catch_flat = 0.30;
+hybrid_green_catch_flat = 0.80;      // two 0.4 mm bearing lines
+hybrid_green_catch_nose_t = 0.80;    // four 0.2 mm layers at the shoulder
+hybrid_green_catch_tip_t = 0.40;     // two-layer minimum leading edge
+hybrid_green_catch_tip_bevel = 0.40; // 45-degree support-free lead-in
 hybrid_green_top_ramp_h = 1.225;
 hybrid_green_fixed_arm_t = 2.4;
 hybrid_green_spring_arm_t = 2.8;
@@ -348,10 +351,11 @@ hybrid_green_window_margin = 1.0;
 hybrid_splitter_clip_len = 14.0;
 hybrid_splitter_clip_center_offset = 20.0;
 hybrid_splitter_fixed_reach = 1.20;
-hybrid_splitter_spring_reach = 0.80;
+hybrid_splitter_spring_reach = 1.20;
 hybrid_splitter_clip_clearance = 0.50;
 hybrid_splitter_arm_gap = 0.60;
 hybrid_splitter_catch_flat = 0.30;
+hybrid_splitter_catch_nose_t = 0.60;
 
 module rounded_rect_2d(w, h, r) {
     hull() {
@@ -2361,8 +2365,11 @@ module hybrid_green_top_catch_left(y0,
     catch_z = green_device_z + green_h + hybrid_green_clip_clearance;
     flat_x = inner + reach - hybrid_green_catch_flat;
     tip_x = inner + reach;
-    lower_z = catch_z - (flat_x - inner);
     anchor_x = inner - 0.25;
+    lower_z = catch_z - (flat_x - anchor_x);
+    nose_top_z = catch_z + hybrid_green_catch_nose_t;
+    tip_top_z = catch_z + hybrid_green_catch_tip_t;
+    shoulder_x = tip_x - hybrid_green_catch_tip_bevel;
 
     union() {
         translate([outer, y0, 0])
@@ -2384,6 +2391,9 @@ module hybrid_green_top_catch_left(y0,
             [anchor_x, lower_z],
             [flat_x, catch_z],
             [tip_x, catch_z],
+            [tip_x, tip_top_z],
+            [shoulder_x, nose_top_z],
+            [flat_x, nose_top_z],
             [anchor_x, catch_z + hybrid_green_top_ramp_h]
         ], y0, hybrid_green_clip_len);
     }
@@ -2397,8 +2407,11 @@ module hybrid_green_top_catch_right(y0,
     catch_z = green_device_z + green_h + hybrid_green_clip_clearance;
     flat_x = inner - reach + hybrid_green_catch_flat;
     tip_x = inner - reach;
-    lower_z = catch_z - (inner - flat_x);
     anchor_x = inner + 0.25;
+    lower_z = catch_z - (anchor_x - flat_x);
+    nose_top_z = catch_z + hybrid_green_catch_nose_t;
+    tip_top_z = catch_z + hybrid_green_catch_tip_t;
+    shoulder_x = tip_x + hybrid_green_catch_tip_bevel;
 
     union() {
         translate([inner, y0, 0])
@@ -2420,6 +2433,9 @@ module hybrid_green_top_catch_right(y0,
             [anchor_x, lower_z],
             [flat_x, catch_z],
             [tip_x, catch_z],
+            [tip_x, tip_top_z],
+            [shoulder_x, nose_top_z],
+            [flat_x, nose_top_z],
             [anchor_x, catch_z + hybrid_green_top_ramp_h]
         ], y0, hybrid_green_clip_len);
 
@@ -2532,6 +2548,7 @@ module retention_splitter_hybrid_clips_local(
             [arm_anchor, catch_z - (flat_x - arm_inner)],
             [flat_x, catch_z],
             [tip_x, catch_z],
+            [tip_x, catch_z + hybrid_splitter_catch_nose_t],
             [arm_anchor, catch_z + (tip_x - arm_inner)]
         ], clip_y0, hybrid_splitter_clip_len);
 
@@ -2555,6 +2572,8 @@ module retention_splitter_hybrid_clips_local(
             [inner_right - fixed_reach + hybrid_splitter_catch_flat,
              catch_z],
             [inner_right - fixed_reach, catch_z],
+            [inner_right - fixed_reach,
+             catch_z + hybrid_splitter_catch_nose_t],
             [inner_right + 0.25, catch_z + fixed_reach]
         ], clip_y0, hybrid_splitter_clip_len);
     }
@@ -3166,8 +3185,11 @@ module green_hybrid_clip_coupon_single(reach = 1.80) {
     catch_z = green_device_z + green_h + hybrid_green_clip_clearance;
     flat_x = inner + reach - hybrid_green_catch_flat;
     tip_x = inner + reach;
-    lower_z = catch_z - (flat_x - inner);
     anchor_x = inner - 0.25;
+    lower_z = catch_z - (flat_x - anchor_x);
+    nose_top_z = catch_z + hybrid_green_catch_nose_t;
+    tip_top_z = catch_z + hybrid_green_catch_tip_t;
+    shoulder_x = tip_x - hybrid_green_catch_tip_bevel;
 
     union() {
         // Full-length root strip matches the production floor thickness while
@@ -3218,6 +3240,9 @@ module green_hybrid_clip_coupon_single(reach = 1.80) {
             [anchor_x, lower_z],
             [flat_x, catch_z],
             [tip_x, catch_z],
+            [tip_x, tip_top_z],
+            [shoulder_x, nose_top_z],
+            [flat_x, nose_top_z],
             [anchor_x, catch_z + hybrid_green_top_ramp_h]
         ], clip_y0, hybrid_green_clip_len);
         extrude_xz_profile_y([
@@ -3293,7 +3318,7 @@ module splitter_fit_coupon() {
 }
 
 // Compact production-fit coupon for the selected TP-Link hybrid retention.
-// It preserves the exact 1.2 mm fixed catch, 0.8 mm spring catch, full-height
+// It preserves the exact 1.2 mm fixed and spring catches, full-height
 // wall profiles, and both clip roots. Two narrow transverse seat bars hold the
 // production spacing and device height without printing a non-load-bearing
 // solid floor across the open center of this short test section.
@@ -3825,6 +3850,14 @@ module assembly(include_mockups = false) {
     if (include_mockups)
         translate([ear_width, 0, 0]) mockups();
 }
+
+assert(hybrid_green_catch_tip_t <= hybrid_green_catch_nose_t,
+       "Green catch tip cannot be thicker than its shoulder");
+assert(hybrid_green_catch_tip_bevel <= hybrid_green_catch_flat,
+       "Green catch lead-in bevel must fit within the bearing land");
+assert(green_device_z + green_h + hybrid_green_clip_clearance
+           + hybrid_green_top_ramp_h <= rack_height,
+       "Green hybrid catch exceeds the 1U panel envelope");
 
 assert(!(front_ethernet_enabled
          && front_keystone_side == "far_right"

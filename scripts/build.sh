@@ -139,6 +139,28 @@ finish_scad_jobs() {
   done
 }
 
+build_variant_hybrid_overlay() {
+  local requested_id="$1"
+  local spec variant_id variant_model variant_y variant_front variant_side
+  local variant_dir
+  if ! spec="$(variant_spec "$requested_id")"; then
+    echo "Unknown viewer variant: $requested_id" >&2
+    usage >&2
+    exit 2
+  fi
+  IFS=: read -r variant_id variant_model variant_y variant_front variant_side \
+    <<< "$spec"
+  variant_dir="viewer/variants/${variant_id}"
+  mkdir -p "$variant_dir"
+
+  launch_scad "${variant_dir}/viewer_retention_hybrid_clips.stl" \
+    -D 'part="viewer_retention_hybrid_clips"' \
+    -D "splitter_model=\"${variant_model}\"" \
+    -D "splitter_y_override=${variant_y}" \
+    -D "front_ethernet_enabled=${variant_front}" \
+    -D "front_keystone_side=\"${variant_side}\""
+}
+
 build_viewer_variant() {
   local requested_id="$1"
   local spec variant_id variant_model variant_y variant_front variant_side
@@ -182,6 +204,8 @@ build_viewer_variant() {
       -D "front_keystone_side=\"${variant_side}\"" \
       -D 'led_shutter_enabled=false'
   done
+
+  build_variant_hybrid_overlay "$variant_id"
 }
 
 build_shared_viewer_trays() {
@@ -200,6 +224,7 @@ build_friction_tray_variants() {
 
 build_retention_overlay() {
   local retention_id="$1"
+  local variant_id
   if ! retention_is_valid "$retention_id"; then
     echo "Unknown retention type: $retention_id" >&2
     usage >&2
@@ -207,6 +232,10 @@ build_retention_overlay() {
   fi
   if [[ "$retention_id" == "friction_sleeve" ]]; then
     build_friction_tray_variants
+  elif [[ "$retention_id" == "hybrid_clips" ]]; then
+    for variant_id in "${variant_ids[@]}"; do
+      build_variant_hybrid_overlay "$variant_id"
+    done
   else
     launch_scad "viewer/viewer_retention_${retention_id}.stl" \
       -D "part=\"viewer_retention_${retention_id}\""
@@ -261,6 +290,13 @@ case "$target" in
     finish_scad_jobs
     job_pids=()
     trap - EXIT INT TERM
+    for variant_id in "${selected_variants[@]}"; do
+      if [[ "$variant_id" == "cable_friendly" ]]; then
+        cp viewer/variants/cable_friendly/viewer_retention_hybrid_clips.stl \
+           viewer/viewer_retention_hybrid_clips.stl
+        break
+      fi
+    done
     run_glb_build "${selected_variants[@]}"
     ;;
   retention)
@@ -276,6 +312,13 @@ case "$target" in
     finish_scad_jobs
     job_pids=()
     trap - EXIT INT TERM
+    for retention_id in "${selected_retentions[@]}"; do
+      if [[ "$retention_id" == "hybrid_clips" ]]; then
+        cp viewer/variants/cable_friendly/viewer_retention_hybrid_clips.stl \
+           viewer/viewer_retention_hybrid_clips.stl
+        break
+      fi
+    done
     run_glb_build
     ;;
   full)

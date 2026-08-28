@@ -260,9 +260,10 @@ for part_name in mount mount_without_green_tray green_tray_standard green_tray_f
     -D 'led_shutter_enabled=true' ha_green_rack.scad
 done
 
-# Green-retention concepts use the same device coordinates in every layout.
-# Build each lightweight overlay once and reuse it in all viewer GLBs.
-for retention_name in factory_screws slide_latch corner_gate sled_gate padded_rails captive_strap x_cage hybrid_clips friction_sleeve; do
+# Green-only retention concepts use the same device coordinates in every
+# layout. The mixed Green + TP-Link hybrid is built per variant below because
+# its splitter catches follow the layout-specific setback.
+for retention_name in factory_screws slide_latch corner_gate sled_gate padded_rails captive_strap x_cage friction_sleeve; do
   run_openscad \
     -o "viewer/viewer_retention_${retention_name}.stl" \
     -D "part=\"viewer_retention_${retention_name}\"" ha_green_rack.scad
@@ -294,7 +295,7 @@ build_viewer_variant() {
   variant_dir="viewer/variants/${variant_id}"
   mkdir -p "$variant_dir"
 
-  for part_name in mount_without_green_tray enclosure_airframe insert shutter_open shutter_closed shutter_retainer logo green splitter green_ports splitter_ports internal_data_cable input_data_cable dc_cable rulers led_power led_activity led_health; do
+  for part_name in mount_without_green_tray enclosure_airframe insert shutter_open shutter_closed shutter_retainer logo green splitter green_ports splitter_ports internal_data_cable input_data_cable dc_cable rulers led_power led_activity led_health retention_hybrid_clips; do
     run_openscad -o "${variant_dir}/viewer_${part_name}.stl" \
       -D "part=\"viewer_${part_name}\"" \
       -D "splitter_model=\"${variant_model}\"" \
@@ -365,6 +366,11 @@ if (( variant_failed != 0 )); then
   echo "One or more viewer-variant builds failed" >&2
   exit 1
 fi
+
+# Backward-compatible standalone alias follows the production cable-friendly
+# layout. GLB assembly uses the variant-local files instead.
+cp viewer/variants/cable_friendly/viewer_retention_hybrid_clips.stl \
+   viewer/viewer_retention_hybrid_clips.stl
 
 render_common=(--viewall --autocenter --projection=perspective \
   --colorscheme=Tomorrow -D 'part="assembly_preview"')

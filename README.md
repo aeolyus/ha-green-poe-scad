@@ -112,10 +112,10 @@ The viewer is a hand-built HTML page using Google's open-source `<model-viewer>`
 - `left_ear.stl` / `right_ear.stl` — detachable rack ears for `core.stl`
 - `led_insert_optional.stl` and `led_fixed_window_kit_optional.stl` / `.3mf` — optional self-retaining translucent insert comparison
 - `friction_fit_coupon.stl` / `.3mf` — follow-up smooth-wall channels at 0.25, 0.30, and 0.35 mm interference per side. The original three-hole 0.20 mm/side coupon was a near-perfect clearance fit but did not grip, so test these in order and use the first one that holds without scuffing.
-- `green_hybrid_clip_coupon.stl` / `.3mf` — one compact full-height Green spring-catch gauge at the selected 1.8 mm reach. Its open ribbed seat preserves the production clip root and 9.025 mm device height while using about 4.1 g of PETG. Use a 5 mm slicer brim because the gauge is intentionally tall and narrow.
+- `green_hybrid_clip_coupon.stl` / `.3mf` — one compact full-height Green spring-catch gauge at the selected 1.8 mm reach. Its 0.8 mm bearing shoulder and 0.4 mm leading tip replace the earlier knife edge while staying at 42.55 mm maximum height. The open ribbed seat uses about 4.1 g of PETG; add a 5 mm slicer brim.
 - `splitter_fit_coupon.stl` / `.3mf` — three short open-ended smooth-wall test channels at 0.00, 0.05, and 0.10 mm interference per side for the TP-Link body; use the least aggressive level that holds before committing to its full-length friction cradle
-- `splitter_hybrid_clip_coupon.stl` / `.3mf` — one compact open-frame TP-Link section with the selected 1.2 mm fixed catch and 0.8 mm spring catch, using about 6.2 g of PETG
-- `hybrid_clip_coupon.stl` / `.3mf` — the recommended single print containing both compact top-clip gauges, about 10.3 g of PETG total and roughly 72% less material than the previous two three-setting coupon files
+- `splitter_hybrid_clip_coupon.stl` / `.3mf` — one compact open-frame TP-Link section with the selected 1.2 mm fixed and spring catches, including the same 0.6 mm-thick capture noses used by the full tray; about 6.3 g of PETG
+- `hybrid_clip_coupon.stl` / `.3mf` — the recommended single print containing both compact top-clip gauges, about 10.4 g of PETG total and roughly 72% less material than the previous two three-setting coupon files
 - `assembly.stl` — reference assembly only; print the separate parts above
 - `fit_test.stl` / `.3mf` — general device-clearance check
 
@@ -240,17 +240,18 @@ bash scripts/build.sh glb
 # Rebuild one layout's viewer geometry, both shutter states, GLBs, and HTML.
 bash scripts/build.sh viewer cable_friendly
 
-# Rebuild every layout after changing shared per-layout viewer geometry such as the optional airframe.
+# Rebuild every layout after changing per-layout geometry such as the optional airframe or TP-Link hybrid clips.
 bash scripts/build.sh viewer
 
-# Rebuild one shared retention concept, then refresh all viewer GLBs.
+# Rebuild a retention concept, then refresh the affected viewer GLBs.
+# Hybrid clips are rebuilt separately for every splitter setback.
 bash scripts/build.sh retention slide_latch
 
 # Rebuild canonical production files plus clearly named comparisons.
 bash scripts/build.sh full
 ```
 
-`viewer` and `glb` accept multiple variant names; omit them to rebuild every comparison layout. `glb` repacks both shutter states for each selected layout. `retention friction_sleeve` rebuilds all three shared friction support styles plus the Full honeycomb compatibility mesh, then refreshes the viewer GLBs. OpenSCAD viewer jobs run four at a time by default, adjustable with `VIEWER_BUILD_JOBS`. Partial outputs are written to temporary files and moved into place only after a successful build.
+`viewer` and `glb` accept multiple variant names; omit them to rebuild every comparison layout. `glb` repacks both shutter states for each selected layout. `retention friction_sleeve` rebuilds all three shared friction support styles plus the Full honeycomb compatibility mesh. `retention hybrid_clips` rebuilds a separate overlay for every splitter setback so Compact, Balanced, and Cable-friendly cannot drift out of alignment. OpenSCAD viewer jobs run four at a time by default, adjustable with `VIEWER_BUILD_JOBS`. Partial outputs are written to temporary files and moved into place only after a successful build.
 
 ## Licensing and attribution
 
