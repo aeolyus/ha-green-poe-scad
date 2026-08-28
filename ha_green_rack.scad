@@ -4133,57 +4133,24 @@ module retention_splitter_ventilated_sleeve_local() {
         splitter_end_stops_local(include_rear = false);
 
         intersection() {
-            difference() {
-                union() {
-                    sleeve_profiled_side_frame_x(
-                        left_profile,
-                        outer_y, outer_depth,
-                        outer_left, top_inner_left - outer_left,
-                        frame_openings);
-                    sleeve_profiled_side_frame_x(
-                        right_profile,
-                        outer_y, outer_depth,
-                        top_inner_right,
-                        outer_right - top_inner_right,
-                        frame_openings);
-                }
-
-                sleeve_rear_lead_cavity_local(
-                    [
-                        [lower_inner_left, wall_z0 - epsilon],
-                        [lower_inner_right, wall_z0 - epsilon],
-                        [inner_right, lower_bevel_top],
-                        [inner_right, upper_bevel_bottom],
-                        [top_inner_right, roof_z0],
-                        [top_inner_right, roof_top + epsilon],
-                        [top_inner_left, roof_top + epsilon],
-                        [top_inner_left, roof_z0],
-                        [inner_left, upper_bevel_bottom],
-                        [inner_left, lower_bevel_top]
-                    ],
-                    [
-                        [lower_inner_left - sleeve_rear_lead_relief,
-                         wall_z0 - epsilon],
-                        [lower_inner_right + sleeve_rear_lead_relief,
-                         wall_z0 - epsilon],
-                        [inner_right + sleeve_rear_lead_relief,
-                         lower_bevel_top],
-                        [inner_right + sleeve_rear_lead_relief,
-                         upper_bevel_bottom],
-                        [top_inner_right + sleeve_rear_lead_relief,
-                         roof_z0],
-                        [top_inner_right + sleeve_rear_lead_relief,
-                         roof_top + epsilon],
-                        [top_inner_left - sleeve_rear_lead_relief,
-                         roof_top + epsilon],
-                        [top_inner_left - sleeve_rear_lead_relief,
-                         roof_z0],
-                        [inner_left - sleeve_rear_lead_relief,
-                         upper_bevel_bottom],
-                        [inner_left - sleeve_rear_lead_relief,
-                         lower_bevel_top]
-                    ],
-                    outer_y, outer_depth);
+            // Keep the complete measured bevel profile constant from front to
+            // rear. The former six-millimeter rear cavity flare widened the
+            // inner wall only at the insertion end, leaving a visible notch
+            // where that flare met the continuous upper bevel. This sleeve is
+            // intended to be a snug flex fit, so its side frames need no
+            // separate lead-relief cut.
+            union() {
+                sleeve_profiled_side_frame_x(
+                    left_profile,
+                    outer_y, outer_depth,
+                    outer_left, top_inner_left - outer_left,
+                    frame_openings);
+                sleeve_profiled_side_frame_x(
+                    right_profile,
+                    outer_y, outer_depth,
+                    top_inner_right,
+                    outer_right - top_inner_right,
+                    frame_openings);
             }
 
             // The TP-Link floor and roof share this rounded outline, so clip
