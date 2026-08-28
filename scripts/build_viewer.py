@@ -312,22 +312,22 @@ RETENTION_OPTIONS = [
     },
     {
         "id": "ventilated_sleeves",
-        "label": "Ventilated sleeve cages · Green + PoE",
-        "short_label": "Sleeve cages",
+        "label": "Skeletal sleeve cages · Green + PoE",
+        "short_label": "Skeletal cages",
         "filename": "viewer_retention_ventilated_sleeves.stl",
-        "material_name": "Device retention — ventilated sleeve cages",
+        "material_name": "Device retention — skeletal sleeve cages",
         "color": (8, 145, 178, 0),
         "highlight": (8, 145, 178, 255),
         "roughness": 0.66,
         "printable": False,
         "note": (
-            "Rear-loading dual-device concept for TP-Link layouts: snug "
-            "one-piece cages replace the Green tray and the complete PoE "
-            "cradle. Honeycomb roofs and "
-            "floors retain the devices vertically, while hollow side walls "
-            "with ventilation holes constrain them laterally. The body walls "
-            "provide the small insertion flex; there are no relief cuts, "
-            "separate springs, or moving latches."
+            "UCG/USW-inspired rear-loading concept for TP-Link layouts: "
+            "honeycomb floors and roofs are joined by three short vertical "
+            "posts per side, with no separate horizontal side rails. The "
+            "Green returns to its low honeycomb and four raised support pads, "
+            "leaving two large open bays on every side. Rear posts and roof "
+            "flare over 6 mm for insertion; there are no relief cuts, "
+            "springs, or moving latches."
         ),
     },
     {
