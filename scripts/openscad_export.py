@@ -75,6 +75,18 @@ def without_controlled_options(arguments: Sequence[str]) -> list[str]:
     return cleaned
 
 
+def requested_backend(arguments: Sequence[str]) -> str | None:
+    """Return an explicitly requested backend before controlled flags are stripped."""
+    for index, argument in enumerate(arguments):
+        if argument == "--backend":
+            if index + 1 >= len(arguments):
+                raise ValueError("--backend requires a value")
+            return arguments[index + 1]
+        if argument.startswith("--backend="):
+            return argument.split("=", 1)[1]
+    return None
+
+
 def engine_features(engine: str) -> tuple[bool, bool]:
     cached_backend = os.environ.get("OPENSCAD_SUPPORTS_BACKEND")
     cached_format = os.environ.get("OPENSCAD_SUPPORTS_EXPORT_FORMAT")
@@ -293,6 +305,19 @@ def validate_stl(path: Path) -> tuple[bool, str]:
                 f"{len(triangles)} triangles; zero-volume component"
             )
 
+        # A numerically tiny closed sliver can accumulate a non-zero signed
+        # volume when located far from the origin. Reject any component whose
+        # bounding box has no meaningful thickness on one axis.
+        flat_components = [
+            root for root, bounds in component_bounds.items()
+            if any(bounds[1][axis] - bounds[0][axis] <= 1e-6
+                   for axis in range(3))
+        ]
+        if flat_components:
+            return False, (
+                f"{len(triangles)} triangles; zero-thickness component"
+            )
+
         # Negative shells are valid only when they represent a cavity nested
         # inside a positive shell. This rejects a detached inward-wound solid
         # while preserving legitimate enclosed voids.
@@ -351,11 +376,24 @@ def validated_stl_export(
     destination: Path,
     supports_backend: bool,
     supports_export_format: bool,
+    requested: str | None = None,
 ) -> int:
     controlled = without_controlled_options(arguments)
     controlled_output_index, _ = find_output(controlled)
     format_arguments = ["--export-format", "binstl"] if supports_export_format else []
-    backends = ["Manifold", "CGAL"] if supports_backend else ["CGAL"]
+    if requested is not None:
+        normalized = {"manifold": "Manifold", "cgal": "CGAL"}.get(
+            requested.lower()
+        )
+        if normalized is None:
+            print(
+                f"openscad_export.py: unsupported backend {requested!r}",
+                file=sys.stderr,
+            )
+            return 2
+        backends = [normalized] if supports_backend else ["CGAL"]
+    else:
+        backends = ["Manifold", "CGAL"] if supports_backend else ["CGAL"]
 
     for backend in backends:
         candidate = temporary_path(destination, backend.lower())
@@ -428,6 +466,7 @@ def main() -> int:
     arguments = sys.argv[1:]
     try:
         output_index, destination = find_output(arguments)
+        forced_backend = requested_backend(arguments)
     except ValueError as error:
         print(f"openscad_export.py: {error}", file=sys.stderr)
         return 2
@@ -441,6 +480,7 @@ def main() -> int:
         destination,
         supports_backend,
         supports_export_format,
+        forced_backend,
     )
 
 

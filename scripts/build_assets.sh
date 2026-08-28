@@ -59,13 +59,17 @@ canonical_stl_parts=(
   right_ear
   fit_test
   friction_fit_coupon
-  green_hybrid_clip_coupon
   splitter_fit_coupon
-  splitter_hybrid_clip_coupon
-  hybrid_clip_coupon
 )
 for part_name in "${canonical_stl_parts[@]}"; do
   run_openscad -o "exports/${part_name}.stl" \
+    -D "part=\"${part_name}\"" ha_green_rack.scad
+done
+for part_name in green_hybrid_clip_coupon splitter_hybrid_clip_coupon hybrid_clip_coupon green_vent_frame_coupon splitter_vent_frame_coupon vent_frame_coupon; do
+  # Force CGAL for these fit-critical coupons. Some Manifold STL exports can
+  # retain zero-volume sliver components even when their visible shell looks
+  # closed; CGAL removes those artifacts before slicing.
+  run_openscad --backend=CGAL -o "exports/${part_name}.stl" \
     -D "part=\"${part_name}\"" ha_green_rack.scad
 done
 cp exports/one_piece.stl \
@@ -192,8 +196,8 @@ for part_name in fit_test friction_fit_coupon splitter_fit_coupon; do
   run_openscad -o "exports/${part_name}.3mf" \
     -D "part=\"${part_name}\"" ha_green_rack.scad
 done
-for part_name in green_hybrid_clip_coupon splitter_hybrid_clip_coupon hybrid_clip_coupon; do
-  # These tall snap gauges contain short fit-critical catch faces. CGAL avoids
+for part_name in green_hybrid_clip_coupon splitter_hybrid_clip_coupon hybrid_clip_coupon green_vent_frame_coupon splitter_vent_frame_coupon vent_frame_coupon; do
+  # These fit-critical gauges contain short walls or catch faces. CGAL avoids
   # the degenerate facets that some Manifold 3MF exports retain at those seams.
   run_openscad --backend=CGAL -o "exports/${part_name}.3mf" \
     -D "part=\"${part_name}\"" ha_green_rack.scad

@@ -9,9 +9,9 @@ import tempfile
 import unittest
 
 try:
-    from scripts.openscad_export import validate_stl
+    from scripts.openscad_export import requested_backend, validate_stl
 except ModuleNotFoundError:
-    from openscad_export import validate_stl
+    from openscad_export import requested_backend, validate_stl
 
 
 Point = tuple[float, float, float]
@@ -98,6 +98,26 @@ class ValidatorTest(unittest.TestCase):
             valid, detail = validate_stl(path)
         self.assertFalse(valid)
         self.assertIn("vertex fan", detail)
+
+    def test_rejects_numerically_thin_closed_shell(self) -> None:
+        points = [
+            (0, 0, 0),
+            (1e-8, 0, 0),
+            (0, 1, 0),
+            (0, 0, 1),
+        ]
+        faces = [(0, 2, 1), (0, 1, 3), (0, 3, 2), (1, 2, 3)]
+        valid, detail = self.validate([(points, faces)])
+        self.assertFalse(valid)
+        self.assertIn("zero-thickness", detail)
+
+    def test_reads_explicit_backend(self) -> None:
+        self.assertEqual(requested_backend(["--backend=CGAL"]), "CGAL")
+        self.assertEqual(
+            requested_backend(["--backend", "Manifold", "-o", "x.stl"]),
+            "Manifold",
+        )
+        self.assertIsNone(requested_backend(["-o", "x.stl"]))
 
 
 if __name__ == "__main__":

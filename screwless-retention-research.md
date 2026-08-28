@@ -4,16 +4,18 @@ Research date: 2026-08-26
 
 ## Recommendation
 
-For the next prototype, use **light lower guide contact plus localized positive top-edge catches**, printed tray-down. Keep the current four-pad friction tray as the unchanged production baseline until the new Green and TP-Link clip coupons are physically tested.
+The best current screwless design is the **unified raised direct-friction tray with thin honeycomb**, printed faceplate-down. It stays below the Green, uses no small flexures or separate parts, keeps the top and rear open, and already has integral front/rear stops for cable-pull loads. Reprint its fit coupon because the old result used the superseded 109.5375 mm footprint.
+
+The rounded vent-frame cage remains the preferred enclosed/aesthetic experiment. Its continuous frame provides broad top and bottom capture without small snap features, but the measured 33.3375 mm Green height puts its roof at Z=43.5625 mm: inside the nominal 44.45 mm 1U pitch, yet above the 43 mm panel outline. Treat it as coupon-gated until adjacent-unit clearance is confirmed or its deck is lowered.
 
 The viewer prototype applies the same force-path idea to both devices:
 
-- **Home Assistant Green:** two fixed left catches and two releasable right spring catches follow the modeled upper taper, then overlap the clear lid edge by 1.2 mm. Short lower guides locate the measured 109.5375 mm base, then flare outward around the official 112 mm cover envelope.
+- **Home Assistant Green:** two fixed left catches and two releasable right spring catches follow the measured upper taper, then overlap the clear lid edge by 1.2 mm. Short lower guides locate the measured 111.125 mm base, allow for the official 112 mm maximum cover envelope, and converge to the measured 107.95 mm top plateau.
 - **TP-Link:** the bevel-aware cradle opens at the lower bevel, grips only the widest side band, and now uses four mirrored rigid catches grown directly from continuous mini walls. There are no tongue-relief cuts or separate spring regions; both sides use the same ramp/nose geometry and 1.2 mm nominal top overlap.
 - **Rounded vent-frame alternative:** two rear-loading device-local cages use honeycomb floors and roofs joined by substantial rounded side frames. Each device receives one long capsule vent per side. Broad lower rails, end blocks, and roof borders follow the structural language of the supplied UCG-Fiber 3MF, the referenced USW-Lite enclosure, and Mauker's Chromebox rack mount while retaining large airflow openings.
 - In the hybrid option, existing low front/rear stops take cable-pull loads, so the top catches mainly resist lift and tilt rather than carrying constant preload.
 - The catches are short and broad instead of a thin X roof, and they leave the center of both devices open for airflow.
-- The Green prototype reaches 42.55 mm, leaving about 0.45 mm inside the modeled 43 mm 1U envelope. That is enough for a visual prototype, but too close to call production-ready without a rack fit check.
+- The revised Green hybrid prototype reaches 43.8875 mm: 0.5625 mm inside the nominal 44.45 mm 1U pitch, but 0.8875 mm above the 43 mm RackMate faceplate outline. This needs an adjacent-equipment clearance check before production.
 
 Physical TP-Link measurements from the unit on hand use 1/32-inch ruler increments: 53.975 mm maximum width (2 1/8 in), a 47.625 mm flat plateau width (1 7/8 in), 23.8125 mm total height (15/16 in), and an 18.25625 mm straight side band (23/32 in). The enclosure is symmetric top-to-bottom, so the remaining height is divided into equal 2.778125 mm (7/64 in) bevel traversals. Both plateaus are inset 3.175 mm per side. The measured 67.46875 mm length (2 21/32 in) is modeled as the flat plateau length, not the full housing: TP-Link publishes an 80.8 mm overall length, and the other two published dimensions agree with the physical measurements within 0.19 mm. This leaves matching 6.665625 mm longitudinal bevels at each end of both plateaus.
 
@@ -30,30 +32,42 @@ Physical TP-Link measurements from the unit on hand use 1/32-inch ruler incremen
 
 ## Ranked alternatives
 
-1. **Light guides + localized top-edge catches** — current engineering recommendation for a one-piece, top-loadable prototype. It adds positive lift resistance while keeping the floor, vents, and ports open.
-2. **Direct-seat friction tray** — simplest and still the current production baseline, but sensitive to printer calibration, surface scuffing, removal cycles, and PETG creep.
-3. **Rear-slide C-rails + rear latch/gate** — the most directly community-proven top-capture pattern, but it needs either a separate rear closure or a more complex one-piece latch.
-4. **Four lower corner cups plus a captive rear gate** — tolerant of uncertain case geometry, but adds a moving part.
-5. **Separate sliding sled/cage with a captive rear gate** — robust and replaceable, but costs more filament and parts.
-6. **Rigid rails with TPU anti-rattle pads plus a hard latch** — tolerant and quiet; TPU must not be the only restraint.
-7. **Captive TPU or hook-and-loop strap** — dependable but visually busier and consumes scarce vertical clearance.
-8. **Full X-brace cage plus removable rear cap** — secure, but heavier and vulnerable at thin diagonal intersections.
+1. **Unified raised direct-friction tray** — best overall screwless balance: lowest height, fewest parts, support-free printing, open airflow, and integral fore/aft stops. Its risks are printer-specific interference, scuffing, and long-term PETG relaxation.
+2. **Factory screws** — best absolute security and tolerance robustness with no top-height penalty, but slower service and a hardware/overtightening risk.
+3. **Low rear-slide C-rails plus captured dovetail gate** — best future positive screwless architecture, but it still needs lower-ledge measurements, port-aware integration, and a rail-clearance coupon.
+4. **Slide shoes plus rear latch** — open and support-friendly, but dependent on an unmeasured lower ledge and a fatigue-prone flexure.
+5. **Four lower corner cups plus a captive rear gate** — tolerant and well ventilated, but gives less direct uplift capture and adds a moving part.
+6. **Rounded vent-frame rear-loading cages** — best aesthetics and broad capture with large vents, but currently exceeds the 43 mm faceplate outline and makes full-length fit more sensitive to tolerance and creep.
+7. **Light guides plus localized top-edge catches** — open and light with positive lift resistance, but currently over the faceplate outline and dependent on small flexing features plus exact taper assumptions.
+8. **Separate sliding sled/cage with a captive rear gate** — robust and replaceable, but costs more filament, interfaces, and service steps.
+9. **Rigid rails with TPU anti-rattle pads plus a hard latch** — tolerant and quiet; TPU must not be the only restraint.
+10. **Captive TPU or hook-and-loop strap** — dependable but over-height, visually busy, and subject to material creep.
+11. **Full X-brace cage plus removable rear cap** — secure, but over-height, heavier, more obstructive to top airflow, and vulnerable at thin diagonal intersections.
 
 Avoid 4 mm-class community return rails in a top-loading design: those dimensions assume the device slides in from an open end. Also avoid friction-only side springs, thin X lattices, magnets, and adhesive/Dual Lock. The Green can use shallow top catches only if their complete height remains below the real rack clearance and a coupon verifies release without whitening or scuffing.
 
 The browser overlays are form and force-path studies, not finished printable mechanisms. Gate captivity, sled receivers, latch flexures, strap hinges/snaps, mating features, and final tolerances still require engineering and physical coupons. TPU pads are anti-rattle aids rather than standalone positive retention.
 
+### Rear dovetail-gate study
+
+The MakerWorld 590818 photographs show separate open rear H-frames dropping vertically into paired channels after each device is inserted from the rear. The rails block straight rear withdrawal and blind bottoms stop downward travel; no separate screw or obvious snap is visible, so the original appears to rely on channel friction and gravity.
+
+An independent stronger branch was prototyped without copying the licensed mesh: separate Green and TP-Link gates use a shared 60-degree dovetail standard, 2.8 mm rail depth, 2.6 mm neck, 5.8 mm head, 0.25 mm running clearance per flank, and a final 7 mm wedge zone tightening to 0.10 mm per flank. A 1.2 mm blind bottom stop, top lead-in, and rear pull ledge avoid thin spring tabs. The concept is mechanically sound, but rear receiver towers add roughly 6 mm outside each cage wall and need a bridge/cable collision check. If pursued, first print a rail coupon with 0.10, 0.15, and 0.20 mm final wedge clearances.
+
+Do not add this gate to the direct-friction tray: that tray's integral front and rear stops already carry fore/aft cable loads, so the gate adds parts and connector-side complexity without fixing an unmet failure mode. A captured rear gate becomes useful only for a future low-profile rear-loading C-rail or cage whose main sleeve deliberately permits axial sliding.
+
 ## Starting geometry for PETG prototypes
 
-- Green lower guide: 0.20 mm/side nominal interference against the measured 109.5375 mm lower footprint, held for only 2.5 mm above the device seat before flaring around the 112 mm cover.
+- Green lower guide: 0.20 mm/side nominal interference against the measured 111.125 mm lower footprint, held for only 2.5 mm above the device seat before allowing for the 112 mm maximum cover.
 - Green upper clearance: 0.35 mm/side around the published cover envelope.
 - Green catches: two per side, 18 mm long; 2.4 mm fixed arms on the left and 2.8 mm spring arms on the accessible right side.
-- Green clip coupon: one 2.78125 mm-reach screening gauge with a production-height spring root, two rib-supported seating pads, and one smooth X/Z profile joining the root, taper follower, 1.4 mm bearing land, 0.8 mm shoulder, and 0.4 mm minimum leading tip. Under the current image-derived taper model, it overlaps the top face by 1.2 mm.
-- Green catch underside: 0.30 mm above the modeled top and follows the assumed 2.4 mm upper taper before reaching its horizontal bearing land. Maximum prototype height is 42.55 mm.
+- Green clip coupon: one 3.575 mm-reach screening gauge with a production-height spring root, two rib-supported seating pads, and one smooth X/Z profile joining the root, taper follower, 1.4 mm bearing land, 0.8 mm shoulder, and 0.4 mm minimum leading tip. Under the measured 111.125-to-107.95 mm taper, it overlaps the top face by 1.2 mm.
+- Green catch underside: 0.30 mm above the modeled top and follows the 2.4 mm upper taper before reaching its horizontal bearing land. Maximum prototype height is 43.8875 mm.
 - TP-Link bevels: symmetric 2.778125 mm upper and lower vertical traversals. The sleeve follows the 3.175 mm inset at both plateaus and maintains the selected 0.05 mm/side interference through the matching bevel profile.
 - TP-Link clip: four symmetric 14 mm-long rigid catches are fused directly into uninterrupted side walls. Both sides follow the measured 3.175 mm upper inset and use zero nominal top gap for a snug friction/preload fit, a 1.4 mm bearing land, 1.2 mm nominal top overlap, 0.8 mm shoulder, and 0.4 mm leading tip. The whole wall must supply the small installation deflection, so the coupon is required before a full print.
 - TP-Link clip coupon: one full-width open-frame section using the exact mirrored production-study catches. Five-millimeter transverse seating bars and six-millimeter root rails prevent the coupon from twisting more easily than the complete tray.
-- Rounded vent-frame sleeves: 1.2 mm honeycomb roofs with 5 mm borders, aligned raised 3 mm honeycomb floors, zero nominal roof gap, and rear 6 mm/0.5 mm lead-ins. Both device floors and the connecting bridge finish at Z=9.025 mm without separate riser columns. The Green uses a 2.4 mm frame thickness, one approximately 99.8 × 21 mm capsule opening, and 8 mm end blocks. The TP-Link uses one approximately 72.6 × 13 mm capsule opening with 7 mm end blocks. The Green roof ends at Z=42.225 mm, leaving 0.775 mm inside the nominal 43 mm panel envelope; the TP-Link roof ends at Z=34.0375 mm. Both sleeves omit rear stops for axial loading.
+- Rounded vent-frame sleeves: 1.2 mm honeycomb roofs with 5 mm borders, aligned raised 3 mm honeycomb floors, zero nominal roof gap, and rear 6 mm/0.5 mm lead-ins. Both device floors and the connecting bridge finish at Z=9.025 mm without separate riser columns. The Green side frames follow the measured 111.125 mm bottom and 107.95 mm top plateau through the upper taper; they use 2.4 mm frame thickness, one approximately 99.8 × 21 mm capsule opening, and 8 mm end blocks. The TP-Link uses one approximately 72.6 × 13 mm capsule opening with 7 mm end blocks. The Green roof ends at Z=43.5625 mm, leaving 0.8875 mm inside the nominal 44.45 mm 1U pitch while extending 0.5625 mm above the 43 mm faceplate outline. The TP-Link roof ends at Z=34.0375 mm. Both sleeves omit rear stops for axial loading.
+- Rounded vent-frame coupon: an exact 18 mm crop from the rear of each complete cage, including floor, side frames, roof, bevel profile, and insertion lead-in. The revised Green coupon is approximately 116.6 × 37.2 × 18 mm and 8.0 g of PETG; the TP-Link coupon is approximately 59.8 × 28.0 × 18 mm and 6.3 g. The combined plate remains two separate manifold objects, approximately 184.4 × 37.7 × 18 mm and 14.3 g total.
 - The cable-friendly rounded-frame overlay is approximately 68.0 g of PETG by mesh volume after replacing the low floors and Green riser pads with the unified raised decks. This is the two-device sleeve overlay, not the complete faceplate/mount mass.
 - Print in PETG or ASA at 0.20 mm layers with 4–5 walls. Print the Green gauge tray-down with a 5 mm brim. Print the TP-Link gauge on its open Y/end face so its layers match the intended faceplate-down production orientation. The vented-sleeve concept should be printed faceplate-down, matching the supplied UCG-Fiber 3MF.
 
@@ -80,10 +94,11 @@ No complete official Green enclosure CAD was found. The closest device-part refe
 
 ## Validation sequence
 
-1. Print the combined `hybrid_clip_coupon`; it contains the selected taper-following Green spring gauge and the TP-Link matched-ramp gauge as separate, mechanically independent pieces. Both target 1.2 mm nominal overlap under the current enclosure assumptions.
-2. For the Green gauge, tuck the fixed edge first and press the spring side down. For the TP-Link rigid coupon, tuck one side first and rock the opposite edge into place; stop if the wall whitens or requires excessive force.
-3. Confirm that each selected catch visibly overlaps the top edge, holds when gently inverted, and releases without whitening or surface scuffing.
-4. If either selected fit fails, generate only a nearby reach variant rather than reprinting another three-setting coupon. Once both pass, generate one complete hybrid tray and perform at least 50 install/remove cycles plus a warm cable-pull test before promoting it to the canonical print.
+1. Print the combined `vent_frame_coupon.3mf`; it contains mechanically independent, exact 18 mm rear crops of the Green and TP-Link rounded cages and is already oriented for the intended faceplate-down layer direction.
+2. Slide each device into its matching band only as far as needed to engage the full normal-clearance section beyond the short rear lead-in. Stop if insertion requires excessive force or the frame whitens.
+3. Confirm that each device sits flat without rocking, remains snug during a gentle upside-down test, and withdraws without surface scuffing or permanent spreading.
+4. If either cage is too loose or tight, adjust only that device's interference and regenerate the same short coupon. Once both pass, generate one complete rounded-cage mount and perform at least 50 insert/remove cycles plus a warm cable-pull test before promoting it to the canonical print.
+5. Keep `hybrid_clip_coupon.3mf` as the fallback experiment if the continuous cage proves too sensitive or difficult to service.
 
 ## Sources
 

@@ -279,8 +279,8 @@ RETENTION_OPTIONS = [
         "printable": False,
         "note": (
             "A hinged TPU strap stays attached when open, so there is no "
-            "loose cover or clip. It is tolerant and secure, but consumes "
-            "most of the roughly 2 mm remaining 1U clearance."
+            "loose cover or clip. It is tolerant and secure, but the revised "
+            "physical Green height puts it above the 43 mm panel outline."
         ),
     },
     {
@@ -316,8 +316,9 @@ RETENTION_OPTIONS = [
             "rigid catches grown directly from continuous, mirrored mini "
             "walls, with no spring tongues or relief slots. The lower guides "
             "account for "
-            "the Green's measured 109.54 mm base, its published 112 mm cover "
-            "envelope, and the TP-Link's lower bevel. Existing low stops take "
+            "the Green's measured 111.13 mm bottom, 107.95 mm top plateau, "
+            "published 112 mm maximum envelope, and the TP-Link's lower "
+            "bevel. Existing low stops take "
             "fore/aft loads. Print the combined two-device clip coupon before "
             "production."
         ),
@@ -337,9 +338,13 @@ RETENTION_OPTIONS = [
             "thick rounded side frames surround one long capsule vent beside "
             "each device. Both thin honeycomb floors and the connecting "
             "bridge share the Green's seating height, eliminating separate "
-            "riser columns. "
-            "The rear cavity and roof flare over 6 mm for insertion; there "
-            "are no relief cuts, springs, or moving latches."
+            "riser columns. The TP-Link bevel walls remain continuous from "
+            "front to rear; only the roof keeps a shallow rear insertion "
+            "flare. There are no relief cuts, springs, or moving latches. "
+            "The measured Green height puts its roof at 43.56 mm, inside the "
+            "44.45 mm nominal 1U pitch but above the 43 mm panel outline. "
+            "Print the combined Green + PoE rear-section vent-frame coupon "
+            "before committing to a full plate."
         ),
     },
     {
@@ -540,6 +545,82 @@ VARIANTS = [
         ),
     },
 ]
+
+# Numeric dimensions drive the viewport ruler readout. Keeping this data in
+# the generated variant payload avoids parsing display copy in JavaScript and
+# keeps millimeter/inch labels synchronized whenever a layout changes.
+VARIANT_MEASUREMENTS = {
+    "compact": {
+        "depth_mm": 120.0,
+        "chassis_depth_mm": 185.0,
+        "clearance_label": "Panel → PoE face",
+        "clearance_mm": 32.0,
+        "clearance_detail": "After 25 mm boot",
+        "clearance_detail_mm": 7.0,
+    },
+    "balanced": {
+        "depth_mm": 131.2,
+        "chassis_depth_mm": 185.0,
+        "clearance_label": "Panel → PoE face",
+        "clearance_mm": 44.5,
+        "clearance_detail": "After 25 mm boot",
+        "clearance_detail_mm": 19.5,
+    },
+    "cable_friendly": {
+        "depth_mm": 143.7,
+        "chassis_depth_mm": 185.0,
+        "clearance_label": "Panel → PoE face",
+        "clearance_mm": 57.0,
+        "clearance_detail": "After 25 mm boot",
+        "clearance_detail_mm": 32.0,
+    },
+    STACKED_VARIANT_ID: {
+        "depth_mm": 202.4,
+        "chassis_depth_mm": 225.0,
+        "clearance_label": "Panel → PoE body",
+        "clearance_mm": 142.6,
+        "clearance_detail": "Green rear → PoE body",
+        "clearance_detail_mm": 29.1,
+    },
+    "front_ethernet_right": {
+        "depth_mm": 143.7,
+        "chassis_depth_mm": 205.0,
+        "clearance_label": "Panel → PoE face",
+        "clearance_mm": 57.0,
+        "clearance_detail": "After 25 mm boot",
+        "clearance_detail_mm": 32.0,
+    },
+    "front_ethernet_far_right": {
+        "depth_mm": 143.7,
+        "chassis_depth_mm": 205.0,
+        "clearance_label": "Panel → PoE face",
+        "clearance_mm": 57.0,
+        "clearance_detail": "After 25 mm boot",
+        "clearance_detail_mm": 32.0,
+    },
+    "front_ethernet_left": {
+        "depth_mm": 172.7,
+        "chassis_depth_mm": 225.0,
+        "clearance_label": "Panel → PoE face",
+        "clearance_mm": 86.0,
+        "clearance_detail": "After 25 mm boot",
+        "clearance_detail_mm": 61.0,
+    },
+    "sics_angled": {
+        "depth_mm": 202.0,
+        "chassis_depth_mm": 238.0,
+        "clearance_label": "Panel → PoE output",
+        "clearance_mm": 127.0,
+        "clearance_detail": "Angled viewer study",
+    },
+}
+
+for variant in VARIANTS:
+    variant["measurements"] = {
+        "width_mm": 254.0,
+        "height_mm": 43.0,
+        **VARIANT_MEASUREMENTS[variant["id"]],
+    }
 
 DEFAULT_VARIANT = "cable_friendly"
 PRODUCTION_VARIANT = "cable_friendly"

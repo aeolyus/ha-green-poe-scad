@@ -16,7 +16,7 @@
 
 $fn = 48;
 
-// [assembly_preview, assembly, one_piece, one_piece_logo_inlay, x2d_plate, core, logo_inlay, left_ear, right_ear, led_insert, led_shutter, led_shutter_retainer, led_shutter_kit, led_fixed_window_kit, green_spacer, green_spacers_4x, fit_test, friction_fit_coupon, green_hybrid_clip_coupon, splitter_fit_coupon, splitter_hybrid_clip_coupon, hybrid_clip_coupon, keystone_fit_test, viewer_mount, viewer_mount_without_green_tray, viewer_splitter_floor, viewer_splitter_side_walls, viewer_splitter_end_stops, viewer_green_tray_standard, viewer_green_tray_friction, viewer_green_tray_friction_raised, viewer_green_tray_friction_full, viewer_green_tray_friction_pads, viewer_green_tray_friction_skeletal, viewer_insert, viewer_shutter_open, viewer_shutter_closed, viewer_shutter_retainer, viewer_logo, viewer_green, viewer_splitter, viewer_ports, viewer_green_ports, viewer_splitter_ports, viewer_keystone_ports, viewer_data_cables, viewer_internal_data_cable, viewer_input_data_cable, viewer_dc_cable, viewer_fasteners, viewer_retention_factory_screws, viewer_retention_slide_latch, viewer_retention_corner_gate, viewer_retention_sled_gate, viewer_retention_padded_rails, viewer_retention_captive_strap, viewer_retention_x_cage, viewer_retention_hybrid_clips, viewer_retention_ventilated_sleeves, viewer_retention_friction_sleeve, viewer_enclosure_airframe, viewer_rulers, viewer_led_power, viewer_led_activity, viewer_led_health]
+// [assembly_preview, assembly, one_piece, one_piece_logo_inlay, x2d_plate, core, logo_inlay, left_ear, right_ear, led_insert, led_shutter, led_shutter_retainer, led_shutter_kit, led_fixed_window_kit, green_spacer, green_spacers_4x, fit_test, friction_fit_coupon, green_hybrid_clip_coupon, splitter_fit_coupon, splitter_hybrid_clip_coupon, hybrid_clip_coupon, green_vent_frame_coupon, splitter_vent_frame_coupon, vent_frame_coupon, keystone_fit_test, viewer_mount, viewer_mount_without_green_tray, viewer_splitter_floor, viewer_splitter_side_walls, viewer_splitter_end_stops, viewer_green_tray_standard, viewer_green_tray_friction, viewer_green_tray_friction_raised, viewer_green_tray_friction_full, viewer_green_tray_friction_pads, viewer_green_tray_friction_skeletal, viewer_insert, viewer_shutter_open, viewer_shutter_closed, viewer_shutter_retainer, viewer_logo, viewer_green, viewer_splitter, viewer_ports, viewer_green_ports, viewer_splitter_ports, viewer_keystone_ports, viewer_data_cables, viewer_internal_data_cable, viewer_input_data_cable, viewer_dc_cable, viewer_fasteners, viewer_retention_factory_screws, viewer_retention_slide_latch, viewer_retention_corner_gate, viewer_retention_sled_gate, viewer_retention_padded_rails, viewer_retention_captive_strap, viewer_retention_x_cage, viewer_retention_hybrid_clips, viewer_retention_ventilated_sleeves, viewer_retention_friction_sleeve, viewer_enclosure_airframe, viewer_rulers, viewer_led_power, viewer_led_activity, viewer_led_health]
 part = "assembly_preview";
 
 // Production geometry uses the TP-Link. Viewer-only builds may override this
@@ -64,6 +64,7 @@ splitter_clearance = 0.40;    // clearance per side, mm
 // Rack geometry
 rack_width = 254.0;
 rack_height = 43.0;           // matches the official RackMate blank panel
+rack_unit_pitch = 44.45;      // IEC 60297 nominal vertical allowance for 1U
 rack_hole_spacing = 236.525;  // official RackMate T2 rail-hole pitch
 rack_hole_x = (rack_width - rack_hole_spacing) / 2;
 rack_hole_z = [6.5, 36.5];    // RackMate panels use the outer pair per U
@@ -76,24 +77,24 @@ core_width = rack_width - 2 * ear_width;
 face_thickness = 3.0;
 base_thickness = 3.0;
 
-// Home Assistant lists 112 x 112 x 32 mm. Richard's physical enclosure
-// measures 4 5/16 in (109.5375 mm) in both horizontal axes at the tray's
-// contact height, so use that measured footprint for the friction interface.
-// The centered placement preserves the previous LED window and screw pattern.
-green_w = 109.5375;
-green_d = 109.5375;
-green_h = 32.0;
-// The measured lower footprint is smaller than Home Assistant's published
-// 112 mm overall envelope. Official product/exploded imagery shows the clear
-// upper enclosure standing proud of the black lower base, then tapering into
-// the top face. These dimensions keep the lower friction interface measured
-// while reserving room for the published maximum cover envelope.
+// Home Assistant publishes a 112 x 112 x 32 mm nominal envelope. Richard's
+// physical enclosure measures 4 3/8 in (111.125 mm) across the bottom,
+// 4 1/4 in (107.95 mm) across the top plateau after the inward taper, and
+// 1 5/16 in (33.3375 mm) tall. Treat both plan axes as square until a separate
+// depth measurement says otherwise. Keep the published 112 mm mid-cover
+// maximum as a conservative clearance envelope between the measured ends.
+// Centered placement preserves the previous LED window and screw pattern.
+green_w = 111.125;
+green_d = 111.125;
+green_h = 33.3375;
+green_top_w = 107.95;
+green_top_d = 107.95;
 green_cover_w = 112.0;
 green_cover_d = 112.0;
 green_lower_base_h = 5.0;
 green_cover_relief_h = 2.0;
 green_cover_side_clearance = 0.20;
-green_cover_top_inset = (green_cover_w - green_w) / 2;
+green_cover_top_inset = (green_cover_w - green_top_w) / 2;
 green_cover_upper_bevel_h = 2.4;
 green_inner_w = green_w + 2 * green_clearance;
 green_inner_d = green_d + 2 * green_clearance;
@@ -273,7 +274,13 @@ led_window_w = 92.0;
 led_window_h = 8.0;
 led_window_x = green_x + (green_inner_w - led_window_w) / 2;
 led_window_z = 10.0 + green_standoff;
-led_status_x = [green_x + 44.3, green_x + 56.2, green_x + 68.3];
+// Image-derived LED offsets are referenced to the enclosure center, not its
+// measured lower-left edge. This preserves their visual alignment when the
+// physical bottom-width estimate changes; caliper measurements can replace
+// these approximate center offsets later.
+led_status_x = [green_x + green_w / 2 - 10.46875,
+                green_x + green_w / 2 + 1.43125,
+                green_x + green_w / 2 + 13.53125];
 led_status_y = green_y - 0.40;
 led_status_z = led_window_z + led_window_h / 2;
 
@@ -346,6 +353,8 @@ sleeve_green_frame_open_z = 15.0;
 sleeve_green_frame_open_h = 21.0;
 sleeve_splitter_frame_open_z = 9.0;
 sleeve_splitter_frame_open_h = 13.0;
+vent_frame_coupon_depth = 18.0;
+vent_frame_coupon_spacing = 8.0;
 
 // Viewer-only open protective shell. Thin point-up honeycomb shear walls add
 // stiffness and edge protection without consuming the Green's 1U top gap.
@@ -3983,10 +3992,15 @@ module retention_green_ventilated_sleeve_local() {
                  + sleeve_green_interference;
     cover_right = green_x + green_w + cover_outset
                   - sleeve_green_interference;
+    top_left = green_x + (green_w - green_top_w) / 2
+               + sleeve_green_interference;
+    top_right = green_x + (green_w + green_top_w) / 2
+                - sleeve_green_interference;
     outer_left = cover_left - sleeve_green_frame_t;
     outer_right = cover_right + sleeve_green_frame_t;
     base_grip_top = green_device_z + green_lower_base_h;
     cover_relief_top = base_grip_top + green_cover_relief_h;
+    upper_taper_start = roof_z0 - green_cover_upper_bevel_h;
     opening_z0 = sleeve_green_frame_open_z;
     opening_h = sleeve_green_frame_open_h;
     opening_d = sleeve_depth - 2 * sleeve_green_frame_end_border;
@@ -4000,14 +4014,18 @@ module retention_green_ventilated_sleeve_local() {
         [inner_left, wall_z0],
         [inner_left, base_grip_top],
         [cover_left, cover_relief_top],
-        [cover_left, roof_top],
+        [cover_left, upper_taper_start],
+        [top_left, roof_z0],
+        [top_left, roof_top],
         [outer_left, roof_top]
     ];
     right_profile = [
         [inner_right, wall_z0],
         [outer_right, wall_z0],
         [outer_right, roof_top],
-        [cover_right, roof_top],
+        [top_right, roof_top],
+        [top_right, roof_z0],
+        [cover_right, upper_taper_start],
         [cover_right, cover_relief_top],
         [inner_right, base_grip_top]
     ];
@@ -4038,8 +4056,12 @@ module retention_green_ventilated_sleeve_local() {
                         [inner_right, wall_z0 - epsilon],
                         [inner_right, base_grip_top],
                         [cover_right, cover_relief_top],
-                        [cover_right, roof_top + epsilon],
-                        [cover_left, roof_top + epsilon],
+                        [cover_right, upper_taper_start],
+                        [top_right, roof_z0],
+                        [top_right, roof_top + epsilon],
+                        [top_left, roof_top + epsilon],
+                        [top_left, roof_z0],
+                        [cover_left, upper_taper_start],
                         [cover_left, cover_relief_top],
                         [inner_left, base_grip_top]
                     ],
@@ -4053,9 +4075,17 @@ module retention_green_ventilated_sleeve_local() {
                         [cover_right + sleeve_rear_lead_relief,
                          cover_relief_top],
                         [cover_right + sleeve_rear_lead_relief,
+                         upper_taper_start],
+                        [top_right + sleeve_rear_lead_relief,
+                         roof_z0],
+                        [top_right + sleeve_rear_lead_relief,
                          roof_top + epsilon],
+                        [top_left - sleeve_rear_lead_relief,
+                         roof_top + epsilon],
+                        [top_left - sleeve_rear_lead_relief,
+                         roof_z0],
                         [cover_left - sleeve_rear_lead_relief,
-                         roof_top + epsilon],
+                         upper_taper_start],
                         [cover_left - sleeve_rear_lead_relief,
                          cover_relief_top],
                         [inner_left - sleeve_rear_lead_relief,
@@ -4177,6 +4207,96 @@ module retention_ventilated_sleeves_local() {
             retention_splitter_ventilated_sleeve_local();
 }
 
+// Low-material, production-derived cage gauges. Each coupon is the exact rear
+// 18 mm of its complete sleeve, including both side frames, floor, roof and
+// insertion lead-in. Printing the cropped opening on the build plate preserves
+// the faceplate-down production layer direction while testing the full device
+// width, height and local bevel profile in one short insertion.
+function green_vent_coupon_sleeve_y0() = face_thickness - 0.20;
+function green_vent_coupon_sleeve_depth() =
+    green_inner_d + (green_y - face_thickness) + wall_thickness;
+function green_vent_coupon_y0() =
+    green_vent_coupon_sleeve_y0()
+    + green_vent_coupon_sleeve_depth()
+    - vent_frame_coupon_depth;
+function green_vent_coupon_outer_w() =
+    green_cover_w - 2 * sleeve_green_interference
+    + 2 * sleeve_green_frame_t;
+function green_vent_coupon_outer_left() =
+    green_x + green_w / 2 - green_vent_coupon_outer_w() / 2;
+function green_vent_coupon_roof_top() =
+    green_device_z + green_h + sleeve_roof_t;
+
+function splitter_vent_coupon_outer_left() =
+    -splitter_clearance - wall_thickness;
+function splitter_vent_coupon_outer_w() =
+    splitter_inner_w + 2 * wall_thickness;
+function splitter_vent_coupon_outer_y() =
+    -splitter_clearance - wall_thickness;
+function splitter_vent_coupon_outer_depth() =
+    splitter_inner_d + 2 * wall_thickness;
+function splitter_vent_coupon_y0() =
+    splitter_vent_coupon_outer_y()
+    + splitter_vent_coupon_outer_depth()
+    - vent_frame_coupon_depth;
+function splitter_vent_coupon_roof_top() =
+    base_thickness + splitter_h + sleeve_roof_t;
+
+module green_vent_frame_coupon_raw() {
+    intersection() {
+        retention_green_ventilated_sleeve_local();
+        translate([
+            green_vent_coupon_outer_left() - epsilon,
+            green_vent_coupon_y0(),
+            -epsilon
+        ]) cube([
+            green_vent_coupon_outer_w() + 2 * epsilon,
+            vent_frame_coupon_depth + epsilon,
+            rack_height + 2 * epsilon
+        ]);
+    }
+}
+
+module splitter_vent_frame_coupon_raw() {
+    intersection() {
+        retention_splitter_ventilated_sleeve_local();
+        translate([
+            splitter_vent_coupon_outer_left() - epsilon,
+            splitter_vent_coupon_y0(),
+            -epsilon
+        ]) cube([
+            splitter_vent_coupon_outer_w() + 2 * epsilon,
+            vent_frame_coupon_depth + epsilon,
+            rack_height + 2 * epsilon
+        ]);
+    }
+}
+
+module green_vent_frame_coupon() {
+    translate([
+        -green_vent_coupon_outer_left(),
+        green_vent_coupon_roof_top(),
+        -green_vent_coupon_y0()
+    ]) rotate([90, 0, 0]) green_vent_frame_coupon_raw();
+}
+
+module splitter_vent_frame_coupon() {
+    translate([
+        -splitter_vent_coupon_outer_left(),
+        splitter_vent_coupon_roof_top(),
+        -splitter_vent_coupon_y0()
+    ]) rotate([90, 0, 0]) splitter_vent_frame_coupon_raw();
+}
+
+module vent_frame_coupon() {
+    green_vent_frame_coupon();
+    translate([
+        green_vent_coupon_outer_w() + vent_frame_coupon_spacing,
+        0,
+        0
+    ]) splitter_vent_frame_coupon();
+}
+
 function chassis_depth_for_layout() =
     splitter_model == "sics" ? 238.0
     : stacked_center_layout ? 225.0
@@ -4206,8 +4326,10 @@ module chassis_roof_local(chassis_depth) {
                     chassis_w, chassis_depth - chassis_y0, 4.0);
 
         // A flat-printed 18 mm honeycomb keeps the roof mostly open. Preserve
-        // side rails and one longitudinal beam over the device gap rather than
-        // putting a thick member over the Green's 0.975 mm roof clearance.
+        // side rails and one longitudinal beam over the device gap. With the
+        // revised 33.3375 mm physical Green height, this historical roof now
+        // intersects the device by 0.3625 mm and remains viewer-only until it
+        // is raised beyond the 43 mm panel outline or the deck is lowered.
         translate([0, 0, roof_z0 - epsilon])
             linear_extrude(height = roof_t + 2 * epsilon)
                 difference() {
@@ -4566,8 +4688,8 @@ assert(abs(hybrid_green_clip_reach
               + hybrid_green_top_overlap)) < 0.001,
        "Green reach must preserve the requested top overlap");
 assert(green_device_z + green_h + hybrid_green_clip_clearance
-           + hybrid_green_top_ramp_h <= rack_height,
-       "Green hybrid catch exceeds the 1U panel envelope");
+           + hybrid_green_top_ramp_h <= rack_unit_pitch,
+       "Green hybrid catch exceeds the nominal 1U pitch");
 assert(abs(splitter_lower_bevel_h + splitter_flat_side_h
            + splitter_upper_bevel_h - splitter_h) < 0.001,
        "TP-Link measured vertical profile must equal its total height");
@@ -4616,8 +4738,8 @@ assert(abs(hybrid_splitter_clip_clearance) < 0.001,
 assert(splitter_device_z + splitter_h + hybrid_splitter_clip_clearance
            + hybrid_splitter_catch_nose_t <= rack_height,
        "TP-Link hybrid catch exceeds the 1U panel envelope");
-assert(green_device_z + green_h + sleeve_roof_t <= rack_height,
-       "Green sleeve roof exceeds the 1U panel envelope");
+assert(green_device_z + green_h + sleeve_roof_t <= rack_unit_pitch,
+       "Green sleeve roof exceeds the nominal 1U pitch");
 assert(splitter_device_z + splitter_h + sleeve_roof_t <= rack_height,
        "TP-Link sleeve roof exceeds the 1U panel envelope");
 assert(sleeve_rear_lead_len > 0
@@ -4712,6 +4834,12 @@ if (part == "assembly_preview") {
     splitter_hybrid_clip_coupon();
 } else if (part == "hybrid_clip_coupon") {
     hybrid_clip_coupon();
+} else if (part == "green_vent_frame_coupon") {
+    green_vent_frame_coupon();
+} else if (part == "splitter_vent_frame_coupon") {
+    splitter_vent_frame_coupon();
+} else if (part == "vent_frame_coupon") {
+    vent_frame_coupon();
 } else if (part == "keystone_fit_test") {
     keystone_fit_test();
 } else if (part == "viewer_mount") {
