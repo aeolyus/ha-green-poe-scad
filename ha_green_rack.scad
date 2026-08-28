@@ -127,13 +127,15 @@ unified_deck_raise = green_standoff;
 unified_deck_z0 = green_device_z - base_thickness;
 
 // TP-Link TL-PD30G-M2. TP-Link publishes 80.8 x 54 x 24 mm overall.
-// The user's physical unit measured 2 1/8 in wide, 15/16 in high, with a
-// 2 21/32 in-long flat top plateau. X is device width; Y is full device
-// length. LAN/DC outputs face the rack front, while POWER+DATA IN faces rear.
+// The user's revised physical measurements are 2 1/8 in maximum width,
+// 31/32 in total height, a 1 29/32 in flat plateau width, a 23/32 in straight
+// side band, and a 2 21/32 in-long flat top plateau. X is device width; Y is
+// full device length. LAN/DC outputs face the rack front, while POWER+DATA IN
+// faces rear.
 splitter_w = 53.975;                 // measured 2 1/8 in; official 54 mm
 splitter_d = 80.8;
-splitter_h = 23.8125;                // measured 15/16 in; official 24 mm
-splitter_top_flat_w = 47.625;         // measured 1 7/8 in
+splitter_h = 24.60625;               // measured 31/32 in
+splitter_top_flat_w = 48.41875;      // measured 1 29/32 in
 splitter_top_flat_d = 67.46875;      // measured 2 21/32 in
 splitter_inner_w = splitter_w + 2 * splitter_clearance;
 splitter_inner_d = splitter_d + 2 * splitter_clearance;
@@ -145,8 +147,9 @@ splitter_friction_lead_relief = 0.50;   // opening gained per side at top, mm
 splitter_friction_grip_h = 8.0;         // contact above tray floor, mm
 splitter_friction_lead_h = 3.0;         // insertion chamfer height, mm
 // The enclosure is vertically symmetric: equal lower/upper bevel traversals
-// around the measured 23/32 in straight side band. Preserving the measured
-// 15/16 in overall height makes each bevel 7/64 in (2.778125 mm).
+// around the measured 23/32 in straight side band. The revised 31/32 in total
+// height makes each vertical bevel traversal 1/8 in (3.175 mm); the revised
+// plateau width leaves a 7/64 in (2.778125 mm) horizontal inset per side.
 splitter_flat_side_h = 18.25625;
 splitter_bevel_h = (splitter_h - splitter_flat_side_h) / 2;
 splitter_lower_bevel_h = splitter_bevel_h;
@@ -341,8 +344,10 @@ splitter_honeycomb_end_inset = 5.0;
 // and Mauker Chromebox rack cases. Thin honeycomb floors/roofs are joined by
 // thick rounded side frames with large capsule-shaped ventilation openings.
 sleeve_roof_t = 1.60;
-sleeve_green_interference = 0.10;
-sleeve_green_vertical_interference = 0.40;
+sleeve_green_side_clearance = 0.10;
+sleeve_green_vertical_clearance = 0.10;
+sleeve_splitter_side_clearance = 0.10;
+sleeve_splitter_vertical_clearance = 0.10;
 sleeve_green_frame_t = 2.40;
 sleeve_green_roof_pitch = 15.0;
 sleeve_green_roof_wall = 1.80;
@@ -367,7 +372,7 @@ dovetail_head_w = 5.80;
 dovetail_running_clearance = 0.25;
 dovetail_lock_clearance = 0.10;
 dovetail_receiver_wall = 1.20;
-dovetail_receiver_overlap = 0.80;
+dovetail_rear_extension = 3.50;
 dovetail_bottom_stop_h = 1.20;
 dovetail_stop_clearance = 0.05;
 dovetail_lock_h = 7.0;
@@ -3870,7 +3875,7 @@ module airframe_splitter_wall_clipped(x0, y0, depth, z0, height) {
 // side. Center this comparison sleeve's floor on the measured Green instead,
 // so its roof, wall borders, and honeycomb are true left/right mirrors.
 module green_sleeve_outer_outline_2d() {
-    outer_w = green_w - 2 * sleeve_green_interference
+    outer_w = green_w + 2 * sleeve_green_side_clearance
               + 2 * sleeve_green_frame_t;
     outer_x = green_x + green_w / 2 - outer_w / 2;
     outer_y = face_thickness - 0.20;
@@ -4017,19 +4022,19 @@ module retention_green_ventilated_sleeve_local() {
     sleeve_depth = green_inner_d + (green_y - face_thickness)
                    + wall_thickness;
     wall_z0 = unified_deck_z0 - 0.20;
-    // The broad honeycomb roof flexes upward over the measured top. Its
-    // 0.40 mm preload plus the 1.60 mm roof keeps the complete cage
-    // below the 44.45 mm front-panel outline without moving the device or LEDs.
+    // The broad honeycomb roof clears the measured top by 0.10 mm. Combined
+    // with 0.10 mm lateral clearance per side, this avoids stacking deliberate
+    // interference on top of normal FDM inner-feature shrinkage.
     // Its underside and both side-fit profiles remain constant front-to-back.
     roof_z0 = green_device_z + green_h
-              - sleeve_green_vertical_interference;
+              + sleeve_green_vertical_clearance;
     roof_top = roof_z0 + sleeve_roof_t;
-    inner_left = green_x + sleeve_green_interference;
-    inner_right = green_x + green_w - sleeve_green_interference;
+    inner_left = green_x - sleeve_green_side_clearance;
+    inner_right = green_x + green_w + sleeve_green_side_clearance;
     top_left = green_x + (green_w - green_top_w) / 2
-               + sleeve_green_interference;
+               - sleeve_green_side_clearance;
     top_right = green_x + (green_w + green_top_w) / 2
-                - sleeve_green_interference;
+                + sleeve_green_side_clearance;
     outer_left = inner_left - sleeve_green_frame_t;
     outer_right = inner_right + sleeve_green_frame_t;
     upper_taper_start = green_device_z + green_taper_start_h;
@@ -4103,8 +4108,8 @@ module retention_green_ventilated_sleeve_local() {
 module retention_splitter_ventilated_sleeve_local() {
     outer_left = -splitter_clearance - wall_thickness;
     outer_right = splitter_w + splitter_clearance + wall_thickness;
-    inner_left = splitter_friction_interference;
-    inner_right = splitter_w - splitter_friction_interference;
+    inner_left = -sleeve_splitter_side_clearance;
+    inner_right = splitter_w + sleeve_splitter_side_clearance;
     outer_y = -splitter_clearance - wall_thickness;
     outer_depth = splitter_inner_d + 2 * wall_thickness;
     wall_z0 = base_thickness - 0.20;
@@ -4113,10 +4118,11 @@ module retention_splitter_ventilated_sleeve_local() {
     lower_bevel_top = base_thickness + splitter_lower_bevel_h;
     upper_bevel_bottom = lower_bevel_top + splitter_flat_side_h;
     top_inner_left = splitter_upper_bevel_inset
-                     + splitter_friction_interference;
+                     - sleeve_splitter_side_clearance;
     top_inner_right = splitter_w - splitter_upper_bevel_inset
-                      - splitter_friction_interference;
-    roof_z0 = base_thickness + splitter_h;
+                      + sleeve_splitter_side_clearance;
+    roof_z0 = base_thickness + splitter_h
+              + sleeve_splitter_vertical_clearance;
     roof_top = roof_z0 + sleeve_roof_t;
     frame_openings = [[
         sleeve_splitter_frame_open_z,
@@ -4197,9 +4203,9 @@ function dovetail_receiver_w() =
     dovetail_head_w
     + 2 * (dovetail_running_clearance + dovetail_receiver_wall);
 function dovetail_left_center(outer_left) =
-    outer_left + dovetail_receiver_overlap - dovetail_receiver_w() / 2;
+    outer_left + dovetail_receiver_w() / 2;
 function dovetail_right_center(outer_right) =
-    outer_right - dovetail_receiver_overlap + dovetail_receiver_w() / 2;
+    outer_right - dovetail_receiver_w() / 2;
 
 // Vertical sliding dovetail: the narrow throat opens toward the rack rear,
 // while the buried head widens toward the device. The gate therefore cannot
@@ -4328,6 +4334,14 @@ module dovetail_gate_frame_local(
     contact_h = 2.40;
     contact_y = device_rear_y + dovetail_gate_contact_gap;
     contact_d = gate_y + dovetail_gate_t - contact_y;
+    receiver_contact_gap = 0.40;
+    left_contact_x = max(
+        device_left + contact_inset,
+        left_center + dovetail_receiver_w() / 2 + receiver_contact_gap);
+    right_contact_x = min(
+        device_right - contact_w - contact_inset,
+        right_center - dovetail_receiver_w() / 2
+            - receiver_contact_gap - contact_w);
     bottom_contact_z = device_z0 + 0.05;
     bottom_bar_h = max(
         dovetail_gate_bar_h,
@@ -4380,8 +4394,7 @@ module dovetail_gate_frame_local(
         // stop the device. Their Z positions clear the connector field and
         // avoid the cage floor/roof, keeping the gate a genuinely separate
         // removable component rather than welding it to the sleeve mesh.
-        for (contact_x = [device_left + contact_inset,
-                          device_right - contact_w - contact_inset])
+        for (contact_x = [left_contact_x, right_contact_x])
             for (contact_z = [bottom_contact_z, top_contact_z])
                 translate([contact_x, contact_y, contact_z])
                     rounded_prism_z(
@@ -4397,30 +4410,31 @@ module dovetail_gate_frame_local(
 }
 
 module green_dovetail_receivers_local() {
-    outer_w = green_w - 2 * sleeve_green_interference
+    outer_w = green_w + 2 * sleeve_green_side_clearance
               + 2 * sleeve_green_frame_t;
     outer_left = green_x + green_w / 2 - outer_w / 2;
     outer_right = outer_left + outer_w;
     wall_z0 = unified_deck_z0 - 0.20;
     roof_top = green_device_z + green_h
-               - sleeve_green_vertical_interference + sleeve_roof_t;
+               + sleeve_green_vertical_clearance + sleeve_roof_t;
     sleeve_y0 = face_thickness - 0.20;
     sleeve_depth = green_inner_d + (green_y - face_thickness)
                    + wall_thickness;
 
     dovetail_receiver_pair_local(
-        outer_left, outer_right, sleeve_y0 + sleeve_depth,
+        outer_left, outer_right,
+        sleeve_y0 + sleeve_depth + dovetail_rear_extension,
         wall_z0, roof_top);
 }
 
 module green_dovetail_gate_local() {
-    outer_w = green_w - 2 * sleeve_green_interference
+    outer_w = green_w + 2 * sleeve_green_side_clearance
               + 2 * sleeve_green_frame_t;
     outer_left = green_x + green_w / 2 - outer_w / 2;
     outer_right = outer_left + outer_w;
     wall_z0 = unified_deck_z0 - 0.20;
     roof_top = green_device_z + green_h
-               - sleeve_green_vertical_interference + sleeve_roof_t;
+               + sleeve_green_vertical_clearance + sleeve_roof_t;
     sleeve_y0 = face_thickness - 0.20;
     sleeve_depth = green_inner_d + (green_y - face_thickness)
                    + wall_thickness;
@@ -4428,22 +4442,25 @@ module green_dovetail_gate_local() {
     dovetail_gate_frame_local(
         outer_left, outer_right,
         green_x, green_x + green_w, green_y + green_d,
-        green_device_z, green_h, sleeve_y0 + sleeve_depth,
+        green_device_z, green_h,
+        sleeve_y0 + sleeve_depth + dovetail_rear_extension,
         wall_z0, roof_top,
         (green_w - green_top_w) / 2
-            + sleeve_green_interference + 0.50);
+            - sleeve_green_side_clearance + 0.50);
 }
 
 module splitter_dovetail_receivers_local() {
     outer_left = -splitter_clearance - wall_thickness;
     outer_right = splitter_w + splitter_clearance + wall_thickness;
     wall_z0 = base_thickness - 0.20;
-    roof_top = base_thickness + splitter_h + sleeve_roof_t;
+    roof_top = base_thickness + splitter_h
+               + sleeve_splitter_vertical_clearance + sleeve_roof_t;
     outer_y = -splitter_clearance - wall_thickness;
     outer_depth = splitter_inner_d + 2 * wall_thickness;
 
     dovetail_receiver_pair_local(
-        outer_left, outer_right, outer_y + outer_depth,
+        outer_left, outer_right,
+        outer_y + outer_depth + dovetail_rear_extension,
         wall_z0, roof_top);
 }
 
@@ -4451,20 +4468,23 @@ module splitter_dovetail_gate_local() {
     outer_left = -splitter_clearance - wall_thickness;
     outer_right = splitter_w + splitter_clearance + wall_thickness;
     wall_z0 = base_thickness - 0.20;
-    roof_top = base_thickness + splitter_h + sleeve_roof_t;
+    roof_top = base_thickness + splitter_h
+               + sleeve_splitter_vertical_clearance + sleeve_roof_t;
     outer_y = -splitter_clearance - wall_thickness;
     outer_depth = splitter_inner_d + 2 * wall_thickness;
 
     dovetail_gate_frame_local(
         outer_left, outer_right,
         0, splitter_w, splitter_d,
-        base_thickness, splitter_h, outer_y + outer_depth,
+        base_thickness, splitter_h,
+        outer_y + outer_depth + dovetail_rear_extension,
         wall_z0, roof_top, splitter_lower_bevel_inset + 0.50);
 }
 
-// Rounded cages plus two installed removable rear gates. Receiver towers live
-// only in each existing solid rear end block and remain outside the device-fit
-// cavities, so the normal vent-frame friction dimensions stay unchanged.
+// Rounded cages plus two installed removable rear gates. The receivers sit
+// entirely inside the cages' outer side-wall planes, removing the former
+// external brim. Their station is extended rearward far enough that the wider
+// buried dovetail heads occupy only the empty space behind each device.
 module green_dovetail_cage_local() {
     retention_green_ventilated_sleeve_local();
     green_dovetail_receivers_local();
@@ -4584,13 +4604,13 @@ function green_vent_coupon_y0() =
     + green_vent_coupon_sleeve_depth()
     - vent_frame_coupon_depth;
 function green_vent_coupon_outer_w() =
-    green_w - 2 * sleeve_green_interference
+    green_w + 2 * sleeve_green_side_clearance
     + 2 * sleeve_green_frame_t;
 function green_vent_coupon_outer_left() =
     green_x + green_w / 2 - green_vent_coupon_outer_w() / 2;
 function green_vent_coupon_roof_top() =
     green_device_z + green_h
-    - sleeve_green_vertical_interference + sleeve_roof_t;
+    + sleeve_green_vertical_clearance + sleeve_roof_t;
 
 function splitter_vent_coupon_outer_left() =
     -splitter_clearance - wall_thickness;
@@ -4605,7 +4625,8 @@ function splitter_vent_coupon_y0() =
     + splitter_vent_coupon_outer_depth()
     - vent_frame_coupon_depth;
 function splitter_vent_coupon_roof_top() =
-    base_thickness + splitter_h + sleeve_roof_t;
+    base_thickness + splitter_h
+    + sleeve_splitter_vertical_clearance + sleeve_roof_t;
 
 module green_vent_frame_coupon_raw() {
     intersection() {
@@ -5112,25 +5133,36 @@ assert(abs(hybrid_splitter_clip_clearance) < 0.001,
 assert(splitter_device_z + splitter_h + hybrid_splitter_clip_clearance
            + hybrid_splitter_catch_nose_t <= rack_height,
        "TP-Link hybrid catch exceeds the 1U panel envelope");
-assert(green_device_z + green_h - sleeve_green_vertical_interference
+assert(green_device_z + green_h + sleeve_green_vertical_clearance
            + sleeve_roof_t <= rack_height,
        "Green sleeve roof exceeds the 1U panel outline");
-assert(splitter_device_z + splitter_h + sleeve_roof_t <= rack_height,
+assert(splitter_device_z + splitter_h + sleeve_splitter_vertical_clearance
+           + sleeve_roof_t <= rack_height,
        "TP-Link sleeve roof exceeds the 1U panel envelope");
 assert(sleeve_green_frame_t >= 2.20,
        "Green rounded side frames need at least 2.20 mm thickness");
 assert(sleeve_green_frame_open_h
-           < green_device_z + green_h - sleeve_green_vertical_interference
+           < green_device_z + green_h + sleeve_green_vertical_clearance
              + sleeve_roof_t
              - (unified_deck_z0 - 0.20),
        "Green capsule vents must fit inside the side-frame height");
 assert(sleeve_splitter_frame_open_h
-           < base_thickness + splitter_h + sleeve_roof_t
+           < base_thickness + splitter_h
+             + sleeve_splitter_vertical_clearance + sleeve_roof_t
              - (base_thickness - 0.20),
        "TP-Link capsule vents must fit inside the side-frame height");
-assert(sleeve_green_interference >= 0
-           && sleeve_green_interference <= 0.20,
-       "Green sleeve interference is outside the coupon-scale range");
+assert(sleeve_green_side_clearance >= 0
+           && sleeve_green_side_clearance <= 0.30,
+       "Green sleeve side clearance is outside the coupon-scale range");
+assert(sleeve_green_vertical_clearance >= 0
+           && sleeve_green_vertical_clearance <= 0.30,
+       "Green sleeve vertical clearance is outside the coupon-scale range");
+assert(sleeve_splitter_side_clearance >= 0
+           && sleeve_splitter_side_clearance <= 0.30,
+       "TP-Link sleeve side clearance is outside the coupon-scale range");
+assert(sleeve_splitter_vertical_clearance >= 0
+           && sleeve_splitter_vertical_clearance <= 0.30,
+       "TP-Link sleeve vertical clearance is outside the coupon-scale range");
 assert(dovetail_head_w > dovetail_neck_w,
        "Dovetail head must remain wider than its rear throat");
 assert(dovetail_receiver_wall >= 1.20,
