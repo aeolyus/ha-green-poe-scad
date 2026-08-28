@@ -14,6 +14,8 @@ The viewer prototype applies the same force-path idea to both devices:
 - The catches are short and broad instead of a thin X roof, and they leave the center of both devices open for airflow.
 - The Green prototype reaches 42.55 mm, leaving about 0.45 mm inside the modeled 43 mm 1U envelope. That is enough for a visual prototype, but too close to call production-ready without a rack fit check.
 
+Physical TP-Link measurements from the unit on hand use 1/32-inch ruler increments: 53.975 mm maximum width (2 1/8 in), 23.8125 mm total height (15/16 in), a 3.96875 mm lower bevel rise (5/32 in), an 18.25625 mm straight side band (23/32 in), and therefore a 1.5875 mm upper bevel rise (1/16 in). The measured 67.46875 mm length (2 21/32 in) is modeled as the flat top plateau, not the full housing: TP-Link publishes an 80.8 mm overall length, and the other two published dimensions agree with the physical measurements within 0.19 mm. This leaves 6.665625 mm of longitudinal upper bevel at each end. The top plateau width and horizontal lower-bevel inset remain unmeasured.
+
 ## Evidence from existing designs
 
 - [MakerWorld 883556](https://makerworld.com/en/models/883556-home-assistant-green-wall-mount) uses a slide-in pocket/sleeve with open ports and airflow. It has 294 reported prints and 385 downloads. In a horizontal rack it would still need a positive end latch because gravity no longer retains the device.
@@ -47,7 +49,7 @@ The browser overlays are form and force-path studies, not finished printable mec
 - Green catches: two per side, 18 mm long; 2.4 mm fixed arms on the left and 2.8 mm spring arms on the accessible right side.
 - Green clip coupon: one 2.78125 mm-reach screening gauge with a production-height spring root, two rib-supported seating pads, and one smooth X/Z profile joining the root, taper follower, 1.4 mm bearing land, 0.8 mm shoulder, and 0.4 mm minimum leading tip. Under the current image-derived taper model, it overlaps the top face by 1.2 mm.
 - Green catch underside: 0.30 mm above the modeled top and follows the assumed 2.4 mm upper taper before reaching its horizontal bearing land. Maximum prototype height is 42.55 mm.
-- TP-Link lower bevel: 0.50 mm/side relief at the floor, transitioning to the 0.05 mm/side body-band fit over 3.5 mm.
+- TP-Link lower bevel: 0.50 mm/side relief at the floor, transitioning to the 0.05 mm/side body-band fit over the measured 3.96875 mm vertical rise. The 0.50 mm horizontal relief remains provisional until the bottom face width is measured.
 - TP-Link clip: 14 mm long, with a 1.6 mm thick flexible tongue inside the accessible mini wall and 0.8 mm Y relief slots on each end. The opposite catch is fused to the uninterrupted wall. Both have 0.50 mm top clearance, a 1.4 mm bearing land, 1.2 mm nominal top overlap, 0.8 mm shoulder, and 0.4 mm leading tip.
 - TP-Link clip coupon: one full-width open-frame section using the exact mirrored production-study catches. Five-millimeter transverse seating bars and six-millimeter root rails prevent the coupon from twisting more easily than the complete tray.
 - Print tray-down in PETG or ASA at 0.20 mm layers with 4–5 walls. The tall Green gauge needs a 5 mm slicer brim.
@@ -75,7 +77,7 @@ No complete official Green enclosure CAD was found. The closest device-part refe
 
 ## Validation sequence
 
-1. Print the combined `hybrid_clip_coupon`; it contains the selected taper-following Green spring gauge and the TP-Link matched-ramp gauge as separate, mechanically independent pieces. Both target 0.8 mm nominal overlap under the current enclosure assumptions.
+1. Print the combined `hybrid_clip_coupon`; it contains the selected taper-following Green spring gauge and the TP-Link matched-ramp gauge as separate, mechanically independent pieces. Both target 1.2 mm nominal overlap under the current enclosure assumptions.
 2. Tuck each device edge under the fixed side and press the spring side down. Do not slide the open-ended gauges longitudinally onto the devices, because that bypasses the snap action being tested.
 3. Confirm that each selected catch visibly overlaps the top edge, holds when gently inverted, and releases without whitening or surface scuffing.
 4. If either selected fit fails, generate only a nearby reach variant rather than reprinting another three-setting coupon. Once both pass, generate one complete hybrid tray and perform at least 50 install/remove cycles plus a warm cable-pull test before promoting it to the canonical print.

@@ -112,12 +112,14 @@ green_mount_y = [green_y + (green_d - green_mount_pitch_y) / 2,
                  green_y + (green_d + green_mount_pitch_y) / 2];
 green_device_z = base_thickness + green_standoff;
 
-// TP-Link TL-PD30G-M2 (official: 80.8 x 54 x 24 mm).
-// X is device width; Y is device length. LAN/DC outputs face the rack front,
-// while POWER+DATA IN faces the rear for clean patch-panel routing.
-splitter_w = 54.0;
+// TP-Link TL-PD30G-M2. TP-Link publishes 80.8 x 54 x 24 mm overall.
+// The user's physical unit measured 2 1/8 in wide, 15/16 in high, with a
+// 2 21/32 in-long flat top plateau. X is device width; Y is full device
+// length. LAN/DC outputs face the rack front, while POWER+DATA IN faces rear.
+splitter_w = 53.975;                 // measured 2 1/8 in; official 54 mm
 splitter_d = 80.8;
-splitter_h = 24.0;
+splitter_h = 23.8125;                // measured 15/16 in; official 24 mm
+splitter_top_flat_d = 67.46875;      // measured 2 21/32 in
 splitter_inner_w = splitter_w + 2 * splitter_clearance;
 splitter_inner_d = splitter_d + 2 * splitter_clearance;
 splitter_vertical_clearance = 0.50;
@@ -127,13 +129,19 @@ splitter_friction_interference = 0.05;  // inward movement per side, mm
 splitter_friction_lead_relief = 0.50;   // opening gained per side at top, mm
 splitter_friction_grip_h = 8.0;         // contact above tray floor, mm
 splitter_friction_lead_h = 3.0;         // insertion chamfer height, mm
-// Official imagery shows lower and upper case bevels. The lower cradle wall
-// opens by 0.50 mm per side at the floor, then reaches the measured 54 mm
-// body band over a provisional 3.5 mm bevel height. Coupon-test before print.
-splitter_lower_bevel_h = 3.5;
+// Measured vertical profile, bottom-to-top: 5/32 in lower bevel, 23/32 in
+// straight side band, then the remaining 1/16 in upper bevel. Horizontal
+// bevel insets still need a direct top/bottom-width measurement.
+splitter_lower_bevel_h = 3.96875;
+splitter_flat_side_h = 18.25625;
+splitter_upper_bevel_h = splitter_h
+                          - splitter_lower_bevel_h
+                          - splitter_flat_side_h;
 splitter_lower_bevel_relief = 0.50;
-splitter_upper_bevel_h = 1.8;
+splitter_lower_bevel_inset = 0.8;
 splitter_upper_bevel_inset = 1.0;
+splitter_upper_end_bevel_inset =
+    (splitter_d - splitter_top_flat_d) / 2;
 splitter_x = 13.0;
 // Production default is the cable-friendly 60 mm setback. Viewer builds can
 // override this to compare closer layouts without changing printable exports.
@@ -147,7 +155,7 @@ splitter_y = !is_undef(splitter_y_override)
 // Approximate port centers used only for viewer cable mockups.
 splitter_lan_x = splitter_x + 15.7;
 splitter_dc_x = splitter_x + 37.3;
-splitter_port_z = base_thickness + 12.0;
+splitter_port_z = base_thickness + splitter_h / 2;
 splitter_input_x = splitter_x + 31.9;
 splitter_input_y = splitter_y + splitter_d;
 
@@ -397,19 +405,33 @@ module beveled_rounded_box(
     lower_bevel_h = 0.8,
     upper_bevel_h = 1.8,
     lower_inset = 0.8,
-    upper_inset = 1.0) {
+    upper_inset = 1.0,
+    lower_inset_x = undef,
+    lower_inset_y = undef,
+    upper_inset_x = undef,
+    upper_inset_y = undef) {
     slice_h = 0.08;
     middle_h = h - lower_bevel_h - upper_bevel_h;
+    lower_x = is_undef(lower_inset_x) ? lower_inset : lower_inset_x;
+    lower_y = is_undef(lower_inset_y) ? lower_inset : lower_inset_y;
+    upper_x = is_undef(upper_inset_x) ? upper_inset : upper_inset_x;
+    upper_y = is_undef(upper_inset_y) ? upper_inset : upper_inset_y;
+    lower_r = max(0.8, r - min(lower_x, lower_y));
+    upper_r = max(0.8, r - min(upper_x, upper_y));
 
     assert(middle_h > 0, "Beveled mockup needs a positive straight band");
+    assert(2 * lower_x < w && 2 * lower_y < d,
+           "Lower bevel inset exceeds the enclosure footprint");
+    assert(2 * upper_x < w && 2 * upper_y < d,
+           "Upper bevel inset exceeds the enclosure footprint");
     union() {
         hull() {
-            translate([lower_inset, lower_inset, 0])
+            translate([lower_x, lower_y, 0])
                 linear_extrude(height = slice_h)
                     rounded_rect_2d(
-                        w - 2 * lower_inset,
-                        d - 2 * lower_inset,
-                        max(0.8, r - lower_inset));
+                        w - 2 * lower_x,
+                        d - 2 * lower_y,
+                        lower_r);
             translate([0, 0, lower_bevel_h - slice_h])
                 linear_extrude(height = slice_h)
                     rounded_rect_2d(w, d, r);
@@ -421,12 +443,12 @@ module beveled_rounded_box(
             translate([0, 0, h - upper_bevel_h])
                 linear_extrude(height = slice_h)
                     rounded_rect_2d(w, d, r);
-            translate([upper_inset, upper_inset, h - slice_h])
+            translate([upper_x, upper_y, h - slice_h])
                 linear_extrude(height = slice_h)
                     rounded_rect_2d(
-                        w - 2 * upper_inset,
-                        d - 2 * upper_inset,
-                        max(0.8, r - upper_inset));
+                        w - 2 * upper_x,
+                        d - 2 * upper_y,
+                        upper_r);
         }
     }
 }
@@ -1771,10 +1793,12 @@ module mockups() {
                 translate([0, 0, base_thickness])
                     beveled_rounded_box(
                         splitter_w, splitter_d, splitter_h, 4.0,
-                        lower_bevel_h = 0.8,
+                        lower_bevel_h = splitter_lower_bevel_h,
                         upper_bevel_h = splitter_upper_bevel_h,
-                        lower_inset = 0.8,
-                        upper_inset = splitter_upper_bevel_inset);
+                        lower_inset = splitter_lower_bevel_inset,
+                        upper_inset = splitter_upper_bevel_inset,
+                        upper_inset_y =
+                            splitter_upper_end_bevel_inset);
     }
 
     color([0.08, 0.09, 0.10, 1.0]) viewer_ports(false);
@@ -3818,10 +3842,12 @@ module viewer_splitter() {
                 translate([0, 0, base_thickness])
                     beveled_rounded_box(
                         splitter_w, splitter_d, splitter_h, 4.0,
-                        lower_bevel_h = 0.8,
+                        lower_bevel_h = splitter_lower_bevel_h,
                         upper_bevel_h = splitter_upper_bevel_h,
-                        lower_inset = 0.8,
-                        upper_inset = splitter_upper_bevel_inset);
+                        lower_inset = splitter_lower_bevel_inset,
+                        upper_inset = splitter_upper_bevel_inset,
+                        upper_inset_y =
+                            splitter_upper_end_bevel_inset);
     }
 }
 
@@ -3892,6 +3918,21 @@ assert(green_device_z + green_h + hybrid_green_clip_clearance
        "Green hybrid catch exceeds the 1U panel envelope");
 assert(hybrid_splitter_spring_reach == hybrid_splitter_fixed_reach,
        "TP-Link fixed and spring catches must use equal reach");
+assert(abs(splitter_lower_bevel_h + splitter_flat_side_h
+           + splitter_upper_bevel_h - splitter_h) < 0.001,
+       "TP-Link measured vertical profile must equal its total height");
+assert(splitter_lower_bevel_h > 0 && splitter_upper_bevel_h > 0
+           && splitter_flat_side_h > 0,
+       "TP-Link measured vertical profile segments must be positive");
+assert(splitter_lower_bevel_h < splitter_friction_grip_h,
+       "TP-Link cradle grip must extend above the lower bevel");
+assert(abs(splitter_top_flat_d
+           + 2 * splitter_upper_end_bevel_inset - splitter_d) < 0.001,
+       "TP-Link measured top plateau must fit its published full length");
+assert(hybrid_splitter_clip_center_offset
+           + hybrid_splitter_clip_len / 2
+           <= splitter_top_flat_d / 2,
+       "TP-Link catches must stay within the measured top plateau");
 assert(hybrid_splitter_clip_y_gap >= 0.80,
        "TP-Link spring tongues need at least 0.8 mm end relief");
 assert(hybrid_splitter_root_top > base_thickness,

@@ -6,14 +6,14 @@ Designed for:
 
 - DeskPi/GeeekPi RackMate T2 12U, 10-inch rack
 - Home Assistant Green (official 112 × 112 × 32 mm envelope; measured tray-contact footprint 109.54 × 109.54 mm)
-- TP-Link TL-PD30G-M2 2.5G PoE+ splitter (80.8 × 54 × 24 mm body)
+- TP-Link TL-PD30G-M2 2.5G PoE+ splitter (80.8 mm published overall length; the physical unit measured a 67.47 mm top plateau, 53.98 mm maximum width, and 23.81 mm height)
 - Bambu Lab X2D
 
 The canonical printable edition is the final selected design: **rear cable entry, 60 mm cable-friendly splitter setback, an integrated Green friction tray with four raised support pads, a plain front with no logo, an open LED viewing aperture with no shutter or lens, visible LEDs, and no surrounding chassis**. The unqualified `core`, `one_piece`, and `x2d_plate` exports all use that combination.
 
 Smooth continuous tray walls target a light 0.10 mm-per-side friction fit around the physically measured 109.54 mm lower footprint, then flare outward around Home Assistant's published 112 mm maximum cover envelope. Low front/rear stops resist sliding without localized ribs, tabs, or clips. Four broad lands centered on the factory mounting locations carry the Green at the normal 9.025 mm device height while the original 3 mm ventilated honeycomb floor remains low and open. The support and walls are fused into the mount; there is no separate sleeve or Green mounting hardware.
 
-All device ports face the rear. The TP-Link splitter sits straight on the left with its POWER+DATA IN port toward the rack rear. Its cradle opens by 0.50 mm/side around the lower case bevel, transitions to a conservative 0.05 mm-per-side grip at the widest body band, and uses four low corner stops that leave both connector centers open. Its LAN/DC outputs face the front internally, and both short jumpers route through the open lane between the two trays before reaching the Green's rear ports.
+All device ports face the rear. The TP-Link splitter sits straight on the left with its POWER+DATA IN port toward the rack rear. Its cradle opens by 0.50 mm/side across the measured 3.97 mm-high lower case bevel, transitions to a conservative 0.05 mm-per-side grip at the widest body band, and uses four low corner stops that leave both connector centers open. Its LAN/DC outputs face the front internally, and both short jumpers route through the open lane between the two trays before reaching the Green's rear ports.
 
 The front is solid, word-free, logo-free, and has no decorative vents. Its outside corners and exposed tray edges are rounded. Cooling remains open where it matters: the Green's top is unobstructed, the low 15 mm-pitch Green honeycomb ties the tray together below the four pads, and the narrower splitter shelf uses a 10 mm-pitch honeycomb inside its friction walls. The exposed triangular tray braces remain removed.
 
@@ -114,7 +114,7 @@ The viewer is a hand-built HTML page using Google's open-source `<model-viewer>`
 - `friction_fit_coupon.stl` / `.3mf` — follow-up smooth-wall channels at 0.25, 0.30, and 0.35 mm interference per side. The original three-hole 0.20 mm/side coupon was a near-perfect clearance fit but did not grip, so test these in order and use the first one that holds without scuffing.
 - `green_hybrid_clip_coupon.stl` / `.3mf` — one compact full-height Green spring-catch gauge. Its smooth single-piece profile follows the taper into a 1.4 mm bearing land with 1.2 mm nominal top overlap, a 0.8 mm shoulder, and a 0.4 mm leading tip while staying at 42.55 mm maximum height; about 4.5 g of PETG. Add a 5 mm slicer brim.
 - `splitter_fit_coupon.stl` / `.3mf` — three short open-ended smooth-wall test channels at 0.00, 0.05, and 0.10 mm interference per side for the TP-Link body; use the least aggressive level that holds before committing to its full-length friction cradle
-- `splitter_hybrid_clip_coupon.stl` / `.3mf` — one compact open-frame TP-Link section with matched fixed and spring ramps grown directly from the side walls, 1.4 mm bearing lands, 1.2 mm nominal top overlap, 0.8 mm shoulders, and 0.4 mm leading tips; about 5.4 g of PETG
+- `splitter_hybrid_clip_coupon.stl` / `.3mf` — one compact open-frame TP-Link section with matched fixed and spring ramps grown directly from the side walls, 1.4 mm bearing lands, 1.2 mm nominal top overlap, 0.8 mm shoulders, and 0.4 mm leading tips; about 5.3 g of PETG
 - `hybrid_clip_coupon.stl` / `.3mf` — the recommended single print containing both compact top-clip gauges, about 9.8 g of PETG total; regenerate or re-download it whenever the clip geometry changes
 - `assembly.stl` — reference assembly only; print the separate parts above
 - `fit_test.stl` / `.3mf` — general device-clearance check
