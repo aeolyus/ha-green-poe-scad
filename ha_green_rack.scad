@@ -344,10 +344,10 @@ splitter_honeycomb_end_inset = 5.0;
 // and Mauker Chromebox rack cases. Thin honeycomb floors/roofs are joined by
 // thick rounded side frames with large capsule-shaped ventilation openings.
 sleeve_roof_t = 1.60;
-sleeve_green_side_clearance = 0.10;
+sleeve_green_side_clearance = 0.20;
 sleeve_green_vertical_clearance = 0.10;
 sleeve_splitter_side_clearance = 0.10;
-sleeve_splitter_vertical_clearance = 0.10;
+sleeve_splitter_vertical_clearance = 0.05;
 sleeve_green_frame_t = 2.40;
 sleeve_green_roof_pitch = 15.0;
 sleeve_green_roof_wall = 1.80;
@@ -370,9 +370,9 @@ dovetail_depth = 2.80;
 dovetail_neck_w = 2.60;
 dovetail_head_w = 5.80;
 dovetail_running_clearance = 0.25;
-dovetail_lock_clearance = 0.10;
+dovetail_lock_clearance = 0.00;
 dovetail_receiver_wall = 1.20;
-dovetail_rear_extension = 3.50;
+dovetail_rear_extension = 2.00;
 dovetail_bottom_stop_h = 1.20;
 dovetail_stop_clearance = 0.05;
 dovetail_lock_h = 7.0;
@@ -381,7 +381,10 @@ dovetail_top_lead_extra = 0.35;
 dovetail_gate_t = 2.40;
 dovetail_gate_post_w = 6.20;
 dovetail_gate_bar_h = 3.20;
-dovetail_gate_contact_gap = 0.10;
+dovetail_gate_contact_preload = 0.15;
+dovetail_gate_contact_ramp_h = 0.80;
+dovetail_gate_contact_lead_relief = 0.35;
+dovetail_gate_contact_slot_clearance = 0.25;
 dovetail_coupon_h = 28.0;
 dovetail_coupon_spacing = 5.0;
 
@@ -4023,7 +4026,7 @@ module retention_green_ventilated_sleeve_local() {
                    + wall_thickness;
     wall_z0 = unified_deck_z0 - 0.20;
     // The broad honeycomb roof clears the measured top by 0.10 mm. Combined
-    // with 0.10 mm lateral clearance per side, this avoids stacking deliberate
+    // with 0.20 mm lateral clearance per side, this avoids stacking deliberate
     // interference on top of normal FDM inner-feature shrinkage.
     // Its underside and both side-fit profiles remain constant front-to-back.
     roof_z0 = green_device_z + green_h
@@ -4266,7 +4269,10 @@ module dovetail_receiver_tower_local(
     body_w = dovetail_receiver_w();
     body_y0 = mouth_y - dovetail_depth
               - dovetail_running_clearance - dovetail_receiver_wall;
-    body_y1 = mouth_y + 0.10;
+    // End exactly at the open throat. Extending the receiver behind the mouth
+    // creates a hidden lip that the gate neck must collide with when the final
+    // wedge closes to a line fit.
+    body_y1 = mouth_y;
     track_z0 = wall_z0 + dovetail_bottom_stop_h;
     track_h = roof_top - track_z0;
 
@@ -4294,6 +4300,78 @@ module dovetail_receiver_pair_local(
             lock_clearance);
 }
 
+// Cut the tracks through the complete cage/receiver union. The receiver body
+// overlaps the cage's solid rear border for strength; subtracting only inside
+// each receiver tower would let that border refill the buried part of the
+// track and block a gate before it reached the seated position.
+module dovetail_receiver_channel_pair_local(
+    outer_left, outer_right, cage_rear_y,
+    wall_z0, roof_top,
+    lock_clearance = dovetail_lock_clearance) {
+    mouth_y = cage_rear_y + 0.10;
+    track_z0 = wall_z0 + dovetail_bottom_stop_h;
+    track_h = roof_top - track_z0;
+
+    for (center_x = [dovetail_left_center(outer_left),
+                     dovetail_right_center(outer_right)])
+        dovetail_channel_z(
+            center_x, mouth_y, track_z0,
+            track_h + epsilon, lock_clearance);
+}
+
+// Two compact rear pads bear on solid lower enclosure faces, away from the
+// connector field and any upper taper. Their leading lower edge is relieved,
+// so the last 0.8 mm of gate travel progressively closes the fore/aft play.
+module dovetail_gate_contact_pad_local(
+    x0, contact_y, gate_rear_y, z0, width, height) {
+    ramp_h = min(dovetail_gate_contact_ramp_h, height / 2);
+    full_depth = gate_rear_y - contact_y;
+
+    union() {
+        hull() {
+            translate([
+                x0,
+                contact_y + dovetail_gate_contact_lead_relief,
+                z0
+            ]) rounded_prism_z(
+                    width,
+                    full_depth - dovetail_gate_contact_lead_relief,
+                    epsilon, 0.60);
+            translate([x0, contact_y, z0 + ramp_h])
+                rounded_prism_z(
+                    width, full_depth, epsilon, 0.60);
+        }
+        translate([x0, contact_y, z0 + ramp_h - epsilon])
+            rounded_prism_z(
+                width, full_depth,
+                height - ramp_h + epsilon, 0.60);
+    }
+}
+
+// The rear pads travel vertically with the gate. These two narrow roof slots
+// clear their complete swept path while leaving the rest of the roof border
+// intact. The pads finish below the roof and close against the device only at
+// the bottom of the stroke.
+module dovetail_gate_contact_slots_local(
+    contact_x_positions, device_rear_y,
+    receiver_y, roof_top, contact_w) {
+    contact_y = device_rear_y - dovetail_gate_contact_preload;
+    cage_rear_y = receiver_y - dovetail_rear_extension;
+    slot_y0 = contact_y - dovetail_gate_contact_slot_clearance;
+    slot_d = cage_rear_y - slot_y0 + epsilon;
+
+    for (contact_x = contact_x_positions)
+        translate([
+            contact_x - dovetail_gate_contact_slot_clearance,
+            slot_y0,
+            roof_top - sleeve_roof_t - epsilon
+        ]) cube([
+            contact_w + 2 * dovetail_gate_contact_slot_clearance,
+            slot_d,
+            sleeve_roof_t + 2 * epsilon
+        ]);
+}
+
 module dovetail_gate_rail_local(
     center_x, mouth_y, wall_z0, roof_top) {
     rail_z0 = wall_z0 + dovetail_bottom_stop_h
@@ -4317,10 +4395,9 @@ module dovetail_gate_rail_local(
 
 module dovetail_gate_frame_local(
     outer_left, outer_right,
-    device_left, device_right, device_rear_y,
-    device_z0, device_h, cage_rear_y,
+    device_rear_y, cage_rear_y,
     wall_z0, roof_top,
-    contact_inset = 1.0) {
+    contact_x_positions, contact_w, contact_z, contact_h) {
     left_center = dovetail_left_center(outer_left);
     right_center = dovetail_right_center(outer_right);
     mouth_y = cage_rear_y + 0.10;
@@ -4328,27 +4405,11 @@ module dovetail_gate_frame_local(
     gate_x0 = left_center - dovetail_gate_post_w / 2;
     gate_x1 = right_center + dovetail_gate_post_w / 2;
     gate_h = roof_top - wall_z0;
-    pull_w = 20.0;
-    pull_h = 2.20;
-    contact_w = min(10.0, (device_right - device_left) / 4);
-    contact_h = 2.40;
-    contact_y = device_rear_y + dovetail_gate_contact_gap;
-    contact_d = gate_y + dovetail_gate_t - contact_y;
-    receiver_contact_gap = 0.40;
-    left_contact_x = max(
-        device_left + contact_inset,
-        left_center + dovetail_receiver_w() / 2 + receiver_contact_gap);
-    right_contact_x = min(
-        device_right - contact_w - contact_inset,
-        right_center - dovetail_receiver_w() / 2
-            - receiver_contact_gap - contact_w);
-    bottom_contact_z = device_z0 + 0.05;
+    contact_y = device_rear_y - dovetail_gate_contact_preload;
+    gate_rear_y = gate_y + dovetail_gate_t;
     bottom_bar_h = max(
         dovetail_gate_bar_h,
-        bottom_contact_z + contact_h - wall_z0);
-    top_contact_z = min(
-        device_z0 + device_h - 0.40,
-        roof_top - sleeve_roof_t - 0.20) - contact_h;
+        contact_z + contact_h - wall_z0);
 
     union() {
         // Top and bottom rails overlap only the enclosure edges, leaving the
@@ -4390,22 +4451,11 @@ module dovetail_gate_frame_local(
             ]);
         }
 
-        // Four shallow corner pads reach forward through the open rear end to
-        // stop the device. Their Z positions clear the connector field and
-        // avoid the cage floor/roof, keeping the gate a genuinely separate
-        // removable component rather than welding it to the sleeve mesh.
-        for (contact_x = [left_contact_x, right_contact_x])
-            for (contact_z = [bottom_contact_z, top_contact_z])
-                translate([contact_x, contact_y, contact_z])
-                    rounded_prism_z(
-                        contact_w, contact_d, contact_h, 0.60);
+        for (contact_x = contact_x_positions)
+            dovetail_gate_contact_pad_local(
+                contact_x, contact_y, gate_rear_y,
+                contact_z, contact_w, contact_h);
 
-        // Rearward thumb ledge does not increase the 1U height envelope.
-        translate([
-            (left_center + right_center - pull_w) / 2,
-            gate_y + dovetail_gate_t - 0.10,
-            roof_top - pull_h
-        ]) rounded_prism_z(pull_w, 3.20, pull_h, 0.65);
     }
 }
 
@@ -4441,12 +4491,11 @@ module green_dovetail_gate_local() {
 
     dovetail_gate_frame_local(
         outer_left, outer_right,
-        green_x, green_x + green_w, green_y + green_d,
-        green_device_z, green_h,
+        green_y + green_d,
         sleeve_y0 + sleeve_depth + dovetail_rear_extension,
         wall_z0, roof_top,
-        (green_w - green_top_w) / 2
-            - sleeve_green_side_clearance + 0.50);
+        [green_x + 16.0, green_x + 64.0], 6.00,
+        green_device_z + 0.60, 3.60);
 }
 
 module splitter_dovetail_receivers_local() {
@@ -4475,10 +4524,46 @@ module splitter_dovetail_gate_local() {
 
     dovetail_gate_frame_local(
         outer_left, outer_right,
-        0, splitter_w, splitter_d,
-        base_thickness, splitter_h,
+        splitter_d,
         outer_y + outer_depth + dovetail_rear_extension,
-        wall_z0, roof_top, splitter_lower_bevel_inset + 0.50);
+        wall_z0, roof_top,
+        [17.75, 42.0], 5.50,
+        base_thickness + splitter_lower_bevel_h + 1.00, 3.00);
+}
+
+// Standalone gate exports place the broad rear H-frame on the build plate.
+// The dovetail rails and anti-rattle pads then rise from that face without a
+// long unsupported bridge; the installed-orientation modules remain unchanged
+// for the browser viewer and complete assembly.
+module green_dovetail_gate_print() {
+    outer_w = green_w + 2 * sleeve_green_side_clearance
+              + 2 * sleeve_green_frame_t;
+    outer_left = green_x + green_w / 2 - outer_w / 2;
+    gate_x0 = dovetail_left_center(outer_left)
+              - dovetail_gate_post_w / 2;
+    wall_z0 = unified_deck_z0 - 0.20;
+    sleeve_y0 = face_thickness - 0.20;
+    sleeve_depth = green_inner_d + (green_y - face_thickness)
+                   + wall_thickness;
+    gate_y = sleeve_y0 + sleeve_depth + dovetail_rear_extension + 0.35;
+    gate_rear_y = gate_y + dovetail_gate_t;
+
+    translate([-gate_x0, -wall_z0, gate_rear_y])
+        rotate([-90, 0, 0]) green_dovetail_gate_local();
+}
+
+module splitter_dovetail_gate_print() {
+    outer_left = -splitter_clearance - wall_thickness;
+    gate_x0 = dovetail_left_center(outer_left)
+              - dovetail_gate_post_w / 2;
+    wall_z0 = base_thickness - 0.20;
+    outer_y = -splitter_clearance - wall_thickness;
+    outer_depth = splitter_inner_d + 2 * wall_thickness;
+    gate_y = outer_y + outer_depth + dovetail_rear_extension + 0.35;
+    gate_rear_y = gate_y + dovetail_gate_t;
+
+    translate([-gate_x0, -wall_z0, gate_rear_y])
+        rotate([-90, 0, 0]) splitter_dovetail_gate_local();
 }
 
 // Rounded cages plus two installed removable rear gates. The receivers sit
@@ -4486,13 +4571,55 @@ module splitter_dovetail_gate_local() {
 // external brim. Their station is extended rearward far enough that the wider
 // buried dovetail heads occupy only the empty space behind each device.
 module green_dovetail_cage_local() {
-    retention_green_ventilated_sleeve_local();
-    green_dovetail_receivers_local();
+    outer_w = green_w + 2 * sleeve_green_side_clearance
+              + 2 * sleeve_green_frame_t;
+    outer_left = green_x + green_w / 2 - outer_w / 2;
+    outer_right = outer_left + outer_w;
+    wall_z0 = unified_deck_z0 - 0.20;
+    roof_top = green_device_z + green_h
+               + sleeve_green_vertical_clearance + sleeve_roof_t;
+    sleeve_y0 = face_thickness - 0.20;
+    sleeve_depth = green_inner_d + (green_y - face_thickness)
+                   + wall_thickness;
+    receiver_y = sleeve_y0 + sleeve_depth + dovetail_rear_extension;
+
+    difference() {
+        union() {
+            retention_green_ventilated_sleeve_local();
+            green_dovetail_receivers_local();
+        }
+        dovetail_receiver_channel_pair_local(
+            outer_left, outer_right, receiver_y,
+            wall_z0, roof_top);
+        dovetail_gate_contact_slots_local(
+            [green_x + 16.0, green_x + 64.0],
+            green_y + green_d,
+            receiver_y, roof_top, 6.00);
+    }
 }
 
 module splitter_dovetail_cage_local() {
-    retention_splitter_ventilated_sleeve_local();
-    splitter_dovetail_receivers_local();
+    outer_left = -splitter_clearance - wall_thickness;
+    outer_right = splitter_w + splitter_clearance + wall_thickness;
+    wall_z0 = base_thickness - 0.20;
+    roof_top = base_thickness + splitter_h
+               + sleeve_splitter_vertical_clearance + sleeve_roof_t;
+    outer_y = -splitter_clearance - wall_thickness;
+    outer_depth = splitter_inner_d + 2 * wall_thickness;
+    receiver_y = outer_y + outer_depth + dovetail_rear_extension;
+
+    difference() {
+        union() {
+            retention_splitter_ventilated_sleeve_local();
+            splitter_dovetail_receivers_local();
+        }
+        dovetail_receiver_channel_pair_local(
+            outer_left, outer_right, receiver_y,
+            wall_z0, roof_top);
+        dovetail_gate_contact_slots_local(
+            [17.75, 42.0], splitter_d,
+            receiver_y, roof_top, 5.50);
+    }
 }
 
 module retention_dovetail_gates_local() {
@@ -4537,7 +4664,7 @@ module dovetail_coupon_key_local(marker_count = 1) {
             ]);
         }
 
-        // One, two, or three holes identify the 0.10, 0.15, and 0.20 mm lock
+        // One, two, or three holes identify the 0.00, 0.05, and 0.10 mm lock
         // clearances after the coupon is removed from the build plate.
         for (marker = [0 : marker_count - 1])
             translate([
@@ -4573,7 +4700,7 @@ module dovetail_coupon_key_print(marker_count) {
 }
 
 module dovetail_rail_coupon() {
-    lock_values = [0.10, 0.15, 0.20];
+    lock_values = [0.00, 0.05, 0.10];
     pair_pitch = dovetail_receiver_w()
                  + dovetail_coupon_spacing
                  + dovetail_gate_post_w
@@ -5258,9 +5385,9 @@ if (part == "assembly_preview") {
 } else if (part == "dovetail_rail_coupon") {
     dovetail_rail_coupon();
 } else if (part == "green_dovetail_gate") {
-    green_dovetail_gate_local();
+    green_dovetail_gate_print();
 } else if (part == "splitter_dovetail_gate") {
-    splitter_dovetail_gate_local();
+    splitter_dovetail_gate_print();
 } else if (part == "keystone_fit_test") {
     keystone_fit_test();
 } else if (part == "viewer_mount") {
