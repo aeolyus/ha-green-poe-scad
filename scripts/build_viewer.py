@@ -280,7 +280,8 @@ RETENTION_OPTIONS = [
         "note": (
             "A hinged TPU strap stays attached when open, so there is no "
             "loose cover or clip. It is tolerant and secure, but the revised "
-            "physical Green height puts it above the 43 mm panel outline."
+            "physical Green height puts it above the exact 44.45 mm / "
+            "1.750 in panel outline."
         ),
     },
     {
@@ -317,8 +318,8 @@ RETENTION_OPTIONS = [
             "walls, with no spring tongues or relief slots. The lower guides "
             "account for "
             "the Green's measured 111.13 mm bottom, 107.95 mm top plateau, "
-            "published 112 mm maximum envelope, and the TP-Link's lower "
-            "bevel. Existing low stops take "
+            "6.35 mm taper start, and the TP-Link's lower bevel. Existing "
+            "low stops take "
             "fore/aft loads. Print the combined two-device clip coupon before "
             "production."
         ),
@@ -338,14 +339,31 @@ RETENTION_OPTIONS = [
             "thick rounded side frames surround one long capsule vent beside "
             "each device. Both thin honeycomb floors and the connecting "
             "bridge share the Green's seating height, eliminating separate "
-            "riser columns. The TP-Link bevel walls remain continuous from "
-            "front to rear; only the roof keeps a shallow rear insertion "
-            "flare. There are no relief cuts, springs, or moving latches. "
-            "Without moving the Green or LEDs, its 0.8 mm roof uses 0.4 mm "
-            "nominal vertical preload and finishes at 42.76 mm, below the "
-            "43 mm panel outline. "
-            "Print the combined Green + PoE rear-section vent-frame coupon "
-            "before committing to a full plate."
+            "riser columns. Both cages keep the same snug profile from front "
+            "to rear. There are no relief cuts, springs, or moving latches. "
+            "Without moving the Green or LEDs, its 1.60 mm roof uses 0.4 mm "
+            "nominal vertical preload and finishes at 43.5625 mm, leaving "
+            "0.8875 mm below the exact 44.45 mm / 1.750 in panel top. "
+            "Print the combined Green + PoE 10 mm rear-section vent-frame "
+            "coupon before committing to a full plate."
+        ),
+    },
+    {
+        "id": "dovetail_gates",
+        "label": "Vent-frame cages + dovetail rear gates",
+        "short_label": "Dovetail gates",
+        "filename": "viewer_retention_dovetail_gates.stl",
+        "material_name": "Device retention — dovetail rear H-gates",
+        "color": (217, 119, 6, 0),
+        "highlight": (217, 119, 6, 255),
+        "roughness": 0.62,
+        "printable": False,
+        "note": (
+            "Viewer prototype based on the rounded vent-frame cages. The "
+            "devices load from the rear, then separate H-shaped gates slide "
+            "vertically into captured dovetail rails to block withdrawal. "
+            "Only the dovetail rail-and-gate fit coupon is printable for now; "
+            "the full rack mount has not been promoted to production."
         ),
     },
     {
@@ -408,6 +426,7 @@ SHARED_PART_FILENAMES = {
 VARIANT_RETENTION_FILENAMES = {
     "viewer_retention_hybrid_clips.stl",
     "viewer_retention_ventilated_sleeves.stl",
+    "viewer_retention_dovetail_gates.stl",
 }
 
 TPLINK_TRAY_FILENAMES = {
@@ -418,9 +437,13 @@ TPLINK_TRAY_FILENAMES = {
 
 TPLINK_ONLY_RETENTION_FILENAMES = {
     "viewer_retention_ventilated_sleeves.stl",
+    "viewer_retention_dovetail_gates.stl",
 }
 
 STACKED_VARIANT_ID = "stacked_center"
+STACKED_UNSUPPORTED_RETENTION_FILENAMES = {
+    "viewer_retention_dovetail_gates.stl",
+}
 
 SHUTTER_CONFIGURATION = "shutter"
 NO_SHUTTER_CONFIGURATION = "no_shutter"
@@ -433,7 +456,7 @@ VARIANTS = [
         "device_name": "TP-Link TL-PD30G-M2",
         "label": "Compact",
         "setback": "35 mm splitter setback",
-        "dimensions": "254 W × 43 H × 120 D mm",
+        "dimensions": "254 W × 44.45 H × 120 D mm",
         "note": (
             "Collision-aware mockup keeps cable meshes out of the panel, but "
             "it can do so only by tightening the RJ45 bend to about 3.7 mm "
@@ -447,7 +470,7 @@ VARIANTS = [
         "device_name": "TP-Link TL-PD30G-M2",
         "label": "Balanced",
         "setback": "47.5 mm setback · 44.5 mm / 1.75 in inside clearance",
-        "dimensions": "254 W × 43 H × 131.2 D mm",
+        "dimensions": "254 W × 44.45 H × 131.2 D mm",
         "note": (
             "The measured cable reaches a comfortable bend at 44.5 mm / "
             "1.75 in from the panel's inside face to the splitter. The generic "
@@ -461,7 +484,7 @@ VARIANTS = [
         "device_name": "TP-Link TL-PD30G-M2",
         "label": "Cable-friendly",
         "setback": "60 mm splitter setback",
-        "dimensions": "254 W × 43 H × 143.7 D mm",
+        "dimensions": "254 W × 44.45 H × 143.7 D mm",
         "note": (
             "Current printable and straight-cable baseline. Separate X/Z "
             "lanes keep both jumpers clear of the panel, devices, and each "
@@ -474,7 +497,7 @@ VARIANTS = [
         "device_name": "TP-Link TL-PD30G-M2",
         "label": "Centered stacked",
         "setback": "Green centered · TP-Link transverse behind",
-        "dimensions": "254 W × 43 H × 202.4 D mm printed mount",
+        "dimensions": "254 W × 44.45 H × 202.4 D mm printed mount",
         "note": (
             "Viewer-only centered study. The TP-Link rotates 90° behind the "
             "Green, keeping both device bottoms on the unified 9.025 mm "
@@ -489,7 +512,7 @@ VARIANTS = [
         "device_name": "TP-Link TL-PD30G-M2",
         "label": "Front Ethernet — center gap",
         "setback": "60 mm splitter setback · centered gap keystone",
-        "dimensions": "254 W × 43 H × 143.7 D mm printed mount",
+        "dimensions": "254 W × 44.45 H × 143.7 D mm printed mount",
         "note": (
             "Compact front-entry edition: the vertically centered keystone "
             "sits in the device gap. Layered "
@@ -504,7 +527,7 @@ VARIANTS = [
         "device_name": "TP-Link TL-PD30G-M2",
         "label": "Front Ethernet — HA right",
         "setback": "60 mm splitter setback · jack right of HA Green",
-        "dimensions": "254 W × 43 H × 143.7 D mm · one-piece only",
+        "dimensions": "254 W × 44.45 H × 143.7 D mm · one-piece only",
         "note": (
             "The vertically centered keystone sits on the physical right side "
             "of the Home Assistant Green. With shutter hardware installed, "
@@ -520,7 +543,7 @@ VARIANTS = [
         "device_name": "TP-Link TL-PD30G-M2",
         "label": "Front Ethernet — left",
         "setback": "89 mm splitter setback · centered left keystone",
-        "dimensions": "254 W × 43 H × 172.7 D mm printed mount",
+        "dimensions": "254 W × 44.45 H × 172.7 D mm printed mount",
         "note": (
             "Alternate front-entry edition with the vertically centered jack "
             "in the left face area. The splitter moves 29 mm rearward so an "
@@ -535,7 +558,7 @@ VARIANTS = [
         "device_name": "SICSOLINK SL-FLQ-POE48K",
         "label": "SICSOLINK rear-angle",
         "setback": "40° rear-input placement",
-        "dimensions": "254 W × 43 H × 202 D mm mount",
+        "dimensions": "254 W × 44.45 H × 202 D mm mount",
         "note": (
             "Cable-valid comparison for the seller-stated 180 mm captive "
             "leads. The visible LAN/DC routes consume about 165–170 mm, "
@@ -619,7 +642,7 @@ VARIANT_MEASUREMENTS = {
 for variant in VARIANTS:
     variant["measurements"] = {
         "width_mm": 254.0,
-        "height_mm": 43.0,
+        "height_mm": 44.45,
         **VARIANT_MEASUREMENTS[variant["id"]],
     }
 
@@ -711,6 +734,9 @@ def load_variants(
             for filename, name, color, roughness, emissive in RETENTION_PARTS:
                 if filename in TPLINK_ONLY_RETENTION_FILENAMES \
                         and variant["device"] != "tplink":
+                    continue
+                if variant["id"] == STACKED_VARIANT_ID \
+                        and filename in STACKED_UNSUPPORTED_RETENTION_FILENAMES:
                     continue
                 if variant["id"] == STACKED_VARIANT_ID:
                     source_path = variant_dir / filename

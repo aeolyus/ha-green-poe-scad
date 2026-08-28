@@ -26,6 +26,7 @@ retention_ids=(
   x_cage
   hybrid_clips
   ventilated_sleeves
+  dovetail_gates
   friction_sleeve
 )
 
@@ -64,7 +65,7 @@ variant_spec() {
 
 retention_is_valid() {
   case "$1" in
-    factory_screws|slide_latch|corner_gate|sled_gate|padded_rails|captive_strap|x_cage|hybrid_clips|ventilated_sleeves|friction_sleeve)
+    factory_screws|slide_latch|corner_gate|sled_gate|padded_rails|captive_strap|x_cage|hybrid_clips|ventilated_sleeves|dovetail_gates|friction_sleeve)
       return 0
       ;;
     *) return 1 ;;
@@ -191,6 +192,32 @@ build_variant_ventilated_sleeves_overlay() {
     -D "front_keystone_side=\"${variant_side}\""
 }
 
+build_variant_dovetail_gates_overlay() {
+  local requested_id="$1"
+  local spec variant_id variant_model variant_y variant_front variant_side variant_layout
+  local variant_dir
+  if ! spec="$(variant_spec "$requested_id")"; then
+    echo "Unknown viewer variant: $requested_id" >&2
+    usage >&2
+    exit 2
+  fi
+  IFS=: read -r variant_id variant_model variant_y variant_front variant_side variant_layout \
+    <<< "$spec"
+  if [[ "$variant_model" != "tplink" || "$variant_layout" != "side_by_side" ]]; then
+    return
+  fi
+  variant_dir="viewer/variants/${variant_id}"
+  mkdir -p "$variant_dir"
+
+  launch_scad "${variant_dir}/viewer_retention_dovetail_gates.stl" \
+    -D 'part="viewer_retention_dovetail_gates"' \
+    -D "splitter_model=\"${variant_model}\"" \
+    -D "splitter_y_override=${variant_y}" \
+    -D "device_layout=\"${variant_layout}\"" \
+    -D "front_ethernet_enabled=${variant_front}" \
+    -D "front_keystone_side=\"${variant_side}\""
+}
+
 build_viewer_variant() {
   local requested_id="$1"
   local spec variant_id variant_model variant_y variant_front variant_side variant_layout
@@ -268,6 +295,7 @@ build_viewer_variant() {
 
   build_variant_hybrid_overlay "$variant_id"
   build_variant_ventilated_sleeves_overlay "$variant_id"
+  build_variant_dovetail_gates_overlay "$variant_id"
 }
 
 build_shared_viewer_trays() {
@@ -307,6 +335,10 @@ build_retention_overlay() {
   elif [[ "$retention_id" == "ventilated_sleeves" ]]; then
     for variant_id in "${variant_ids[@]}"; do
       build_variant_ventilated_sleeves_overlay "$variant_id"
+    done
+  elif [[ "$retention_id" == "dovetail_gates" ]]; then
+    for variant_id in "${variant_ids[@]}"; do
+      build_variant_dovetail_gates_overlay "$variant_id"
     done
   else
     launch_scad "viewer/viewer_retention_${retention_id}.stl" \
@@ -382,6 +414,8 @@ case "$target" in
            viewer/viewer_retention_hybrid_clips.stl
         cp viewer/variants/cable_friendly/viewer_retention_ventilated_sleeves.stl \
            viewer/viewer_retention_ventilated_sleeves.stl
+        cp viewer/variants/cable_friendly/viewer_retention_dovetail_gates.stl \
+           viewer/viewer_retention_dovetail_gates.stl
         break
       fi
     done
@@ -407,6 +441,9 @@ case "$target" in
       elif [[ "$retention_id" == "ventilated_sleeves" ]]; then
         cp viewer/variants/cable_friendly/viewer_retention_ventilated_sleeves.stl \
            viewer/viewer_retention_ventilated_sleeves.stl
+      elif [[ "$retention_id" == "dovetail_gates" ]]; then
+        cp viewer/variants/cable_friendly/viewer_retention_dovetail_gates.stl \
+           viewer/viewer_retention_dovetail_gates.stl
       fi
     done
     run_glb_build

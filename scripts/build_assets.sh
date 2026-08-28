@@ -65,7 +65,7 @@ for part_name in "${canonical_stl_parts[@]}"; do
   run_openscad -o "exports/${part_name}.stl" \
     -D "part=\"${part_name}\"" ha_green_rack.scad
 done
-for part_name in green_hybrid_clip_coupon splitter_hybrid_clip_coupon hybrid_clip_coupon green_vent_frame_coupon splitter_vent_frame_coupon vent_frame_coupon; do
+for part_name in green_hybrid_clip_coupon splitter_hybrid_clip_coupon hybrid_clip_coupon green_vent_frame_coupon splitter_vent_frame_coupon vent_frame_coupon dovetail_rail_coupon; do
   # Force CGAL for these fit-critical coupons. Some Manifold STL exports can
   # retain zero-volume sliver components even when their visible shell looks
   # closed; CGAL removes those artifacts before slicing.
@@ -196,7 +196,7 @@ for part_name in fit_test friction_fit_coupon splitter_fit_coupon; do
   run_openscad -o "exports/${part_name}.3mf" \
     -D "part=\"${part_name}\"" ha_green_rack.scad
 done
-for part_name in green_hybrid_clip_coupon splitter_hybrid_clip_coupon hybrid_clip_coupon green_vent_frame_coupon splitter_vent_frame_coupon vent_frame_coupon; do
+for part_name in green_hybrid_clip_coupon splitter_hybrid_clip_coupon hybrid_clip_coupon green_vent_frame_coupon splitter_vent_frame_coupon vent_frame_coupon dovetail_rail_coupon; do
   # These fit-critical gauges contain short walls or catch faces. CGAL avoids
   # the degenerate facets that some Manifold 3MF exports retain at those seams.
   run_openscad --backend=CGAL -o "exports/${part_name}.3mf" \
@@ -337,6 +337,17 @@ build_viewer_variant() {
     done
   fi
 
+  if [[ "$variant_model" == "tplink" && "$variant_layout" == "side_by_side" ]]; then
+    run_openscad -o "${variant_dir}/viewer_retention_dovetail_gates.stl" \
+      -D 'part="viewer_retention_dovetail_gates"' \
+      -D "splitter_model=\"${variant_model}\"" \
+      -D "splitter_y_override=${variant_y}" \
+      -D "device_layout=\"${variant_layout}\"" \
+      -D "front_ethernet_enabled=${variant_front}" \
+      -D "front_keystone_side=\"${variant_side}\"" \
+      -D 'led_shutter_enabled=true' ha_green_rack.scad
+  fi
+
   if [[ "$variant_front" == "true" ]]; then
     run_openscad -o "${variant_dir}/viewer_keystone_ports.stl" \
       -D 'part="viewer_keystone_ports"' \
@@ -421,6 +432,8 @@ cp viewer/variants/cable_friendly/viewer_retention_hybrid_clips.stl \
    viewer/viewer_retention_hybrid_clips.stl
 cp viewer/variants/cable_friendly/viewer_retention_ventilated_sleeves.stl \
    viewer/viewer_retention_ventilated_sleeves.stl
+cp viewer/variants/cable_friendly/viewer_retention_dovetail_gates.stl \
+   viewer/viewer_retention_dovetail_gates.stl
 
 render_common=(--viewall --autocenter --projection=perspective \
   --colorscheme=Tomorrow -D 'part="assembly_preview"')
