@@ -77,7 +77,7 @@ Open `viewer/interactive_viewer.html` in a web browser and choose the splitter, 
 
 The default view matches the production choice: TP-Link, rear Ethernet, Cable-friendly spacing, raised-tray friction retention with **Four pads**, open trays with no chassis, no logo, no shutter hardware, visible simulated LEDs, and auto-rotation off. The comparison controls can still show the alternate supports, logo, captive shutter, front-entry layouts, other retention studies, and ventilated chassis. Those toggles do not change which files are canonical.
 
-The **Retention** controls compare the selected integrated friction tray with the earlier M3-screw baseline and eight other studies. **Hybrid top clips · Green + PoE** is the newest viewer-only option: each device uses two fixed and two releasable catches over its top edge or bevel. The Four pads friction tray remains the production geometry until both new clip coupons pass.
+The **Retention** controls compare the selected integrated friction tray with the earlier M3-screw baseline and eight other studies. **Hybrid top clips · Green + PoE** is the newest viewer-only option: each device uses two fixed and two releasable catches over its top edge or bevel. The TP-Link catches rise directly from its mini side walls; the accessible wall sections are isolated by relief slots so they can flex without outboard clip towers. The Four pads friction tray remains the production geometry until both new clip coupons pass.
 
 The support selector switches among three complete, mutually exclusive friction-tray meshes without reloading the GLB. **Four pads** is the selected production geometry: the low 3 mm honeycomb floor remains ventilated while four broad lands carry the Green. **Full honeycomb** raises the complete lattice and perimeter to the seating plane; **Open frame** replaces the floor with a perimeter, two transverse load paths, a center spine, and the same four lands. Every version includes the same fused friction walls and low stops, with the rear center open for ports and cable service.
 
@@ -112,10 +112,10 @@ The viewer is a hand-built HTML page using Google's open-source `<model-viewer>`
 - `left_ear.stl` / `right_ear.stl` — detachable rack ears for `core.stl`
 - `led_insert_optional.stl` and `led_fixed_window_kit_optional.stl` / `.3mf` — optional self-retaining translucent insert comparison
 - `friction_fit_coupon.stl` / `.3mf` — follow-up smooth-wall channels at 0.25, 0.30, and 0.35 mm interference per side. The original three-hole 0.20 mm/side coupon was a near-perfect clearance fit but did not grip, so test these in order and use the first one that holds without scuffing.
-- `green_hybrid_clip_coupon.stl` / `.3mf` — one compact full-height Green spring-catch gauge. Its taper-following underside leads into a 1.0 mm bearing land with 0.8 mm nominal top overlap, a 0.8 mm shoulder, and a 0.4 mm leading tip while staying at 42.55 mm maximum height; about 4.1 g of PETG. Add a 5 mm slicer brim.
+- `green_hybrid_clip_coupon.stl` / `.3mf` — one compact full-height Green spring-catch gauge. Its smooth single-piece profile follows the taper into a 1.0 mm bearing land with 0.8 mm nominal top overlap, a 0.8 mm shoulder, and a 0.4 mm leading tip while staying at 42.55 mm maximum height; about 4.5 g of PETG. Add a 5 mm slicer brim.
 - `splitter_fit_coupon.stl` / `.3mf` — three short open-ended smooth-wall test channels at 0.00, 0.05, and 0.10 mm interference per side for the TP-Link body; use the least aggressive level that holds before committing to its full-length friction cradle
-- `splitter_hybrid_clip_coupon.stl` / `.3mf` — one compact open-frame TP-Link section with matched fixed and spring ramps, 1.0 mm bearing lands, 0.8 mm nominal top overlap, 0.8 mm shoulders, and 0.4 mm leading tips; about 6.4 g of PETG
-- `hybrid_clip_coupon.stl` / `.3mf` — the recommended single print containing both compact top-clip gauges, about 10.5 g of PETG total; regenerate or re-download it whenever the clip geometry changes
+- `splitter_hybrid_clip_coupon.stl` / `.3mf` — one compact open-frame TP-Link section with matched fixed and spring ramps grown directly from the side walls, 1.0 mm bearing lands, 0.8 mm nominal top overlap, 0.8 mm shoulders, and 0.4 mm leading tips; about 5.3 g of PETG
+- `hybrid_clip_coupon.stl` / `.3mf` — the recommended single print containing both compact top-clip gauges, about 9.8 g of PETG total; regenerate or re-download it whenever the clip geometry changes
 - `assembly.stl` — reference assembly only; print the separate parts above
 - `fit_test.stl` / `.3mf` — general device-clearance check
 
@@ -139,7 +139,7 @@ Viewer and render artifacts:
 - `viewer/home-assistant-green-rack-front_ethernet.glb` and its no-shutter counterpart are compatibility aliases of the center-gap GLBs
 - `viewer/home-assistant-green-rack-sics_angled.glb` — viewer-only angled SICSOLINK mockup showing its captive cable routing
 - `viewer/viewer_green_tray_friction_full.stl`, `viewer/viewer_green_tray_friction_pads.stl`, and `viewer/viewer_green_tray_friction_skeletal.stl` — mutually exclusive complete friction-tray meshes for Full honeycomb, Four pads, and Open frame support; each includes the fused walls and stops
-- `viewer/viewer_retention_hybrid_clips.stl` — viewer-only combined prototype containing the complete four-pad Green top-clip tray plus two fixed bridge-side and two flexible outboard TP-Link catches
+- `viewer/viewer_retention_hybrid_clips.stl` — viewer-only combined prototype containing the complete four-pad Green top-clip tray plus TP-Link replacement side walls with two fixed and two wall-integrated flexible catches
 - `viewer/variants/*/viewer_enclosure_airframe.stl` — viewer-only ventilated 1U chassis study; it is not part of the printable production files
 
 The canonical core is approximately 220 × 144 mm. The one-piece faceplate is 254 mm wide and nominally fits the X2D's 256 mm main-nozzle area with only 1 mm per side; center it carefully and do not use a brim. It does not fit the 235.5 mm dual-nozzle overlap area, so `x2d_plate` remains the lower-risk fallback. The printed tray and modeled cable exits stay within the RackMate T2's approximately 240 mm internal depth.

@@ -254,7 +254,7 @@ run_openscad -o exports/keystone_fit_test.3mf \
 run_openscad -o viewer/assembly_preview.3mf \
   -D 'part="assembly_preview"' ha_green_rack.scad
 
-for part_name in mount mount_without_green_tray green_tray_standard green_tray_friction green_tray_friction_full green_tray_friction_pads green_tray_friction_skeletal insert shutter_open shutter_closed shutter_retainer logo green splitter ports green_ports splitter_ports internal_data_cable input_data_cable dc_cable fasteners rulers led_power led_activity led_health; do
+for part_name in mount mount_without_green_tray splitter_side_walls green_tray_standard green_tray_friction green_tray_friction_full green_tray_friction_pads green_tray_friction_skeletal insert shutter_open shutter_closed shutter_retainer logo green splitter ports green_ports splitter_ports internal_data_cable input_data_cable dc_cable fasteners rulers led_power led_activity led_health; do
   run_openscad -o "viewer/viewer_${part_name}.stl" \
     -D "part=\"viewer_${part_name}\"" \
     -D 'led_shutter_enabled=true' ha_green_rack.scad
@@ -304,6 +304,16 @@ build_viewer_variant() {
       -D "front_keystone_side=\"${variant_side}\"" \
       -D 'led_shutter_enabled=true' ha_green_rack.scad
   done
+
+  if [[ "$variant_model" == "tplink" ]]; then
+    run_openscad -o "${variant_dir}/viewer_splitter_side_walls.stl" \
+      -D 'part="viewer_splitter_side_walls"' \
+      -D "splitter_model=\"${variant_model}\"" \
+      -D "splitter_y_override=${variant_y}" \
+      -D "front_ethernet_enabled=${variant_front}" \
+      -D "front_keystone_side=\"${variant_side}\"" \
+      -D 'led_shutter_enabled=true' ha_green_rack.scad
+  fi
 
   if [[ "$variant_front" == "true" ]]; then
     run_openscad -o "${variant_dir}/viewer_keystone_ports.stl" \

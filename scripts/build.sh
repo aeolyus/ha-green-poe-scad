@@ -185,6 +185,16 @@ build_viewer_variant() {
       -D 'led_shutter_enabled=true'
   done
 
+  if [[ "$variant_model" == "tplink" ]]; then
+    launch_scad "${variant_dir}/viewer_splitter_side_walls.stl" \
+      -D 'part="viewer_splitter_side_walls"' \
+      -D "splitter_model=\"${variant_model}\"" \
+      -D "splitter_y_override=${variant_y}" \
+      -D "front_ethernet_enabled=${variant_front}" \
+      -D "front_keystone_side=\"${variant_side}\"" \
+      -D 'led_shutter_enabled=true'
+  fi
+
   if [[ "$variant_front" == "true" ]]; then
     launch_scad "${variant_dir}/viewer_keystone_ports.stl" \
       -D 'part="viewer_keystone_ports"' \

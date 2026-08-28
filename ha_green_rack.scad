@@ -16,7 +16,7 @@
 
 $fn = 48;
 
-// [assembly_preview, assembly, one_piece, one_piece_logo_inlay, x2d_plate, core, logo_inlay, left_ear, right_ear, led_insert, led_shutter, led_shutter_retainer, led_shutter_kit, led_fixed_window_kit, green_spacer, green_spacers_4x, fit_test, friction_fit_coupon, green_hybrid_clip_coupon, splitter_fit_coupon, splitter_hybrid_clip_coupon, hybrid_clip_coupon, keystone_fit_test, viewer_mount, viewer_mount_without_green_tray, viewer_green_tray_standard, viewer_green_tray_friction, viewer_green_tray_friction_full, viewer_green_tray_friction_pads, viewer_green_tray_friction_skeletal, viewer_insert, viewer_shutter_open, viewer_shutter_closed, viewer_shutter_retainer, viewer_logo, viewer_green, viewer_splitter, viewer_ports, viewer_green_ports, viewer_splitter_ports, viewer_keystone_ports, viewer_data_cables, viewer_internal_data_cable, viewer_input_data_cable, viewer_dc_cable, viewer_fasteners, viewer_retention_factory_screws, viewer_retention_slide_latch, viewer_retention_corner_gate, viewer_retention_sled_gate, viewer_retention_padded_rails, viewer_retention_captive_strap, viewer_retention_x_cage, viewer_retention_hybrid_clips, viewer_retention_friction_sleeve, viewer_enclosure_airframe, viewer_rulers, viewer_led_power, viewer_led_activity, viewer_led_health]
+// [assembly_preview, assembly, one_piece, one_piece_logo_inlay, x2d_plate, core, logo_inlay, left_ear, right_ear, led_insert, led_shutter, led_shutter_retainer, led_shutter_kit, led_fixed_window_kit, green_spacer, green_spacers_4x, fit_test, friction_fit_coupon, green_hybrid_clip_coupon, splitter_fit_coupon, splitter_hybrid_clip_coupon, hybrid_clip_coupon, keystone_fit_test, viewer_mount, viewer_mount_without_green_tray, viewer_splitter_side_walls, viewer_green_tray_standard, viewer_green_tray_friction, viewer_green_tray_friction_full, viewer_green_tray_friction_pads, viewer_green_tray_friction_skeletal, viewer_insert, viewer_shutter_open, viewer_shutter_closed, viewer_shutter_retainer, viewer_logo, viewer_green, viewer_splitter, viewer_ports, viewer_green_ports, viewer_splitter_ports, viewer_keystone_ports, viewer_data_cables, viewer_internal_data_cable, viewer_input_data_cable, viewer_dc_cable, viewer_fasteners, viewer_retention_factory_screws, viewer_retention_slide_latch, viewer_retention_corner_gate, viewer_retention_sled_gate, viewer_retention_padded_rails, viewer_retention_captive_strap, viewer_retention_x_cage, viewer_retention_hybrid_clips, viewer_retention_friction_sleeve, viewer_enclosure_airframe, viewer_rulers, viewer_led_power, viewer_led_activity, viewer_led_health]
 part = "assembly_preview";
 
 // Production geometry uses the TP-Link. Viewer-only builds may override this
@@ -357,7 +357,9 @@ hybrid_green_window_margin = 1.0;
 hybrid_splitter_clip_len = 14.0;
 hybrid_splitter_clip_center_offset = 20.0;
 hybrid_splitter_clip_clearance = 0.50;
-hybrid_splitter_arm_gap = 0.60;
+hybrid_splitter_arm_t = 1.60;
+hybrid_splitter_clip_y_gap = 0.80;
+hybrid_splitter_root_top = 4.00;
 hybrid_splitter_top_overlap = 0.80;
 hybrid_splitter_catch_flat = 1.00;    // starts 0.20 mm outside the top edge
 hybrid_splitter_fixed_reach = splitter_upper_bevel_inset
@@ -368,7 +370,6 @@ hybrid_splitter_catch_nose_t = 0.80;
 hybrid_splitter_catch_tip_t = 0.40;
 hybrid_splitter_catch_tip_bevel = 0.40;
 hybrid_splitter_top_ramp_h = 1.60;
-hybrid_splitter_lower_ramp_drop = 4.50;
 
 module rounded_rect_2d(w, h, r) {
     hull() {
@@ -710,14 +711,10 @@ module splitter_transform() {
         children();
 }
 
-module splitter_side_walls_local(
+module splitter_side_wall_left_local(
     interference = splitter_friction_interference) {
     outer_left = -splitter_clearance - wall_thickness;
-    outer_right = splitter_w + splitter_clearance + wall_thickness;
     inner_left = interference;
-    inner_right = splitter_w - interference;
-    left_w = inner_left - outer_left;
-    right_w = outer_right - inner_right;
     wall_y = -splitter_clearance - wall_thickness;
     wall_d = splitter_inner_d + 2 * wall_thickness;
     wall_z = base_thickness - 0.20;
@@ -725,35 +722,19 @@ module splitter_side_walls_local(
     grip_top = base_thickness + splitter_friction_grip_h;
     lead_top = grip_top + splitter_friction_lead_h;
     lower_inner_left = inner_left - splitter_lower_bevel_relief;
-    lower_inner_right = inner_right + splitter_lower_bevel_relief;
 
     intersection() {
-        union() {
-            // The official housing imagery shows a lower bevel. Open the
-            // cradle by 0.50 mm/side at the tray floor, then converge to the
-            // conservative 0.05 mm/side grip only at the widest body band.
-            extrude_xz_profile_y([
-                [outer_left, wall_z],
-                [lower_inner_left, wall_z],
-                [inner_left, bevel_top],
-                [inner_left, grip_top],
-                [inner_left - splitter_friction_lead_relief, lead_top],
-                [outer_left, lead_top]
-            ], wall_y, wall_d);
-            extrude_xz_profile_y([
-                [lower_inner_right, wall_z],
-                [outer_right, wall_z],
-                [outer_right, lead_top],
-                [inner_right + splitter_friction_lead_relief, lead_top],
-                [inner_right, grip_top],
-                [inner_right, bevel_top]
-            ], wall_y, wall_d);
-
-            // The top retreats 0.50 mm per side over 3 mm, providing a
-            // gentle support-free insertion lead-in without a hook or lip.
-            // Included directly in the profiles above so the walls remain a
-            // single solid per side without coincident hull faces.
-        }
+        // The official housing imagery shows a lower bevel. Open the cradle
+        // by 0.50 mm at the floor, then converge to the conservative body-band
+        // grip. The top retreats again for a support-free insertion lead-in.
+        extrude_xz_profile_y([
+            [outer_left, wall_z],
+            [lower_inner_left, wall_z],
+            [inner_left, bevel_top],
+            [inner_left, grip_top],
+            [inner_left - splitter_friction_lead_relief, lead_top],
+            [outer_left, lead_top]
+        ], wall_y, wall_d);
 
         // Clip the complete wall profile to the floor's exact 4 mm rounded
         // silhouette. Matching rectangular bounds alone left tiny corner ears.
@@ -761,6 +742,40 @@ module splitter_side_walls_local(
             linear_extrude(height = lead_top - wall_z)
                 splitter_tray_outer_outline_2d();
     }
+}
+
+module splitter_side_wall_right_local(
+    interference = splitter_friction_interference) {
+    outer_right = splitter_w + splitter_clearance + wall_thickness;
+    inner_right = splitter_w - interference;
+    wall_y = -splitter_clearance - wall_thickness;
+    wall_d = splitter_inner_d + 2 * wall_thickness;
+    wall_z = base_thickness - 0.20;
+    bevel_top = base_thickness + splitter_lower_bevel_h;
+    grip_top = base_thickness + splitter_friction_grip_h;
+    lead_top = grip_top + splitter_friction_lead_h;
+    lower_inner_right = inner_right + splitter_lower_bevel_relief;
+
+    intersection() {
+        extrude_xz_profile_y([
+            [lower_inner_right, wall_z],
+            [outer_right, wall_z],
+            [outer_right, lead_top],
+            [inner_right + splitter_friction_lead_relief, lead_top],
+            [inner_right, grip_top],
+            [inner_right, bevel_top]
+        ], wall_y, wall_d);
+
+        translate([0, 0, wall_z])
+            linear_extrude(height = lead_top - wall_z)
+                splitter_tray_outer_outline_2d();
+    }
+}
+
+module splitter_side_walls_local(
+    interference = splitter_friction_interference) {
+    splitter_side_wall_left_local(interference);
+    splitter_side_wall_right_local(interference);
 }
 
 module splitter_end_stops_local(
@@ -807,6 +822,17 @@ module splitter_tray() {
             linear_extrude(height = base_thickness)
                 splitter_tray_floor_2d();
             splitter_side_walls_local();
+            splitter_end_stops_local();
+        }
+}
+
+// Viewer base without side walls. The normal walls are a separate material so
+// the hybrid-retention view can replace them with its integrated clip walls.
+module splitter_tray_without_side_walls() {
+    splitter_transform()
+        union() {
+            linear_extrude(height = base_thickness)
+                splitter_tray_floor_2d();
             splitter_end_stops_local();
         }
 }
@@ -1196,15 +1222,16 @@ module one_piece_mount() {
     }
 }
 
-// Browser-only immutable shell.  The complete standard or friction Green tray
-// is loaded separately, avoiding overlapping floor meshes during UI swaps.
+// Browser-only immutable shell. The complete Green tray and TP-Link side walls
+// are loaded separately, avoiding overlapping meshes when the UI swaps to the
+// hybrid wall-integrated clip design.
 module one_piece_mount_without_green_tray() {
     difference() {
         union() {
             extrude_y(0, face_thickness)
                 rounded_rect_2d(rack_width, rack_height, outer_corner_r);
             translate([ear_width, 0, 0]) {
-                splitter_tray();
+                splitter_tray_without_side_walls();
                 device_bridges();
             }
         }
@@ -2382,39 +2409,28 @@ module hybrid_green_top_catch_left(y0,
     catch_z = green_device_z + green_h + hybrid_green_clip_clearance;
     flat_x = inner + reach - hybrid_green_catch_flat;
     tip_x = inner + reach;
-    anchor_x = inner - 0.25;
     nose_top_z = catch_z + hybrid_green_catch_nose_t;
     tip_top_z = catch_z + hybrid_green_catch_tip_t;
     shoulder_x = tip_x - hybrid_green_catch_tip_bevel;
+    root_inner_x = inner + 2.4;
 
-    union() {
-        translate([outer, y0, 0])
-            rounded_prism_z(
-                hybrid_green_fixed_arm_t,
-                hybrid_green_clip_len,
-                catch_z + hybrid_green_top_ramp_h, 0.55);
-        hull() {
-            translate([outer, y0, 0])
-                rounded_prism_z(
-                    hybrid_green_fixed_arm_t + 2.4,
-                    hybrid_green_clip_len, 1.4, 0.55);
-            translate([outer, y0, 3.8])
-                rounded_prism_z(
-                    hybrid_green_fixed_arm_t,
-                    hybrid_green_clip_len, 0.4, 0.55);
-        }
-        extrude_xz_profile_y([
-            [anchor_x, bevel_start_z - 0.25],
-            [inner, bevel_start_z],
-            [bevel_follow_x, green_device_z + green_h],
-            [flat_x, catch_z],
-            [tip_x, catch_z],
-            [tip_x, tip_top_z],
-            [shoulder_x, nose_top_z],
-            [flat_x, nose_top_z],
-            [anchor_x, catch_z + hybrid_green_top_ramp_h]
-        ], y0, hybrid_green_clip_len);
-    }
+    // One continuous profile eliminates the ridges produced by overlapping
+    // rounded towers, root hulls, and square-ended catch solids.
+    extrude_xz_profile_y([
+        [outer, 0],
+        [root_inner_x, 0],
+        [root_inner_x, 1.4],
+        [inner, 3.8],
+        [inner, bevel_start_z],
+        [bevel_follow_x, green_device_z + green_h],
+        [flat_x, catch_z],
+        [tip_x, catch_z],
+        [tip_x, tip_top_z],
+        [shoulder_x, nose_top_z],
+        [flat_x, nose_top_z],
+        [inner, catch_z + hybrid_green_top_ramp_h],
+        [outer, catch_z + hybrid_green_top_ramp_h]
+    ], y0, hybrid_green_clip_len);
 }
 
 module hybrid_green_top_catch_right(y0,
@@ -2429,47 +2445,31 @@ module hybrid_green_top_catch_right(y0,
     catch_z = green_device_z + green_h + hybrid_green_clip_clearance;
     flat_x = inner - reach + hybrid_green_catch_flat;
     tip_x = inner - reach;
-    anchor_x = inner + 0.25;
     nose_top_z = catch_z + hybrid_green_catch_nose_t;
     tip_top_z = catch_z + hybrid_green_catch_tip_t;
     shoulder_x = tip_x + hybrid_green_catch_tip_bevel;
+    root_outer_x = outer + 0.9;
+    root_inner_x = inner - 0.9;
 
-    union() {
-        translate([inner, y0, 0])
-            rounded_prism_z(
-                hybrid_green_spring_arm_t,
-                hybrid_green_clip_len,
-                catch_z + hybrid_green_top_ramp_h, 0.55);
-        hull() {
-            translate([inner - 0.9, y0, 0])
-                rounded_prism_z(
-                    hybrid_green_spring_arm_t + 1.8,
-                    hybrid_green_clip_len, 1.4, 0.55);
-            translate([inner, y0, 3.8])
-                rounded_prism_z(
-                    hybrid_green_spring_arm_t,
-                    hybrid_green_clip_len, 0.4, 0.55);
-        }
-        extrude_xz_profile_y([
-            [anchor_x, bevel_start_z - 0.25],
-            [inner, bevel_start_z],
-            [bevel_follow_x, green_device_z + green_h],
-            [flat_x, catch_z],
-            [tip_x, catch_z],
-            [tip_x, tip_top_z],
-            [shoulder_x, nose_top_z],
-            [flat_x, nose_top_z],
-            [anchor_x, catch_z + hybrid_green_top_ramp_h]
-        ], y0, hybrid_green_clip_len);
-
-        // 45-degree release wing, reachable from the rack's right side.
-        extrude_xz_profile_y([
-            [outer - 0.15, catch_z - 3.2],
-            [outer + 1.05, catch_z - 2.0],
-            [outer + 1.05, catch_z - 0.2],
-            [outer - 0.15, catch_z - 0.2]
-        ], y0 + 1.0, hybrid_green_clip_len - 2.0);
-    }
+    // The outer wall is itself the release surface. Keeping the root, tower,
+    // taper follower, and nose in one extrusion removes the former add-on tab.
+    extrude_xz_profile_y([
+        [root_inner_x, 0],
+        [root_outer_x, 0],
+        [root_outer_x, 1.4],
+        [outer, 3.8],
+        [outer, catch_z + hybrid_green_top_ramp_h],
+        [inner, catch_z + hybrid_green_top_ramp_h],
+        [flat_x, nose_top_z],
+        [shoulder_x, nose_top_z],
+        [tip_x, tip_top_z],
+        [tip_x, catch_z],
+        [flat_x, catch_z],
+        [bevel_follow_x, green_device_z + green_h],
+        [inner, bevel_start_z],
+        [inner, 3.8],
+        [root_inner_x, 1.4]
+    ], y0, hybrid_green_clip_len);
 }
 
 module retention_green_hybrid_clips_local(
@@ -2524,10 +2524,11 @@ module green_tray_hybrid_pads_local() {
     }
 }
 
-// The TP-Link has ample vertical clearance, so both sides use the same long
-// catch profile and printable nose. The bridge-side tower stays rigid while
-// the rack-outboard tower remains isolated as a spring. Their mirrored ramps
-// provide equal top overlap; fore/aft loads remain on the low end stops.
+// Both TP-Link clips rise directly from the cradle's mini walls. The left wall
+// has narrow Y relief slots around each 1.6 mm tongue, letting it flex without
+// adding an external outrigger; the right catch remains fused to its wall.
+// Each arm and catch is one X/Z extrusion, so the top surface has no union
+// ridges, rounded-end ears, or isolated-looking bulges.
 module retention_splitter_hybrid_clips_local(
     spring_reach = hybrid_splitter_spring_reach,
     fixed_reach = hybrid_splitter_fixed_reach,
@@ -2545,73 +2546,68 @@ module retention_splitter_hybrid_clips_local(
     arm_z0 = base_thickness - 0.20;
     catch_z = base_thickness + splitter_h
               + hybrid_splitter_clip_clearance;
-    arm_t = 1.6;
-    arm_inner = outer_left - hybrid_splitter_arm_gap;
-    arm_outer = arm_inner - arm_t;
+    spring_outer = inner_left - hybrid_splitter_arm_t;
     tip_x = inner_left + spring_reach;
     flat_x = tip_x - hybrid_splitter_catch_flat;
-    arm_anchor = arm_inner - 0.25;
     fixed_tip_x = inner_right - fixed_reach;
     fixed_flat_x = fixed_tip_x + hybrid_splitter_catch_flat;
-    fixed_anchor = splitter_w - arm_anchor;
-    ramp_bottom_z = catch_z - hybrid_splitter_lower_ramp_drop;
+    ramp_bottom_z = base_thickness + splitter_h
+                    - splitter_upper_bevel_h;
     nose_top_z = catch_z + hybrid_splitter_catch_nose_t;
     tip_top_z = catch_z + hybrid_splitter_catch_tip_t;
     shoulder_x = tip_x - hybrid_splitter_catch_tip_bevel;
     fixed_shoulder_x = fixed_tip_x
                        + hybrid_splitter_catch_tip_bevel;
-    root_z_top = 4.0;
 
-    for (clip_y0 = clip_ys) {
-        // Accessible flexible arms on the rack-outboard (left) side. Keeping
-        // a 0.60 mm air gap outside the existing cradle wall preserves the
-        // full spring length without cutting the baseline wall geometry.
-        translate([arm_outer - 0.35, clip_y0 - 2.0, 0])
-            rounded_prism_z(
-                outer_left - arm_outer + 0.55,
-                hybrid_splitter_clip_len + 4.0,
-                root_z_top, 0.45);
-        translate([arm_outer, clip_y0, arm_z0])
-            rounded_prism_z(
-                arm_t, hybrid_splitter_clip_len,
-                catch_z + hybrid_splitter_top_ramp_h - arm_z0,
-                0.45);
-        extrude_xz_profile_y([
-            [arm_anchor, ramp_bottom_z],
-            [flat_x, catch_z],
-            [tip_x, catch_z],
-            [tip_x, tip_top_z],
-            [shoulder_x, nose_top_z],
-            [flat_x, nose_top_z],
-            [arm_anchor, catch_z + hybrid_splitter_top_ramp_h]
-        ], clip_y0, hybrid_splitter_clip_len);
+    union() {
+        // Preserve the normal left wall except for narrow slots that isolate
+        // each spring tongue above its common 4 mm-high root.
+        difference() {
+            splitter_side_wall_left_local();
+            for (clip_y0 = clip_ys)
+                translate([
+                    outer_left - epsilon,
+                    clip_y0 - hybrid_splitter_clip_y_gap,
+                    hybrid_splitter_root_top
+                ])
+                    cube([
+                        inner_left - outer_left + 2 * epsilon,
+                        hybrid_splitter_clip_len
+                            + 2 * hybrid_splitter_clip_y_gap,
+                        rack_height
+                    ]);
+        }
 
-        // Small 45-degree thumb wings let each spring release independently.
-        extrude_xz_profile_y([
-            [arm_outer, catch_z - 3.0],
-            [arm_outer - 0.9, catch_z - 2.1],
-            [arm_outer - 0.9, catch_z - 0.7],
-            [arm_outer, catch_z - 0.7]
-        ], clip_y0 + 1.0, hybrid_splitter_clip_len - 2.0);
+        // The bridge-side wall remains continuous and therefore rigid.
+        splitter_side_wall_right_local();
 
-        // Matching rigid bridge-side catches. The full existing wall width
-        // supports the tower, while the catch profile exactly mirrors the
-        // spring-side insertion ramp and top bearing land.
-        translate([inner_right, clip_y0, arm_z0])
-            rounded_prism_z(
-                outer_right - inner_right,
-                hybrid_splitter_clip_len,
-                catch_z + hybrid_splitter_top_ramp_h - arm_z0,
-                0.45);
-        extrude_xz_profile_y([
-            [fixed_anchor, ramp_bottom_z],
-            [fixed_flat_x, catch_z],
-            [fixed_tip_x, catch_z],
-            [fixed_tip_x, tip_top_z],
-            [fixed_shoulder_x, nose_top_z],
-            [fixed_flat_x, nose_top_z],
-            [fixed_anchor, catch_z + hybrid_splitter_top_ramp_h]
-        ], clip_y0, hybrid_splitter_clip_len);
+        for (clip_y0 = clip_ys) {
+            // Wall-integrated flexible tongue on the rack-outboard side.
+            extrude_xz_profile_y([
+                [spring_outer, arm_z0],
+                [inner_left, arm_z0],
+                [inner_left, ramp_bottom_z],
+                [flat_x, catch_z],
+                [tip_x, catch_z],
+                [tip_x, tip_top_z],
+                [shoulder_x, nose_top_z],
+                [flat_x, nose_top_z],
+                [spring_outer, catch_z + hybrid_splitter_top_ramp_h]
+            ], clip_y0, hybrid_splitter_clip_len);
+
+            // Matching wall-integrated rigid catch on the bridge side.
+            extrude_xz_profile_y([
+                [inner_right, arm_z0],
+                [outer_right, arm_z0],
+                [outer_right, catch_z + hybrid_splitter_top_ramp_h],
+                [fixed_flat_x, nose_top_z],
+                [fixed_shoulder_x, nose_top_z],
+                [fixed_tip_x, tip_top_z],
+                [fixed_tip_x, catch_z],
+                [fixed_flat_x, catch_z],
+                [inner_right, ramp_bottom_z]
+            ], clip_y0, hybrid_splitter_clip_len);
+        }
     }
 }
 
@@ -3225,10 +3221,11 @@ module green_hybrid_clip_coupon_single(reach = hybrid_green_clip_reach) {
     bevel_follow_x = top_edge_x - hybrid_green_cover_clearance;
     flat_x = inner + reach - hybrid_green_catch_flat;
     tip_x = inner + reach;
-    anchor_x = inner - 0.25;
     nose_top_z = catch_z + hybrid_green_catch_nose_t;
     tip_top_z = catch_z + hybrid_green_catch_tip_t;
     shoulder_x = tip_x - hybrid_green_catch_tip_bevel;
+    clip_root_outer_x = outer - 0.9;
+    clip_root_inner_x = inner + 0.9;
 
     union() {
         // Full-length root strip matches the production floor thickness while
@@ -3237,19 +3234,6 @@ module green_hybrid_clip_coupon_single(reach = hybrid_green_clip_reach) {
             rounded_prism_z(
                 root_inner - root_outer, coupon_len,
                 base_thickness, 0.55);
-
-        // Mirror the production spring's reinforced root so the measured
-        // insertion/release force is representative of the complete tray.
-        hull() {
-            translate([outer - 0.90, clip_y0, 0])
-                rounded_prism_z(
-                    hybrid_green_spring_arm_t + 1.80,
-                    hybrid_green_clip_len, 1.40, 0.55);
-            translate([outer, clip_y0, 3.80])
-                rounded_prism_z(
-                    hybrid_green_spring_arm_t,
-                    hybrid_green_clip_len, 0.40, 0.55);
-        }
 
         // Two known-height pads locate the bottom plane. Their printable ribs
         // overlap small floor tongues connected to the root rail.
@@ -3271,12 +3255,13 @@ module green_hybrid_clip_coupon_single(reach = hybrid_green_clip_reach) {
                     seat_pad_t, 0.40);
         }
 
-        translate([outer, clip_y0, 0])
-            rounded_prism_z(
-                hybrid_green_spring_arm_t, hybrid_green_clip_len,
-                catch_z + hybrid_green_top_ramp_h, 0.55);
+        // One clean profile reproduces the production spring without union
+        // ridges, rounded-end ears, or a separate release-tab bulge.
         extrude_xz_profile_y([
-            [anchor_x, bevel_start_z - 0.25],
+            [clip_root_outer_x, 0],
+            [clip_root_inner_x, 0],
+            [clip_root_inner_x, 1.4],
+            [inner, 3.8],
             [inner, bevel_start_z],
             [bevel_follow_x, green_device_z + green_h],
             [flat_x, catch_z],
@@ -3284,14 +3269,9 @@ module green_hybrid_clip_coupon_single(reach = hybrid_green_clip_reach) {
             [tip_x, tip_top_z],
             [shoulder_x, nose_top_z],
             [flat_x, nose_top_z],
-            [anchor_x, catch_z + hybrid_green_top_ramp_h]
+            [inner, catch_z + hybrid_green_top_ramp_h],
+            [outer, catch_z + hybrid_green_top_ramp_h]
         ], clip_y0, hybrid_green_clip_len);
-        extrude_xz_profile_y([
-            [outer + 0.15, catch_z - 3.2],
-            [outer - 1.05, catch_z - 2.0],
-            [outer - 1.05, catch_z - 0.2],
-            [outer + 0.15, catch_z - 0.2]
-        ], clip_y0 + 1.0, hybrid_green_clip_len - 2.0);
     }
 }
 
@@ -3372,9 +3352,7 @@ module splitter_hybrid_clip_coupon_single() {
                - (slice_d - hybrid_splitter_clip_len) / 2;
     outer_left = -splitter_clearance - wall_thickness;
     outer_right = splitter_w + splitter_clearance + wall_thickness;
-    arm_inner = outer_left - hybrid_splitter_arm_gap;
-    arm_outer = arm_inner - 1.6;
-    coupon_left = arm_outer - 0.35;
+    coupon_left = outer_left;
     coupon_right = outer_right;
 
     translate([-coupon_left, -slice_y0, 0])
@@ -3397,8 +3375,7 @@ module splitter_hybrid_clip_coupon_single() {
                     ]);
 
                 // Full-length root rails support the cropped production walls
-                // between the crossbars. The external spring's own 4 mm-high
-                // outrigger remains unchanged inside the retention module.
+                // between the crossbars without an external clip outrigger.
                 translate([outer_left, slice_y0, 0])
                     cube([
                         root_rail_w,
@@ -3413,7 +3390,6 @@ module splitter_hybrid_clip_coupon_single() {
                         base_thickness
                     ]);
 
-                splitter_side_walls_local();
                 retention_splitter_hybrid_clips_local(
                     spring_reach = hybrid_splitter_spring_reach,
                     fixed_reach = hybrid_splitter_fixed_reach,
@@ -3751,6 +3727,12 @@ module viewer_mount_without_green_tray() {
     else one_piece_mount_without_green_tray();
 }
 
+module viewer_splitter_side_walls() {
+    if (splitter_model == "tplink")
+        translate([ear_width, 0, 0])
+            splitter_transform() splitter_side_walls_local();
+}
+
 module viewer_green_tray_standard() {
     translate([ear_width, 0, 0]) green_tray();
 }
@@ -3907,6 +3889,12 @@ assert(green_device_z + green_h + hybrid_green_clip_clearance
        "Green hybrid catch exceeds the 1U panel envelope");
 assert(hybrid_splitter_spring_reach == hybrid_splitter_fixed_reach,
        "TP-Link fixed and spring catches must use equal reach");
+assert(hybrid_splitter_clip_y_gap >= 0.80,
+       "TP-Link spring tongues need at least 0.8 mm end relief");
+assert(hybrid_splitter_root_top > base_thickness,
+       "TP-Link spring root must overlap the tray floor");
+assert(hybrid_splitter_arm_t >= 1.60,
+       "TP-Link wall tongue is too thin for the intended flex test");
 assert(hybrid_splitter_catch_tip_t <= hybrid_splitter_catch_nose_t,
        "TP-Link catch tip cannot be thicker than its shoulder");
 assert(hybrid_splitter_catch_tip_bevel
@@ -3987,6 +3975,8 @@ if (part == "assembly_preview") {
     viewer_mount();
 } else if (part == "viewer_mount_without_green_tray") {
     viewer_mount_without_green_tray();
+} else if (part == "viewer_splitter_side_walls") {
+    viewer_splitter_side_walls();
 } else if (part == "viewer_green_tray_standard") {
     viewer_green_tray_standard();
 } else if (part == "viewer_green_tray_friction") {
