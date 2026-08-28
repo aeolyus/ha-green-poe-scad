@@ -3784,52 +3784,60 @@ module retention_green_ventilated_sleeve_local() {
         friction_end_stop_supports_local(include_rear = false);
         friction_end_stops_local(include_rear = false);
 
-        difference() {
-            union() {
-                sleeve_profiled_side_frame_x(
-                    left_profile,
-                    sleeve_y0, sleeve_depth,
-                    outer_left,
-                    max(inner_left, cover_left) - outer_left,
-                    frame_openings);
-                sleeve_profiled_side_frame_x(
-                    right_profile,
-                    sleeve_y0, sleeve_depth,
-                    min(inner_right, cover_right),
-                    outer_right - min(inner_right, cover_right),
-                    frame_openings);
+        intersection() {
+            difference() {
+                union() {
+                    sleeve_profiled_side_frame_x(
+                        left_profile,
+                        sleeve_y0, sleeve_depth,
+                        outer_left,
+                        max(inner_left, cover_left) - outer_left,
+                        frame_openings);
+                    sleeve_profiled_side_frame_x(
+                        right_profile,
+                        sleeve_y0, sleeve_depth,
+                        min(inner_right, cover_right),
+                        outer_right - min(inner_right, cover_right),
+                        frame_openings);
+                }
+
+                sleeve_rear_lead_cavity_local(
+                    [
+                        [inner_left, wall_z0 - epsilon],
+                        [inner_right, wall_z0 - epsilon],
+                        [inner_right, base_grip_top],
+                        [cover_right, cover_relief_top],
+                        [cover_right, roof_top + epsilon],
+                        [cover_left, roof_top + epsilon],
+                        [cover_left, cover_relief_top],
+                        [inner_left, base_grip_top]
+                    ],
+                    [
+                        [inner_left - sleeve_rear_lead_relief,
+                         wall_z0 - epsilon],
+                        [inner_right + sleeve_rear_lead_relief,
+                         wall_z0 - epsilon],
+                        [inner_right + sleeve_rear_lead_relief,
+                         base_grip_top],
+                        [cover_right + sleeve_rear_lead_relief,
+                         cover_relief_top],
+                        [cover_right + sleeve_rear_lead_relief,
+                         roof_top + epsilon],
+                        [cover_left - sleeve_rear_lead_relief,
+                         roof_top + epsilon],
+                        [cover_left - sleeve_rear_lead_relief,
+                         cover_relief_top],
+                        [inner_left - sleeve_rear_lead_relief,
+                         base_grip_top]
+                    ],
+                    sleeve_y0, sleeve_depth);
             }
 
-            sleeve_rear_lead_cavity_local(
-                [
-                    [inner_left, wall_z0 - epsilon],
-                    [inner_right, wall_z0 - epsilon],
-                    [inner_right, base_grip_top],
-                    [cover_right, cover_relief_top],
-                    [cover_right, roof_top + epsilon],
-                    [cover_left, roof_top + epsilon],
-                    [cover_left, cover_relief_top],
-                    [inner_left, base_grip_top]
-                ],
-                [
-                    [inner_left - sleeve_rear_lead_relief,
-                     wall_z0 - epsilon],
-                    [inner_right + sleeve_rear_lead_relief,
-                     wall_z0 - epsilon],
-                    [inner_right + sleeve_rear_lead_relief,
-                     base_grip_top],
-                    [cover_right + sleeve_rear_lead_relief,
-                     cover_relief_top],
-                    [cover_right + sleeve_rear_lead_relief,
-                     roof_top + epsilon],
-                    [cover_left - sleeve_rear_lead_relief,
-                     roof_top + epsilon],
-                    [cover_left - sleeve_rear_lead_relief,
-                     cover_relief_top],
-                    [inner_left - sleeve_rear_lead_relief,
-                     base_grip_top]
-                ],
-                sleeve_y0, sleeve_depth);
+            // Match the floor and roof's exact rounded plan footprint so the
+            // side-frame corners cannot overhang either horizontal face.
+            translate([0, 0, wall_z0])
+                linear_extrude(height = roof_top - wall_z0)
+                    green_sleeve_outer_outline_2d();
         }
 
         sleeve_roof_panel_local(
@@ -3891,57 +3899,65 @@ module retention_splitter_ventilated_sleeve_local() {
             splitter_tray_floor_2d();
         splitter_end_stops_local(include_rear = false);
 
-        difference() {
-            union() {
-                sleeve_profiled_side_frame_x(
-                    left_profile,
-                    outer_y, outer_depth,
-                    outer_left, top_inner_left - outer_left,
-                    frame_openings);
-                sleeve_profiled_side_frame_x(
-                    right_profile,
-                    outer_y, outer_depth,
-                    top_inner_right,
-                    outer_right - top_inner_right,
-                    frame_openings);
+        intersection() {
+            difference() {
+                union() {
+                    sleeve_profiled_side_frame_x(
+                        left_profile,
+                        outer_y, outer_depth,
+                        outer_left, top_inner_left - outer_left,
+                        frame_openings);
+                    sleeve_profiled_side_frame_x(
+                        right_profile,
+                        outer_y, outer_depth,
+                        top_inner_right,
+                        outer_right - top_inner_right,
+                        frame_openings);
+                }
+
+                sleeve_rear_lead_cavity_local(
+                    [
+                        [lower_inner_left, wall_z0 - epsilon],
+                        [lower_inner_right, wall_z0 - epsilon],
+                        [inner_right, lower_bevel_top],
+                        [inner_right, upper_bevel_bottom],
+                        [top_inner_right, roof_z0],
+                        [top_inner_right, roof_top + epsilon],
+                        [top_inner_left, roof_top + epsilon],
+                        [top_inner_left, roof_z0],
+                        [inner_left, upper_bevel_bottom],
+                        [inner_left, lower_bevel_top]
+                    ],
+                    [
+                        [lower_inner_left - sleeve_rear_lead_relief,
+                         wall_z0 - epsilon],
+                        [lower_inner_right + sleeve_rear_lead_relief,
+                         wall_z0 - epsilon],
+                        [inner_right + sleeve_rear_lead_relief,
+                         lower_bevel_top],
+                        [inner_right + sleeve_rear_lead_relief,
+                         upper_bevel_bottom],
+                        [top_inner_right + sleeve_rear_lead_relief,
+                         roof_z0],
+                        [top_inner_right + sleeve_rear_lead_relief,
+                         roof_top + epsilon],
+                        [top_inner_left - sleeve_rear_lead_relief,
+                         roof_top + epsilon],
+                        [top_inner_left - sleeve_rear_lead_relief,
+                         roof_z0],
+                        [inner_left - sleeve_rear_lead_relief,
+                         upper_bevel_bottom],
+                        [inner_left - sleeve_rear_lead_relief,
+                         lower_bevel_top]
+                    ],
+                    outer_y, outer_depth);
             }
 
-            sleeve_rear_lead_cavity_local(
-                [
-                    [lower_inner_left, wall_z0 - epsilon],
-                    [lower_inner_right, wall_z0 - epsilon],
-                    [inner_right, lower_bevel_top],
-                    [inner_right, upper_bevel_bottom],
-                    [top_inner_right, roof_z0],
-                    [top_inner_right, roof_top + epsilon],
-                    [top_inner_left, roof_top + epsilon],
-                    [top_inner_left, roof_z0],
-                    [inner_left, upper_bevel_bottom],
-                    [inner_left, lower_bevel_top]
-                ],
-                [
-                    [lower_inner_left - sleeve_rear_lead_relief,
-                     wall_z0 - epsilon],
-                    [lower_inner_right + sleeve_rear_lead_relief,
-                     wall_z0 - epsilon],
-                    [inner_right + sleeve_rear_lead_relief,
-                     lower_bevel_top],
-                    [inner_right + sleeve_rear_lead_relief,
-                     upper_bevel_bottom],
-                    [top_inner_right + sleeve_rear_lead_relief,
-                     roof_z0],
-                    [top_inner_right + sleeve_rear_lead_relief,
-                     roof_top + epsilon],
-                    [top_inner_left - sleeve_rear_lead_relief,
-                     roof_top + epsilon],
-                    [top_inner_left - sleeve_rear_lead_relief,
-                     roof_z0],
-                    [inner_left - sleeve_rear_lead_relief,
-                     upper_bevel_bottom],
-                    [inner_left - sleeve_rear_lead_relief,
-                     lower_bevel_top]
-                ],
-                outer_y, outer_depth);
+            // The TP-Link floor and roof share this rounded outline, so clip
+            // the side frames to it and eliminate square-corner overhangs.
+            translate([0, 0, wall_z0])
+                linear_extrude(height = roof_top - wall_z0)
+                    splitter_tray_outer_outline_2d();
         }
 
         sleeve_roof_panel_local(
