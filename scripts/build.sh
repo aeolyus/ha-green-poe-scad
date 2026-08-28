@@ -24,6 +24,7 @@ retention_ids=(
   captive_strap
   x_cage
   hybrid_clips
+  ventilated_sleeves
   friction_sleeve
 )
 
@@ -61,7 +62,7 @@ variant_spec() {
 
 retention_is_valid() {
   case "$1" in
-    factory_screws|slide_latch|corner_gate|sled_gate|padded_rails|captive_strap|x_cage|hybrid_clips|friction_sleeve)
+    factory_screws|slide_latch|corner_gate|sled_gate|padded_rails|captive_strap|x_cage|hybrid_clips|ventilated_sleeves|friction_sleeve)
       return 0
       ;;
     *) return 1 ;;
@@ -161,6 +162,31 @@ build_variant_hybrid_overlay() {
     -D "front_keystone_side=\"${variant_side}\""
 }
 
+build_variant_ventilated_sleeves_overlay() {
+  local requested_id="$1"
+  local spec variant_id variant_model variant_y variant_front variant_side
+  local variant_dir
+  if ! spec="$(variant_spec "$requested_id")"; then
+    echo "Unknown viewer variant: $requested_id" >&2
+    usage >&2
+    exit 2
+  fi
+  IFS=: read -r variant_id variant_model variant_y variant_front variant_side \
+    <<< "$spec"
+  if [[ "$variant_model" != "tplink" ]]; then
+    return
+  fi
+  variant_dir="viewer/variants/${variant_id}"
+  mkdir -p "$variant_dir"
+
+  launch_scad "${variant_dir}/viewer_retention_ventilated_sleeves.stl" \
+    -D 'part="viewer_retention_ventilated_sleeves"' \
+    -D "splitter_model=\"${variant_model}\"" \
+    -D "splitter_y_override=${variant_y}" \
+    -D "front_ethernet_enabled=${variant_front}" \
+    -D "front_keystone_side=\"${variant_side}\""
+}
+
 build_viewer_variant() {
   local requested_id="$1"
   local spec variant_id variant_model variant_y variant_front variant_side
@@ -186,13 +212,15 @@ build_viewer_variant() {
   done
 
   if [[ "$variant_model" == "tplink" ]]; then
-    launch_scad "${variant_dir}/viewer_splitter_side_walls.stl" \
-      -D 'part="viewer_splitter_side_walls"' \
-      -D "splitter_model=\"${variant_model}\"" \
-      -D "splitter_y_override=${variant_y}" \
-      -D "front_ethernet_enabled=${variant_front}" \
-      -D "front_keystone_side=\"${variant_side}\"" \
-      -D 'led_shutter_enabled=true'
+    for part_name in splitter_floor splitter_end_stops splitter_side_walls; do
+      launch_scad "${variant_dir}/viewer_${part_name}.stl" \
+        -D "part=\"viewer_${part_name}\"" \
+        -D "splitter_model=\"${variant_model}\"" \
+        -D "splitter_y_override=${variant_y}" \
+        -D "front_ethernet_enabled=${variant_front}" \
+        -D "front_keystone_side=\"${variant_side}\"" \
+        -D 'led_shutter_enabled=true'
+    done
   fi
 
   if [[ "$variant_front" == "true" ]]; then
@@ -216,6 +244,7 @@ build_viewer_variant() {
   done
 
   build_variant_hybrid_overlay "$variant_id"
+  build_variant_ventilated_sleeves_overlay "$variant_id"
 }
 
 build_shared_viewer_trays() {
@@ -245,6 +274,10 @@ build_retention_overlay() {
   elif [[ "$retention_id" == "hybrid_clips" ]]; then
     for variant_id in "${variant_ids[@]}"; do
       build_variant_hybrid_overlay "$variant_id"
+    done
+  elif [[ "$retention_id" == "ventilated_sleeves" ]]; then
+    for variant_id in "${variant_ids[@]}"; do
+      build_variant_ventilated_sleeves_overlay "$variant_id"
     done
   else
     launch_scad "viewer/viewer_retention_${retention_id}.stl" \
@@ -304,6 +337,8 @@ case "$target" in
       if [[ "$variant_id" == "cable_friendly" ]]; then
         cp viewer/variants/cable_friendly/viewer_retention_hybrid_clips.stl \
            viewer/viewer_retention_hybrid_clips.stl
+        cp viewer/variants/cable_friendly/viewer_retention_ventilated_sleeves.stl \
+           viewer/viewer_retention_ventilated_sleeves.stl
         break
       fi
     done
@@ -326,7 +361,9 @@ case "$target" in
       if [[ "$retention_id" == "hybrid_clips" ]]; then
         cp viewer/variants/cable_friendly/viewer_retention_hybrid_clips.stl \
            viewer/viewer_retention_hybrid_clips.stl
-        break
+      elif [[ "$retention_id" == "ventilated_sleeves" ]]; then
+        cp viewer/variants/cable_friendly/viewer_retention_ventilated_sleeves.stl \
+           viewer/viewer_retention_ventilated_sleeves.stl
       fi
     done
     run_glb_build

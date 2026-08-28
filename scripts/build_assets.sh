@@ -254,15 +254,15 @@ run_openscad -o exports/keystone_fit_test.3mf \
 run_openscad -o viewer/assembly_preview.3mf \
   -D 'part="assembly_preview"' ha_green_rack.scad
 
-for part_name in mount mount_without_green_tray splitter_side_walls green_tray_standard green_tray_friction green_tray_friction_full green_tray_friction_pads green_tray_friction_skeletal insert shutter_open shutter_closed shutter_retainer logo green splitter ports green_ports splitter_ports internal_data_cable input_data_cable dc_cable fasteners rulers led_power led_activity led_health; do
+for part_name in mount mount_without_green_tray splitter_floor splitter_end_stops splitter_side_walls green_tray_standard green_tray_friction green_tray_friction_full green_tray_friction_pads green_tray_friction_skeletal insert shutter_open shutter_closed shutter_retainer logo green splitter ports green_ports splitter_ports internal_data_cable input_data_cable dc_cable fasteners rulers led_power led_activity led_health; do
   run_openscad -o "viewer/viewer_${part_name}.stl" \
     -D "part=\"viewer_${part_name}\"" \
     -D 'led_shutter_enabled=true' ha_green_rack.scad
 done
 
 # Green-only retention concepts use the same device coordinates in every
-# layout. The mixed Green + TP-Link hybrid is built per variant below because
-# its splitter catches follow the layout-specific setback.
+# layout. The mixed Green + TP-Link concepts are built per variant below
+# because their splitter geometry follows the layout-specific setback.
 for retention_name in factory_screws slide_latch corner_gate sled_gate padded_rails captive_strap x_cage friction_sleeve; do
   run_openscad \
     -o "viewer/viewer_retention_${retention_name}.stl" \
@@ -306,13 +306,15 @@ build_viewer_variant() {
   done
 
   if [[ "$variant_model" == "tplink" ]]; then
-    run_openscad -o "${variant_dir}/viewer_splitter_side_walls.stl" \
-      -D 'part="viewer_splitter_side_walls"' \
-      -D "splitter_model=\"${variant_model}\"" \
-      -D "splitter_y_override=${variant_y}" \
-      -D "front_ethernet_enabled=${variant_front}" \
-      -D "front_keystone_side=\"${variant_side}\"" \
-      -D 'led_shutter_enabled=true' ha_green_rack.scad
+    for part_name in splitter_floor splitter_end_stops splitter_side_walls retention_ventilated_sleeves; do
+      run_openscad -o "${variant_dir}/viewer_${part_name}.stl" \
+        -D "part=\"viewer_${part_name}\"" \
+        -D "splitter_model=\"${variant_model}\"" \
+        -D "splitter_y_override=${variant_y}" \
+        -D "front_ethernet_enabled=${variant_front}" \
+        -D "front_keystone_side=\"${variant_side}\"" \
+        -D 'led_shutter_enabled=true' ha_green_rack.scad
+    done
   fi
 
   if [[ "$variant_front" == "true" ]]; then
@@ -381,6 +383,8 @@ fi
 # layout. GLB assembly uses the variant-local files instead.
 cp viewer/variants/cable_friendly/viewer_retention_hybrid_clips.stl \
    viewer/viewer_retention_hybrid_clips.stl
+cp viewer/variants/cable_friendly/viewer_retention_ventilated_sleeves.stl \
+   viewer/viewer_retention_ventilated_sleeves.stl
 
 render_common=(--viewall --autocenter --projection=perspective \
   --colorscheme=Tomorrow -D 'part="assembly_preview"')

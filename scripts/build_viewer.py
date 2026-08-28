@@ -81,6 +81,20 @@ PARTS = [
         None,
     ),
     (
+        "viewer_splitter_floor.stl",
+        "TP-Link cradle floor",
+        (237, 240, 245, 255),
+        0.72,
+        None,
+    ),
+    (
+        "viewer_splitter_end_stops.stl",
+        "TP-Link cradle end stops",
+        (237, 240, 245, 255),
+        0.72,
+        None,
+    ),
+    (
         "viewer_splitter_side_walls.stl",
         "TP-Link cradle side walls",
         (237, 240, 245, 255),
@@ -287,12 +301,33 @@ RETENTION_OPTIONS = [
         "note": (
             "Community-informed prototype: smooth one-piece catches overlap "
             "the Green's clear top by 1.2 mm. The TP-Link uses matched 1.2 mm "
-            "catches grown directly from its mini side walls; relief slots "
-            "let the accessible wall tongue flex. The lower guides account for "
+            "rigid catches grown directly from continuous, mirrored mini "
+            "walls, with no spring tongues or relief slots. The lower guides "
+            "account for "
             "the Green's measured 109.54 mm base, its published 112 mm cover "
             "envelope, and the TP-Link's lower bevel. Existing low stops take "
             "fore/aft loads. Print the combined two-device clip coupon before "
             "production."
+        ),
+    },
+    {
+        "id": "ventilated_sleeves",
+        "label": "Ventilated sleeve cages · Green + PoE",
+        "short_label": "Sleeve cages",
+        "filename": "viewer_retention_ventilated_sleeves.stl",
+        "material_name": "Device retention — ventilated sleeve cages",
+        "color": (8, 145, 178, 0),
+        "highlight": (8, 145, 178, 255),
+        "roughness": 0.66,
+        "printable": False,
+        "note": (
+            "Rear-loading dual-device concept for TP-Link layouts: snug "
+            "one-piece cages replace the Green tray and the complete PoE "
+            "cradle. Honeycomb roofs and "
+            "floors retain the devices vertically, while hollow side walls "
+            "with ventilation holes constrain them laterally. The body walls "
+            "provide the small insertion flex; there are no relief cuts, "
+            "separate springs, or moving latches."
         ),
     },
     {
@@ -349,11 +384,21 @@ SHARED_PART_FILENAMES = {
     *(option["filename"] for option in FRICTION_SUPPORT_OPTIONS),
 }
 
-# Unlike the other retention studies, the hybrid overlay contains TP-Link
-# catches as well as Green geometry. Its splitter coordinates therefore follow
-# each layout's setback and cannot be shared across Compact/Balanced/etc.
+# These mixed Green + TP-Link overlays follow each layout's splitter setback
+# and therefore cannot be shared across Compact/Balanced/etc.
 VARIANT_RETENTION_FILENAMES = {
     "viewer_retention_hybrid_clips.stl",
+    "viewer_retention_ventilated_sleeves.stl",
+}
+
+TPLINK_TRAY_FILENAMES = {
+    "viewer_splitter_floor.stl",
+    "viewer_splitter_end_stops.stl",
+    "viewer_splitter_side_walls.stl",
+}
+
+TPLINK_ONLY_RETENTION_FILENAMES = {
+    "viewer_retention_ventilated_sleeves.stl",
 }
 
 SHUTTER_CONFIGURATION = "shutter"
@@ -505,7 +550,7 @@ def load_variants(
                 if filename == "viewer_keystone_ports.stl" \
                         and not variant["id"].startswith("front_ethernet_"):
                     continue
-                if filename == "viewer_splitter_side_walls.stl" \
+                if filename in TPLINK_TRAY_FILENAMES \
                         and variant["device"] != "tplink":
                     continue
 
@@ -534,11 +579,24 @@ def load_variants(
                     if filename in SHARED_PART_FILENAMES
                     else variant_dir / source_filename
                 )
+                if not source_path.is_file():
+                    if required_variant_retention is not None \
+                            and variant["id"] in required_variant_retention:
+                        raise FileNotFoundError(
+                            "Missing viewer mesh for selected variant: "
+                            f"{source_path}"
+                        )
+                    # A partial rebuild may predate a newly split optional
+                    # material in variants that are being reused unchanged.
+                    continue
                 loaded_parts.append(
                     (source_filename, name, color, roughness, emissive,
                      load_mesh(source_path))
                 )
             for filename, name, color, roughness, emissive in RETENTION_PARTS:
+                if filename in TPLINK_ONLY_RETENTION_FILENAMES \
+                        and variant["device"] != "tplink":
+                    continue
                 if filename in VARIANT_RETENTION_FILENAMES:
                     variant_path = variant_dir / filename
                     if variant_path.is_file():
@@ -552,9 +610,12 @@ def load_variants(
                     else:
                         # Partial viewer rebuilds reuse existing GLBs for
                         # unselected variants. Their raw meshes are loaded only
-                        # to preserve the common scene transform, so the legacy
-                        # cable-friendly overlay is an acceptable fallback.
+                        # to preserve the common scene transform, so the
+                        # cable-friendly standalone alias is an acceptable
+                        # fallback when it already exists.
                         source_path = VIEWER / filename
+                        if not source_path.is_file():
+                            continue
                 else:
                     source_path = VIEWER / filename
                 loaded_parts.append(

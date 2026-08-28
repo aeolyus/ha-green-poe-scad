@@ -16,7 +16,7 @@
 
 $fn = 48;
 
-// [assembly_preview, assembly, one_piece, one_piece_logo_inlay, x2d_plate, core, logo_inlay, left_ear, right_ear, led_insert, led_shutter, led_shutter_retainer, led_shutter_kit, led_fixed_window_kit, green_spacer, green_spacers_4x, fit_test, friction_fit_coupon, green_hybrid_clip_coupon, splitter_fit_coupon, splitter_hybrid_clip_coupon, hybrid_clip_coupon, keystone_fit_test, viewer_mount, viewer_mount_without_green_tray, viewer_splitter_side_walls, viewer_green_tray_standard, viewer_green_tray_friction, viewer_green_tray_friction_full, viewer_green_tray_friction_pads, viewer_green_tray_friction_skeletal, viewer_insert, viewer_shutter_open, viewer_shutter_closed, viewer_shutter_retainer, viewer_logo, viewer_green, viewer_splitter, viewer_ports, viewer_green_ports, viewer_splitter_ports, viewer_keystone_ports, viewer_data_cables, viewer_internal_data_cable, viewer_input_data_cable, viewer_dc_cable, viewer_fasteners, viewer_retention_factory_screws, viewer_retention_slide_latch, viewer_retention_corner_gate, viewer_retention_sled_gate, viewer_retention_padded_rails, viewer_retention_captive_strap, viewer_retention_x_cage, viewer_retention_hybrid_clips, viewer_retention_friction_sleeve, viewer_enclosure_airframe, viewer_rulers, viewer_led_power, viewer_led_activity, viewer_led_health]
+// [assembly_preview, assembly, one_piece, one_piece_logo_inlay, x2d_plate, core, logo_inlay, left_ear, right_ear, led_insert, led_shutter, led_shutter_retainer, led_shutter_kit, led_fixed_window_kit, green_spacer, green_spacers_4x, fit_test, friction_fit_coupon, green_hybrid_clip_coupon, splitter_fit_coupon, splitter_hybrid_clip_coupon, hybrid_clip_coupon, keystone_fit_test, viewer_mount, viewer_mount_without_green_tray, viewer_splitter_floor, viewer_splitter_side_walls, viewer_splitter_end_stops, viewer_green_tray_standard, viewer_green_tray_friction, viewer_green_tray_friction_full, viewer_green_tray_friction_pads, viewer_green_tray_friction_skeletal, viewer_insert, viewer_shutter_open, viewer_shutter_closed, viewer_shutter_retainer, viewer_logo, viewer_green, viewer_splitter, viewer_ports, viewer_green_ports, viewer_splitter_ports, viewer_keystone_ports, viewer_data_cables, viewer_internal_data_cable, viewer_input_data_cable, viewer_dc_cable, viewer_fasteners, viewer_retention_factory_screws, viewer_retention_slide_latch, viewer_retention_corner_gate, viewer_retention_sled_gate, viewer_retention_padded_rails, viewer_retention_captive_strap, viewer_retention_x_cage, viewer_retention_hybrid_clips, viewer_retention_ventilated_sleeves, viewer_retention_friction_sleeve, viewer_enclosure_airframe, viewer_rulers, viewer_led_power, viewer_led_activity, viewer_led_health]
 part = "assembly_preview";
 
 // Production geometry uses the TP-Link. Viewer-only builds may override this
@@ -119,6 +119,7 @@ green_device_z = base_thickness + green_standoff;
 splitter_w = 53.975;                 // measured 2 1/8 in; official 54 mm
 splitter_d = 80.8;
 splitter_h = 23.8125;                // measured 15/16 in; official 24 mm
+splitter_top_flat_w = 47.625;         // measured 1 7/8 in
 splitter_top_flat_d = 67.46875;      // measured 2 21/32 in
 splitter_inner_w = splitter_w + 2 * splitter_clearance;
 splitter_inner_d = splitter_d + 2 * splitter_clearance;
@@ -139,7 +140,8 @@ splitter_upper_bevel_h = splitter_h
                           - splitter_flat_side_h;
 splitter_lower_bevel_relief = 0.50;
 splitter_lower_bevel_inset = 0.8;
-splitter_upper_bevel_inset = 1.0;
+splitter_upper_bevel_inset =
+    (splitter_w - splitter_top_flat_w) / 2;
 splitter_upper_end_bevel_inset =
     (splitter_d - splitter_top_flat_d) / 2;
 splitter_x = 13.0;
@@ -306,6 +308,24 @@ splitter_honeycomb_wall = 1.6;
 splitter_honeycomb_side_inset = 6.0;
 splitter_honeycomb_end_inset = 5.0;
 
+// Viewer-only rear-loading device sleeves inspired by the UCG-Fiber and
+// USW-Lite rack cases. Both use continuous, perforated walls and honeycomb
+// roofs/floors rather than discrete clips or spring reliefs.
+sleeve_roof_t = 1.20;
+sleeve_rear_lead_len = 6.0;
+sleeve_rear_lead_relief = 0.50;
+sleeve_green_interference = 0.10;
+sleeve_green_side_pitch = 12.0;
+sleeve_green_side_wall = 1.60;
+sleeve_green_roof_pitch = 15.0;
+sleeve_green_roof_wall = 1.80;
+sleeve_splitter_side_pitch = 9.5;
+sleeve_splitter_side_wall = 1.60;
+sleeve_splitter_roof_pitch = 10.0;
+sleeve_splitter_roof_wall = 1.60;
+sleeve_side_border = 3.0;
+sleeve_roof_border = 3.5;
+
 // Viewer-only open protective shell. Thin point-up honeycomb shear walls add
 // stiffness and edge protection without consuming the Green's 1U top gap.
 // Two millimeters equals five 0.4 mm extrusion lines and keeps the concept
@@ -339,10 +359,9 @@ friction_lead_relief = 0.60;      // opening gained per side at wall top, mm
 friction_grip_h = 8.0;            // straight contact above device bottom, mm
 friction_lead_h = 3.0;            // printable insertion chamfer height, mm
 
-// Viewer-only hybrid-retention study. Community mounts consistently pair
-// loose/snug guides with a positive catch rather than relying on long-wall
-// squeeze alone. The Green detents engage its taper well below the 1U roof;
-// the shorter TP-Link has room for a fixed top lip and one flexible clip.
+// Viewer-only top-catch study. The Green retains one releasable side because
+// its nearly full-1U height leaves little room to maneuver. The shorter
+// TP-Link uses four rigid, mirrored catches on continuous walls as requested.
 hybrid_green_guide_interference = 0.20;
 hybrid_green_cover_clearance = 0.35;
 hybrid_green_lower_grip_h = 2.50;
@@ -364,20 +383,16 @@ hybrid_green_spring_arm_t = 2.8;
 hybrid_green_window_margin = 1.0;
 hybrid_splitter_clip_len = 14.0;
 hybrid_splitter_clip_center_offset = 20.0;
-hybrid_splitter_clip_clearance = 0.50;
-hybrid_splitter_arm_t = 1.60;
-hybrid_splitter_clip_y_gap = 0.80;
-hybrid_splitter_root_top = 4.00;
+hybrid_splitter_clip_clearance = 0.00;
+hybrid_splitter_tower_t = 1.20;
 hybrid_splitter_top_overlap = 1.20;
 hybrid_splitter_catch_flat = 1.40;    // starts 0.20 mm outside the top edge
-hybrid_splitter_fixed_reach = splitter_upper_bevel_inset
-                              - splitter_friction_interference
-                              + hybrid_splitter_top_overlap;
-hybrid_splitter_spring_reach = hybrid_splitter_fixed_reach;
+hybrid_splitter_clip_reach = splitter_upper_bevel_inset
+                             - splitter_friction_interference
+                             + hybrid_splitter_top_overlap;
 hybrid_splitter_catch_nose_t = 0.80;
 hybrid_splitter_catch_tip_t = 0.40;
 hybrid_splitter_catch_tip_bevel = 0.40;
-hybrid_splitter_top_ramp_h = 1.60;
 
 module rounded_rect_2d(w, h, r) {
     hull() {
@@ -801,7 +816,9 @@ module splitter_side_walls_local(
 }
 
 module splitter_end_stops_local(
-    interference = splitter_friction_interference) {
+    interference = splitter_friction_interference,
+    include_front = true,
+    include_rear = true) {
     outer_y = -splitter_clearance - wall_thickness;
     outer_d = splitter_inner_d + 2 * wall_thickness;
     inner_left = interference;
@@ -824,10 +841,12 @@ module splitter_end_stops_local(
     // and selector envelope, and their rounded end corners stay inside the
     // floor's R4 silhouette.
     for (x0 = [left_x, right_x]) {
-        translate([x0, front_y, stop_z])
-            rounded_prism_z(stop_w, front_d, stop_h, 1.0);
-        translate([x0, rear_y, stop_z])
-            rounded_prism_z(stop_w, rear_d, stop_h, 1.0);
+        if (include_front)
+            translate([x0, front_y, stop_z])
+                rounded_prism_z(stop_w, front_d, stop_h, 1.0);
+        if (include_rear)
+            translate([x0, rear_y, stop_z])
+                rounded_prism_z(stop_w, rear_d, stop_h, 1.0);
     }
 }
 
@@ -1244,16 +1263,15 @@ module one_piece_mount() {
     }
 }
 
-// Browser-only immutable shell. The complete Green tray and TP-Link side walls
-// are loaded separately, avoiding overlapping meshes when the UI swaps to the
-// hybrid wall-integrated clip design.
+// Browser-only immutable shell. Both device trays are loaded as separate
+// meshes, avoiding overlaps when the UI swaps in wall-integrated clips or the
+// rear-loading ventilated sleeves.
 module one_piece_mount_without_green_tray() {
     difference() {
         union() {
             extrude_y(0, face_thickness)
                 rounded_rect_2d(rack_width, rack_height, outer_corner_r);
             translate([ear_width, 0, 0]) {
-                splitter_tray_without_side_walls();
                 device_bridges();
             }
         }
@@ -2548,17 +2566,13 @@ module green_tray_hybrid_pads_local() {
     }
 }
 
-// Both TP-Link clips rise directly from the cradle's mini walls. The left wall
-// has narrow Y relief slots around each 1.6 mm tongue, letting it flex without
-// adding an external outrigger; the right catch remains fused to its wall.
-// Each arm and catch is one X/Z extrusion, so the top surface has no union
-// ridges, rounded-end ears, or isolated-looking bulges.
+// All four TP-Link catches rise directly from continuous, rigid mini walls.
+// The left and right profiles are true mirrors: there are no spring tongues,
+// relief cuts, cosmetic skins, outriggers, or visible wall-to-clip gaps. The
+// measured housing taper and the printed cradle provide the insertion flex.
 module retention_splitter_hybrid_clips_local(
-    spring_reach = hybrid_splitter_spring_reach,
-    fixed_reach = hybrid_splitter_fixed_reach,
+    clip_reach = hybrid_splitter_clip_reach,
     clip_y_override = undef) {
-    outer_left = -splitter_clearance - wall_thickness;
-    outer_right = splitter_w + splitter_clearance + wall_thickness;
     inner_left = splitter_friction_interference;
     inner_right = splitter_w - splitter_friction_interference;
     clip_ys = is_undef(clip_y_override)
@@ -2567,69 +2581,67 @@ module retention_splitter_hybrid_clips_local(
            splitter_d / 2 + hybrid_splitter_clip_center_offset
                - hybrid_splitter_clip_len / 2]
         : [clip_y_override];
-    arm_z0 = base_thickness - 0.20;
     catch_z = base_thickness + splitter_h
               + hybrid_splitter_clip_clearance;
-    spring_outer = inner_left - hybrid_splitter_arm_t;
-    tip_x = inner_left + spring_reach;
+    tip_x = inner_left + clip_reach;
     flat_x = tip_x - hybrid_splitter_catch_flat;
-    fixed_tip_x = inner_right - fixed_reach;
+    fixed_tip_x = inner_right - clip_reach;
     fixed_flat_x = fixed_tip_x + hybrid_splitter_catch_flat;
+    tower_outer_left = inner_left - hybrid_splitter_tower_t;
+    tower_outer_right = inner_right + hybrid_splitter_tower_t;
+    tower_root_z = base_thickness + splitter_friction_grip_h
+                   + splitter_friction_lead_h - 0.20;
     ramp_bottom_z = base_thickness + splitter_h
                     - splitter_upper_bevel_h;
+    land_outer_margin = hybrid_splitter_catch_flat
+                        - hybrid_splitter_top_overlap;
+    ramp_contact_z = ramp_bottom_z
+                     + splitter_upper_bevel_h
+                       * splitter_friction_interference
+                       / splitter_upper_bevel_inset;
+    bevel_flat_z = ramp_bottom_z
+                   + splitter_upper_bevel_h
+                     * (splitter_upper_bevel_inset - land_outer_margin)
+                     / splitter_upper_bevel_inset;
     nose_top_z = catch_z + hybrid_splitter_catch_nose_t;
     tip_top_z = catch_z + hybrid_splitter_catch_tip_t;
     shoulder_x = tip_x - hybrid_splitter_catch_tip_bevel;
     fixed_shoulder_x = fixed_tip_x
                        + hybrid_splitter_catch_tip_bevel;
+    ramp_top_z = ramp_contact_z + hybrid_splitter_catch_nose_t;
 
     union() {
-        // Preserve the normal left wall except for narrow slots that isolate
-        // each spring tongue above its common 4 mm-high root.
-        difference() {
-            splitter_side_wall_left_local();
-            for (clip_y0 = clip_ys)
-                translate([
-                    outer_left - epsilon,
-                    clip_y0 - hybrid_splitter_clip_y_gap,
-                    hybrid_splitter_root_top
-                ])
-                    cube([
-                        inner_left - outer_left + 2 * epsilon,
-                        hybrid_splitter_clip_len
-                            + 2 * hybrid_splitter_clip_y_gap,
-                        rack_height
-                    ]);
-        }
-
-        // The bridge-side wall remains continuous and therefore rigid.
-        splitter_side_wall_right_local();
+        splitter_side_walls_local();
 
         for (clip_y0 = clip_ys) {
-            // Wall-integrated flexible tongue on the rack-outboard side.
+            // Rack-outboard rigid catch.
             extrude_xz_profile_y([
-                [spring_outer, arm_z0],
-                [inner_left, arm_z0],
-                [inner_left, ramp_bottom_z],
+                [tower_outer_left, tower_root_z],
+                [inner_left, tower_root_z],
+                [inner_left, ramp_contact_z],
+                [flat_x, bevel_flat_z],
                 [flat_x, catch_z],
                 [tip_x, catch_z],
                 [tip_x, tip_top_z],
                 [shoulder_x, nose_top_z],
                 [flat_x, nose_top_z],
-                [spring_outer, catch_z + hybrid_splitter_top_ramp_h]
+                [inner_left, ramp_top_z],
+                [tower_outer_left, ramp_top_z]
             ], clip_y0, hybrid_splitter_clip_len);
 
-            // Matching wall-integrated rigid catch on the bridge side.
+            // Bridge-side rigid catch, mirrored from the outboard profile.
             extrude_xz_profile_y([
-                [inner_right, arm_z0],
-                [outer_right, arm_z0],
-                [outer_right, catch_z + hybrid_splitter_top_ramp_h],
+                [inner_right, tower_root_z],
+                [tower_outer_right, tower_root_z],
+                [tower_outer_right, ramp_top_z],
+                [inner_right, ramp_top_z],
                 [fixed_flat_x, nose_top_z],
                 [fixed_shoulder_x, nose_top_z],
                 [fixed_tip_x, tip_top_z],
                 [fixed_tip_x, catch_z],
                 [fixed_flat_x, catch_z],
-                [inner_right, ramp_bottom_z]
+                [fixed_flat_x, bevel_flat_z],
+                [inner_right, ramp_contact_z]
             ], clip_y0, hybrid_splitter_clip_len);
         }
     }
@@ -3040,7 +3052,9 @@ module friction_side_walls_local(interference = friction_interference) {
     }
 }
 
-module friction_end_stops_local() {
+module friction_end_stops_local(
+    include_front = true,
+    include_rear = true) {
     outer_y = face_thickness - 0.20;
     outer_d = green_inner_d + (green_y - face_thickness) + wall_thickness;
     inner_left = green_x + friction_interference;
@@ -3059,16 +3073,19 @@ module friction_end_stops_local() {
 
     // One low integrated front stop and two low rear corner stops mirror the
     // simple UniFi-style case. The rear center remains fully open for ports.
-    translate([stop_x, front_y, stop_z])
-        rounded_prism_z(stop_w, front_d, stop_h, 0.8);
-    translate([stop_x, rear_y, stop_z])
-        rounded_prism_z(
-            rear_corner_w + wall_overlap,
-            rear_d, stop_h, small_end_r);
-    translate([inner_right - rear_corner_w, rear_y, stop_z])
-        rounded_prism_z(
-            rear_corner_w + wall_overlap,
-            rear_d, stop_h, small_end_r);
+    if (include_front)
+        translate([stop_x, front_y, stop_z])
+            rounded_prism_z(stop_w, front_d, stop_h, 0.8);
+    if (include_rear) {
+        translate([stop_x, rear_y, stop_z])
+            rounded_prism_z(
+                rear_corner_w + wall_overlap,
+                rear_d, stop_h, small_end_r);
+        translate([inner_right - rear_corner_w, rear_y, stop_z])
+            rounded_prism_z(
+                rear_corner_w + wall_overlap,
+                rear_d, stop_h, small_end_r);
+    }
 }
 
 // Pad and skeletal bases do not have a full-height lattice below the stops.
@@ -3363,7 +3380,7 @@ module splitter_fit_coupon() {
 }
 
 // Compact production-fit coupon for the selected TP-Link hybrid retention.
-// It preserves the exact production fixed and spring catches, full-height
+// It preserves the exact production mirrored rigid catches, full-height
 // wall profiles, and both clip roots. Two narrow transverse seat bars hold the
 // production spacing and device height without printing a non-load-bearing
 // solid floor across the open center of this short test section.
@@ -3415,8 +3432,7 @@ module splitter_hybrid_clip_coupon_single() {
                     ]);
 
                 retention_splitter_hybrid_clips_local(
-                    spring_reach = hybrid_splitter_spring_reach,
-                    fixed_reach = hybrid_splitter_fixed_reach,
+                    clip_reach = hybrid_splitter_clip_reach,
                     clip_y_override = clip_y0);
             }
             translate([coupon_left - epsilon,
@@ -3561,6 +3577,333 @@ module airframe_splitter_wall_clipped(x0, y0, depth, z0, height) {
             linear_extrude(height = height + 2 * epsilon)
                 splitter_tray_outer_outline_2d();
     }
+}
+
+// Perforate an arbitrary X/Z wall profile with complete point-up cells. The
+// surrounding border stays continuous, so the panel remains a single load
+// path even though most of its area is open for airflow.
+module sleeve_profiled_side_wall_x(
+    profile, y0, depth, cut_x0, cut_w, z0, height,
+    pitch, wall, border) {
+    difference() {
+        extrude_xz_profile_y(profile, y0, depth);
+        airframe_extrude_x(cut_x0 - epsilon, cut_w + 2 * epsilon)
+            translate([z0 + border, y0 + border])
+                airframe_honeycomb_openings_2d(
+                    height - 2 * border,
+                    depth - 2 * border,
+                    pitch, wall);
+    }
+}
+
+// Taper the complete device cavity outward over the final rear segment. This
+// keeps each side panel continuous while giving a rear-loaded enclosure a
+// lateral lead-in that matches the roof's vertical lead-in.
+module sleeve_rear_lead_cavity_local(
+    profile, rear_profile, y0, depth) {
+    lead_y = y0 + depth - sleeve_rear_lead_len;
+    rear_y = y0 + depth;
+
+    hull() {
+        extrude_xz_profile_y(
+            profile, lead_y - epsilon, 2 * epsilon);
+        extrude_xz_profile_y(
+            rear_profile, rear_y - epsilon, 2 * epsilon);
+    }
+}
+
+// The legacy tray outline includes its clearance allowance on only the right
+// side. Center this comparison sleeve's floor on the measured Green instead,
+// so its roof, wall borders, and honeycomb are true left/right mirrors.
+module green_sleeve_floor_2d() {
+    outer_w = green_inner_w + 2 * wall_thickness;
+    outer_x = green_x + green_w / 2 - outer_w / 2;
+    outer_y = face_thickness - 0.20;
+    outer_d = green_inner_d + (green_y - face_thickness)
+              + wall_thickness;
+    cut_w = green_inner_w - 2 * green_honeycomb_inset;
+    cut_x = green_x + green_w / 2 - cut_w / 2;
+    cut_y = green_y + green_honeycomb_inset;
+    cut_d = green_inner_d - 2 * green_honeycomb_inset;
+
+    difference() {
+        translate([outer_x, outer_y])
+            rounded_rect_2d(outer_w, outer_d, tray_corner_r);
+
+        translate([cut_x, cut_y])
+            honeycomb_openings_2d(
+                cut_w, cut_d,
+                green_honeycomb_pitch, green_honeycomb_wall);
+
+        for (x = green_mount_x)
+            for (y = green_mount_y)
+                translate([x, y])
+                    circle(d = green_mount_hole_d, $fn = 28);
+    }
+}
+
+module green_sleeve_floor_full() {
+    linear_extrude(height = green_device_z)
+        green_sleeve_floor_2d();
+}
+
+// Thin honeycomb roof with a shallow rear underside flare. The flare gives a
+// rear-loaded device a forgiving start, then closes to the selected snug fit
+// over the forward portion of the sleeve.
+module sleeve_roof_panel_local(
+    x0, y0, width, depth, z0, thickness,
+    pitch, wall, border, corner_r) {
+    difference() {
+        translate([x0, y0, z0])
+            linear_extrude(height = thickness)
+                rounded_rect_2d(width, depth, corner_r);
+
+        translate([x0 + border, y0 + border, z0 - epsilon])
+            linear_extrude(height = thickness + 2 * epsilon)
+                honeycomb_openings_2d(
+                    width - 2 * border,
+                    depth - 2 * border,
+                    pitch, wall);
+
+        airframe_extrude_x(x0 - epsilon, width + 2 * epsilon)
+            polygon(points = [
+                [z0 - epsilon,
+                 y0 + depth - sleeve_rear_lead_len],
+                [z0 - epsilon, y0 + depth + epsilon],
+                [z0 + sleeve_rear_lead_relief + epsilon,
+                 y0 + depth + epsilon]
+            ]);
+    }
+}
+
+// UCG-Fiber-style rear-loading Green sleeve. The full raised honeycomb is the
+// lower skin; two perforated walls carry a honeycomb roof at the exact 1U-safe
+// device height. Only the low front stop remains, leaving the rear open for
+// axial installation and connector access.
+module retention_green_ventilated_sleeve_local() {
+    outer_w = green_inner_w + 2 * wall_thickness;
+    outer_left = green_x + green_w / 2 - outer_w / 2;
+    outer_right = outer_left + outer_w;
+    sleeve_y0 = face_thickness - 0.20;
+    sleeve_depth = green_inner_d + (green_y - face_thickness)
+                   + wall_thickness;
+    wall_z0 = base_thickness - 0.20;
+    roof_z0 = green_device_z + green_h;
+    roof_top = roof_z0 + sleeve_roof_t;
+    inner_left = green_x + friction_interference;
+    inner_right = green_x + green_w - friction_interference;
+    cover_outset = (green_cover_w - green_w) / 2;
+    cover_left = green_x - cover_outset
+                 + sleeve_green_interference;
+    cover_right = green_x + green_w + cover_outset
+                  - sleeve_green_interference;
+    base_grip_top = green_device_z + green_lower_base_h;
+    cover_relief_top = base_grip_top + green_cover_relief_h;
+    wall_height = roof_top - wall_z0;
+    cavity_profile = [
+        [inner_left, wall_z0 - epsilon],
+        [inner_right, wall_z0 - epsilon],
+        [inner_right, base_grip_top],
+        [cover_right, cover_relief_top],
+        [cover_right, roof_top + epsilon],
+        [cover_left, roof_top + epsilon],
+        [cover_left, cover_relief_top],
+        [inner_left, base_grip_top]
+    ];
+    rear_cavity_profile = [
+        [inner_left - sleeve_rear_lead_relief,
+         wall_z0 - epsilon],
+        [inner_right + sleeve_rear_lead_relief,
+         wall_z0 - epsilon],
+        [inner_right + sleeve_rear_lead_relief,
+         base_grip_top],
+        [cover_right + sleeve_rear_lead_relief,
+         cover_relief_top],
+        [cover_right + sleeve_rear_lead_relief,
+         roof_top + epsilon],
+        [cover_left - sleeve_rear_lead_relief,
+         roof_top + epsilon],
+        [cover_left - sleeve_rear_lead_relief,
+         cover_relief_top],
+        [inner_left - sleeve_rear_lead_relief,
+         base_grip_top]
+    ];
+
+    union() {
+        green_sleeve_floor_full();
+        friction_end_stops_local(include_rear = false);
+
+        difference() {
+            union() {
+                sleeve_profiled_side_wall_x(
+                    [
+                        [outer_left, wall_z0],
+                        [inner_left, wall_z0],
+                        [inner_left, base_grip_top],
+                        [cover_left, cover_relief_top],
+                        [cover_left, roof_top],
+                        [outer_left, roof_top]
+                    ],
+                    sleeve_y0, sleeve_depth,
+                    outer_left,
+                    max(inner_left, cover_left) - outer_left,
+                    wall_z0, wall_height,
+                    sleeve_green_side_pitch,
+                    sleeve_green_side_wall,
+                    sleeve_side_border);
+
+                sleeve_profiled_side_wall_x(
+                    [
+                        [inner_right, wall_z0],
+                        [outer_right, wall_z0],
+                        [outer_right, roof_top],
+                        [cover_right, roof_top],
+                        [cover_right, cover_relief_top],
+                        [inner_right, base_grip_top]
+                    ],
+                    sleeve_y0, sleeve_depth,
+                    min(inner_right, cover_right),
+                    outer_right - min(inner_right, cover_right),
+                    wall_z0, wall_height,
+                    sleeve_green_side_pitch,
+                    sleeve_green_side_wall,
+                    sleeve_side_border);
+            }
+
+            sleeve_rear_lead_cavity_local(
+                cavity_profile, rear_cavity_profile,
+                sleeve_y0, sleeve_depth);
+        }
+
+        sleeve_roof_panel_local(
+            outer_left, sleeve_y0,
+            outer_right - outer_left, sleeve_depth,
+            roof_z0, sleeve_roof_t,
+            sleeve_green_roof_pitch,
+            sleeve_green_roof_wall,
+            sleeve_roof_border, tray_corner_r);
+    }
+}
+
+// Matching rear-loading TP-Link sleeve. Its side-wall cavity follows all
+// three measured vertical bands before meeting a zero-gap honeycomb roof.
+// Front corner stops remain; the rear stops are intentionally omitted so the
+// splitter can slide into the one-piece tunnel.
+module retention_splitter_ventilated_sleeve_local() {
+    outer_left = -splitter_clearance - wall_thickness;
+    outer_right = splitter_w + splitter_clearance + wall_thickness;
+    inner_left = splitter_friction_interference;
+    inner_right = splitter_w - splitter_friction_interference;
+    outer_y = -splitter_clearance - wall_thickness;
+    outer_depth = splitter_inner_d + 2 * wall_thickness;
+    wall_z0 = base_thickness - 0.20;
+    lower_inner_left = inner_left - splitter_lower_bevel_relief;
+    lower_inner_right = inner_right + splitter_lower_bevel_relief;
+    lower_bevel_top = base_thickness + splitter_lower_bevel_h;
+    upper_bevel_bottom = lower_bevel_top + splitter_flat_side_h;
+    top_inner_left = splitter_upper_bevel_inset;
+    top_inner_right = splitter_w - splitter_upper_bevel_inset;
+    roof_z0 = base_thickness + splitter_h;
+    roof_top = roof_z0 + sleeve_roof_t;
+    wall_height = roof_top - wall_z0;
+    cavity_profile = [
+        [lower_inner_left, wall_z0 - epsilon],
+        [lower_inner_right, wall_z0 - epsilon],
+        [inner_right, lower_bevel_top],
+        [inner_right, upper_bevel_bottom],
+        [top_inner_right, roof_z0],
+        [top_inner_right, roof_top + epsilon],
+        [top_inner_left, roof_top + epsilon],
+        [top_inner_left, roof_z0],
+        [inner_left, upper_bevel_bottom],
+        [inner_left, lower_bevel_top]
+    ];
+    rear_cavity_profile = [
+        [lower_inner_left - sleeve_rear_lead_relief,
+         wall_z0 - epsilon],
+        [lower_inner_right + sleeve_rear_lead_relief,
+         wall_z0 - epsilon],
+        [inner_right + sleeve_rear_lead_relief,
+         lower_bevel_top],
+        [inner_right + sleeve_rear_lead_relief,
+         upper_bevel_bottom],
+        [top_inner_right + sleeve_rear_lead_relief,
+         roof_z0],
+        [top_inner_right + sleeve_rear_lead_relief,
+         roof_top + epsilon],
+        [top_inner_left - sleeve_rear_lead_relief,
+         roof_top + epsilon],
+        [top_inner_left - sleeve_rear_lead_relief,
+         roof_z0],
+        [inner_left - sleeve_rear_lead_relief,
+         upper_bevel_bottom],
+        [inner_left - sleeve_rear_lead_relief,
+         lower_bevel_top]
+    ];
+
+    union() {
+        linear_extrude(height = base_thickness)
+            splitter_tray_floor_2d();
+        splitter_end_stops_local(include_rear = false);
+
+        difference() {
+            union() {
+                sleeve_profiled_side_wall_x(
+                    [
+                        [outer_left, wall_z0],
+                        [lower_inner_left, wall_z0],
+                        [inner_left, lower_bevel_top],
+                        [inner_left, upper_bevel_bottom],
+                        [top_inner_left, roof_z0],
+                        [top_inner_left, roof_top],
+                        [outer_left, roof_top]
+                    ],
+                    outer_y, outer_depth,
+                    outer_left, top_inner_left - outer_left,
+                    wall_z0, wall_height,
+                    sleeve_splitter_side_pitch,
+                    sleeve_splitter_side_wall,
+                    sleeve_side_border);
+
+                sleeve_profiled_side_wall_x(
+                    [
+                        [lower_inner_right, wall_z0],
+                        [outer_right, wall_z0],
+                        [outer_right, roof_top],
+                        [top_inner_right, roof_top],
+                        [top_inner_right, roof_z0],
+                        [inner_right, upper_bevel_bottom],
+                        [inner_right, lower_bevel_top]
+                    ],
+                    outer_y, outer_depth,
+                    top_inner_right,
+                    outer_right - top_inner_right,
+                    wall_z0, wall_height,
+                    sleeve_splitter_side_pitch,
+                    sleeve_splitter_side_wall,
+                    sleeve_side_border);
+            }
+
+            sleeve_rear_lead_cavity_local(
+                cavity_profile, rear_cavity_profile,
+                outer_y, outer_depth);
+        }
+
+        sleeve_roof_panel_local(
+            outer_left, outer_y,
+            outer_right - outer_left, outer_depth,
+            roof_z0, sleeve_roof_t,
+            sleeve_splitter_roof_pitch,
+            sleeve_splitter_roof_wall,
+            sleeve_roof_border, tray_corner_r);
+    }
+}
+
+module retention_ventilated_sleeves_local() {
+    retention_green_ventilated_sleeve_local();
+    if (splitter_model == "tplink")
+        splitter_transform()
+            retention_splitter_ventilated_sleeve_local();
 }
 
 function chassis_depth_for_layout() =
@@ -3724,6 +4067,10 @@ module viewer_retention_hybrid_clips() {
     translate([ear_width, 0, 0]) retention_hybrid_clips_local();
 }
 
+module viewer_retention_ventilated_sleeves() {
+    translate([ear_width, 0, 0]) retention_ventilated_sleeves_local();
+}
+
 module viewer_retention_friction_sleeve() {
     translate([ear_width, 0, 0]) retention_friction_sleeve_local();
 }
@@ -3737,6 +4084,8 @@ module viewer_retention_selected(mode) {
     else if (mode == "captive_strap") viewer_retention_captive_strap();
     else if (mode == "x_cage") viewer_retention_x_cage();
     else if (mode == "hybrid_clips") viewer_retention_hybrid_clips();
+    else if (mode == "ventilated_sleeves")
+        viewer_retention_ventilated_sleeves();
     else if (mode == "friction_sleeve") viewer_retention_friction_sleeve();
 }
 
@@ -3751,10 +4100,24 @@ module viewer_mount_without_green_tray() {
     else one_piece_mount_without_green_tray();
 }
 
+module viewer_splitter_floor() {
+    if (splitter_model == "tplink")
+        translate([ear_width, 0, 0])
+            splitter_transform()
+                linear_extrude(height = base_thickness)
+                    splitter_tray_floor_2d();
+}
+
 module viewer_splitter_side_walls() {
     if (splitter_model == "tplink")
         translate([ear_width, 0, 0])
             splitter_transform() splitter_side_walls_local();
+}
+
+module viewer_splitter_end_stops() {
+    if (splitter_model == "tplink")
+        translate([ear_width, 0, 0])
+            splitter_transform() splitter_end_stops_local();
 }
 
 module viewer_green_tray_standard() {
@@ -3853,17 +4216,28 @@ module viewer_splitter() {
 
 module assembly(include_mockups = false) {
     color("white") {
-        if (viewer_retention_preview == "hybrid_clips") {
+        if (viewer_retention_preview == "hybrid_clips"
+            || viewer_retention_preview == "ventilated_sleeves") {
             if (splitter_model == "sics")
                 sics_one_piece_mock_without_green_tray();
             else
                 one_piece_mount_without_green_tray();
+            if (viewer_retention_preview == "hybrid_clips"
+                && splitter_model == "tplink")
+                translate([ear_width, 0, 0])
+                    splitter_transform()
+                        union() {
+                            linear_extrude(height = base_thickness)
+                                splitter_tray_floor_2d();
+                            splitter_end_stops_local();
+                        }
         } else if (splitter_model == "sics")
             sics_one_piece_mock();
         else
             one_piece_mount();
         if (green_tray_style == "standard"
-            && viewer_retention_preview != "hybrid_clips")
+            && viewer_retention_preview != "hybrid_clips"
+            && viewer_retention_preview != "ventilated_sleeves")
             translate([ear_width, 0, 0]) installed_green_spacers();
     }
 
@@ -3916,8 +4290,6 @@ assert(abs(hybrid_green_clip_reach
 assert(green_device_z + green_h + hybrid_green_clip_clearance
            + hybrid_green_top_ramp_h <= rack_height,
        "Green hybrid catch exceeds the 1U panel envelope");
-assert(hybrid_splitter_spring_reach == hybrid_splitter_fixed_reach,
-       "TP-Link fixed and spring catches must use equal reach");
 assert(abs(splitter_lower_bevel_h + splitter_flat_side_h
            + splitter_upper_bevel_h - splitter_h) < 0.001,
        "TP-Link measured vertical profile must equal its total height");
@@ -3929,16 +4301,15 @@ assert(splitter_lower_bevel_h < splitter_friction_grip_h,
 assert(abs(splitter_top_flat_d
            + 2 * splitter_upper_end_bevel_inset - splitter_d) < 0.001,
        "TP-Link measured top plateau must fit its published full length");
+assert(abs(splitter_top_flat_w
+           + 2 * splitter_upper_bevel_inset - splitter_w) < 0.001,
+       "TP-Link measured top plateau must fit its measured full width");
 assert(hybrid_splitter_clip_center_offset
            + hybrid_splitter_clip_len / 2
            <= splitter_top_flat_d / 2,
        "TP-Link catches must stay within the measured top plateau");
-assert(hybrid_splitter_clip_y_gap >= 0.80,
-       "TP-Link spring tongues need at least 0.8 mm end relief");
-assert(hybrid_splitter_root_top > base_thickness,
-       "TP-Link spring root must overlap the tray floor");
-assert(hybrid_splitter_arm_t >= 1.60,
-       "TP-Link wall tongue is too thin for the intended flex test");
+assert(hybrid_splitter_tower_t >= 1.20,
+       "TP-Link rigid catch towers need at least three 0.4 mm lines");
 assert(hybrid_splitter_catch_tip_t <= hybrid_splitter_catch_nose_t,
        "TP-Link catch tip cannot be thicker than its shoulder");
 assert(hybrid_splitter_catch_tip_bevel
@@ -3946,17 +4317,32 @@ assert(hybrid_splitter_catch_tip_bevel
        "TP-Link catch lead-in bevel must fit within the bearing land");
 assert(hybrid_splitter_catch_flat > hybrid_splitter_top_overlap,
        "TP-Link bearing land must begin outside the modeled top edge");
+assert(splitter_upper_bevel_inset
+           > hybrid_splitter_catch_flat - hybrid_splitter_top_overlap,
+       "TP-Link top inset must exceed the bevel-following land margin");
 assert(abs(hybrid_splitter_catch_flat
            - (hybrid_splitter_top_overlap + 0.20)) < 0.001,
        "TP-Link bearing land must begin 0.20 mm outside the modeled top edge");
-assert(abs(hybrid_splitter_fixed_reach
+assert(abs(hybrid_splitter_clip_reach
            - (splitter_upper_bevel_inset
               - splitter_friction_interference
               + hybrid_splitter_top_overlap)) < 0.001,
        "TP-Link reach must preserve the requested top overlap");
+assert(abs(hybrid_splitter_clip_clearance) < 0.001,
+       "TP-Link friction catches target zero nominal top gap");
 assert(base_thickness + splitter_h + hybrid_splitter_clip_clearance
-           + hybrid_splitter_top_ramp_h <= rack_height,
+           + hybrid_splitter_catch_nose_t <= rack_height,
        "TP-Link hybrid catch exceeds the 1U panel envelope");
+assert(green_device_z + green_h + sleeve_roof_t <= rack_height,
+       "Green sleeve roof exceeds the 1U panel envelope");
+assert(base_thickness + splitter_h + sleeve_roof_t <= rack_height,
+       "TP-Link sleeve roof exceeds the 1U panel envelope");
+assert(sleeve_rear_lead_len > 0
+           && sleeve_rear_lead_len < min(green_d, splitter_d),
+       "Sleeve rear lead-in must fit both device depths");
+assert(sleeve_green_interference >= 0
+           && sleeve_green_interference <= 0.20,
+       "Green sleeve interference is outside the coupon-scale range");
 
 assert(!(front_ethernet_enabled
          && front_keystone_side == "far_right"
@@ -4022,8 +4408,12 @@ if (part == "assembly_preview") {
     viewer_mount();
 } else if (part == "viewer_mount_without_green_tray") {
     viewer_mount_without_green_tray();
+} else if (part == "viewer_splitter_floor") {
+    viewer_splitter_floor();
 } else if (part == "viewer_splitter_side_walls") {
     viewer_splitter_side_walls();
+} else if (part == "viewer_splitter_end_stops") {
+    viewer_splitter_end_stops();
 } else if (part == "viewer_green_tray_standard") {
     viewer_green_tray_standard();
 } else if (part == "viewer_green_tray_friction") {
@@ -4084,6 +4474,8 @@ if (part == "assembly_preview") {
     viewer_retention_x_cage();
 } else if (part == "viewer_retention_hybrid_clips") {
     viewer_retention_hybrid_clips();
+} else if (part == "viewer_retention_ventilated_sleeves") {
+    viewer_retention_ventilated_sleeves();
 } else if (part == "viewer_retention_friction_sleeve") {
     viewer_retention_friction_sleeve();
 } else if (part == "viewer_enclosure_airframe") {
