@@ -344,7 +344,7 @@ RETENTION_OPTIONS = [
             "Without moving the Green or LEDs, its 1.60 mm roof uses 0.4 mm "
             "nominal vertical preload and finishes at 43.5625 mm, leaving "
             "0.8875 mm below the exact 44.45 mm / 1.750 in panel top. "
-            "Print the combined Green + PoE 10 mm rear-section vent-frame "
+            "Print the combined Green + PoE 5 mm solid-band vent-frame "
             "coupon before committing to a full plate."
         ),
     },

@@ -355,7 +355,7 @@ sleeve_green_frame_open_z = 15.0;
 sleeve_green_frame_open_h = 21.0;
 sleeve_splitter_frame_open_z = 9.0;
 sleeve_splitter_frame_open_h = 13.0;
-vent_frame_coupon_depth = 10.0;
+vent_frame_coupon_depth = 5.0;
 vent_frame_coupon_spacing = 8.0;
 
 // Optional rear dovetail gates for the rounded vent-frame cages. The wide
@@ -4572,8 +4572,8 @@ module dovetail_rail_coupon() {
 }
 
 // Low-material, production-derived cage gauges. Each coupon is the exact rear
-// 10 mm of its complete sleeve, including both side frames, floor and roof.
-// Printing the cropped opening on the build plate preserves
+// 5 mm of its complete sleeve: exactly the solid rear perimeter border before
+// any honeycomb openings begin. Printing the cropped opening on the build plate preserves
 // the faceplate-down production layer direction while testing the full device
 // width, height and local bevel profile in one short insertion.
 function green_vent_coupon_sleeve_y0() = face_thickness - 0.20;
