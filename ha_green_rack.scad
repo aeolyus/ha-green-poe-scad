@@ -322,14 +322,11 @@ sleeve_splitter_roof_pitch = 10.0;
 sleeve_splitter_roof_wall = 1.60;
 sleeve_roof_border = 5.0;
 sleeve_green_frame_end_border = 8.0;
-sleeve_green_frame_center_web = 6.0;
 sleeve_splitter_frame_end_border = 7.0;
 sleeve_green_frame_open_z = 15.0;
 sleeve_green_frame_open_h = 21.0;
-sleeve_green_frame_outer_r = 2.75;
 sleeve_splitter_frame_open_z = 9.0;
 sleeve_splitter_frame_open_h = 13.0;
-sleeve_splitter_frame_outer_r = 2.50;
 
 // Viewer-only open protective shell. Thin point-up honeycomb shear walls add
 // stiffness and edge protection without consuming the Green's 1U top gap.
@@ -3672,22 +3669,15 @@ module green_sleeve_floor_pads() {
     }
 }
 
-// Mauker-style side frame: keep a substantial tapered wall profile, round its
-// outer Y/Z silhouette, then remove one or more large capsule windows. The
-// remaining perimeter and mullion form a strong, intentional frame rather
-// than a row of isolated rectangular posts.
+// Mauker-style side frame: keep a substantial tapered wall profile and remove
+// one or more large capsule windows. The outer silhouette deliberately stays
+// square at the roof/floor seams, creating full-length, flush load paths; the
+// visible vent openings carry the generous rounded profile.
 module sleeve_profiled_side_frame_x(
     profile, y0, depth, cut_x0, cut_w,
-    z0, height, outer_corner_r, openings) {
+    openings) {
     difference() {
-        intersection() {
-            extrude_xz_profile_y(profile, y0, depth);
-            airframe_extrude_x(
-                cut_x0 - epsilon, cut_w + 2 * epsilon)
-                translate([z0, y0])
-                    rounded_rect_2d(
-                        height, depth, outer_corner_r);
-        }
+        extrude_xz_profile_y(profile, y0, depth);
 
         airframe_extrude_x(
             cut_x0 - 2 * epsilon, cut_w + 4 * epsilon)
@@ -3743,9 +3733,9 @@ module sleeve_roof_panel_local(
     }
 }
 
-// Rear-loading Green sleeve with Mauker-style rounded side frames. Two large
-// capsule vents leave most of each side open while a thick lower rail, roof
-// rail, end blocks, and center mullion create a stronger continuous frame.
+// Rear-loading Green sleeve with Mauker-style rounded side frames. One large
+// capsule vent leaves most of each side open while a thick lower rail, roof
+// rail, and end blocks create a strong continuous frame.
 // The low honeycomb and four short support pads remain beneath the device.
 module retention_green_ventilated_sleeve_local() {
     sleeve_y0 = face_thickness - 0.20;
@@ -3765,20 +3755,14 @@ module retention_green_ventilated_sleeve_local() {
     outer_right = cover_right + sleeve_green_frame_t;
     base_grip_top = green_device_z + green_lower_base_h;
     cover_relief_top = base_grip_top + green_cover_relief_h;
-    frame_height = roof_top - wall_z0;
     opening_z0 = sleeve_green_frame_open_z;
     opening_h = sleeve_green_frame_open_h;
-    opening_d = (
-        sleeve_depth - 2 * sleeve_green_frame_end_border
-        - sleeve_green_frame_center_web) / 2;
+    opening_d = sleeve_depth - 2 * sleeve_green_frame_end_border;
     opening_y0 = sleeve_y0 + sleeve_green_frame_end_border;
-    frame_openings = [
-        [opening_z0, opening_y0,
-         opening_h, opening_d, opening_h / 2],
-        [opening_z0,
-         opening_y0 + opening_d + sleeve_green_frame_center_web,
-         opening_h, opening_d, opening_h / 2]
-    ];
+    frame_openings = [[
+        opening_z0, opening_y0,
+        opening_h, opening_d, opening_h / 2
+    ]];
     left_profile = [
         [outer_left, wall_z0],
         [inner_left, wall_z0],
@@ -3807,16 +3791,12 @@ module retention_green_ventilated_sleeve_local() {
                     sleeve_y0, sleeve_depth,
                     outer_left,
                     max(inner_left, cover_left) - outer_left,
-                    wall_z0, frame_height,
-                    sleeve_green_frame_outer_r,
                     frame_openings);
                 sleeve_profiled_side_frame_x(
                     right_profile,
                     sleeve_y0, sleeve_depth,
                     min(inner_right, cover_right),
                     outer_right - min(inner_right, cover_right),
-                    wall_z0, frame_height,
-                    sleeve_green_frame_outer_r,
                     frame_openings);
             }
 
@@ -3881,7 +3861,6 @@ module retention_splitter_ventilated_sleeve_local() {
     top_inner_right = splitter_w - splitter_upper_bevel_inset;
     roof_z0 = base_thickness + splitter_h;
     roof_top = roof_z0 + sleeve_roof_t;
-    frame_height = roof_top - wall_z0;
     frame_openings = [[
         sleeve_splitter_frame_open_z,
         outer_y + sleeve_splitter_frame_end_border,
@@ -3918,16 +3897,12 @@ module retention_splitter_ventilated_sleeve_local() {
                     left_profile,
                     outer_y, outer_depth,
                     outer_left, top_inner_left - outer_left,
-                    wall_z0, frame_height,
-                    sleeve_splitter_frame_outer_r,
                     frame_openings);
                 sleeve_profiled_side_frame_x(
                     right_profile,
                     outer_y, outer_depth,
                     top_inner_right,
                     outer_right - top_inner_right,
-                    wall_z0, frame_height,
-                    sleeve_splitter_frame_outer_r,
                     frame_openings);
             }
 

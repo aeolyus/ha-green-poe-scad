@@ -322,8 +322,8 @@ RETENTION_OPTIONS = [
         "printable": False,
         "note": (
             "Mauker/UCG-inspired rear-loading concept for TP-Link layouts: "
-            "thick rounded side frames surround two capsule vents beside the "
-            "Green and one long capsule vent beside the TP-Link. The broad "
+            "thick rounded side frames surround one long capsule vent beside "
+            "each device. The broad "
             "lower rails and 5 mm roof borders stiffen the honeycomb cage, "
             "while the Green keeps its low honeycomb and four raised pads. "
             "The rear cavity and roof flare over 6 mm for insertion; there "
