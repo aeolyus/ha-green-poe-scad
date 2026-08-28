@@ -24,6 +24,18 @@ VIEWER = ROOT / "viewer"
 
 FRICTION_SUPPORT_OPTIONS = [
     {
+        "id": "raised",
+        "label": "Unified raised deck",
+        "filename": "viewer_green_tray_friction_raised.stl",
+        "material_name": "Green tray friction — unified raised deck",
+        "roughness": 0.62,
+        "note": (
+            "The original thin honeycomb is lifted directly to the Green's "
+            "seating plane. It removes the four riser columns and aligns with "
+            "the raised TP-Link floor and bridge. This is the production choice."
+        ),
+    },
+    {
         "id": "full",
         "label": "Full honeycomb",
         "filename": "viewer_green_tray_friction_full.stl",
@@ -44,7 +56,7 @@ FRICTION_SUPPORT_OPTIONS = [
         "note": (
             "The original 3 mm honeycomb floor stays low while four broad "
             "lands at the factory mounting locations carry the Green at its "
-            "normal height. This is the selected production support."
+            "normal height. Retained as the previous production comparison."
         ),
     },
     {
@@ -323,9 +335,9 @@ RETENTION_OPTIONS = [
         "note": (
             "Mauker/UCG-inspired rear-loading concept for TP-Link layouts: "
             "thick rounded side frames surround one long capsule vent beside "
-            "each device. The broad "
-            "lower rails and 5 mm roof borders stiffen the honeycomb cage, "
-            "while the Green keeps its low honeycomb and four raised pads. "
+            "each device. Both thin honeycomb floors and the connecting "
+            "bridge share the Green's seating height, eliminating separate "
+            "riser columns. "
             "The rear cavity and roof flare over 6 mm for insertion; there "
             "are no relief cuts, springs, or moving latches."
         ),
@@ -334,8 +346,8 @@ RETENTION_OPTIONS = [
         "id": "friction_sleeve",
         "label": "Integrated raised-tray friction fit",
         "short_label": "Tray friction fit",
-        "filename": "viewer_green_tray_friction_full.stl",
-        "material_name": "Green tray friction — full honeycomb",
+        "filename": "viewer_green_tray_friction_raised.stl",
+        "material_name": "Green tray friction — unified raised deck",
         "color": (16, 185, 129, 0),
         "highlight": (16, 185, 129, 255),
         "roughness": 0.62,
@@ -346,7 +358,8 @@ RETENTION_OPTIONS = [
             "Green with a close interference fit. A 3 mm lead-in chamfer "
             "guides insertion without localized ribs, tabs, or clips. The "
             "support remains fused into the tray at the normal LED height, "
-            "with Four pads selected and full-honeycomb/open-frame variants "
+            "with Unified raised deck selected and full-honeycomb, four-pad, "
+            "and open-frame variants "
             "available for comparison. There is no separate sleeve to print. "
             "Print the fit coupon before the full plate and check for surface "
             "scuffing and long-term PETG relaxation."
@@ -425,12 +438,13 @@ VARIANTS = [
         "device": "tplink",
         "device_name": "TP-Link TL-PD30G-M2",
         "label": "Balanced",
-        "setback": "47.5 mm splitter setback",
+        "setback": "47.5 mm setback · 44.5 mm / 1.75 in inside clearance",
         "dimensions": "254 W × 43 H × 131.2 D mm",
         "note": (
-            "The DC route clears at its full 10 mm radius. The orange Ethernet "
-            "route clears the panel only at about 16.2 mm rather than the "
-            "published 21 mm target, so treat this as a slim-cable test fit."
+            "The measured cable reaches a comfortable bend at 44.5 mm / "
+            "1.75 in from the panel's inside face to the splitter. The generic "
+            "viewer cable remains orange because its conservative 21 mm bend "
+            "target is larger than the physical cable requires."
         ),
     },
     {

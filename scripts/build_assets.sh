@@ -38,6 +38,7 @@ rm -f exports/core_no_shutter.* \
       exports/led_insert.stl \
       exports/led_fixed_window_kit.* \
       exports/led_insert_no_shutter.stl \
+      exports/one_piece_rear_cable_friendly_friction_pads_no_shutter_flat_face.* \
       exports/*_front_ethernet*_no_shutter.* \
       exports/logo_inlay_front_ethernet*.stl \
       exports/*_logo_inlay_front_ethernet*.stl \
@@ -47,7 +48,7 @@ rm -f exports/core_no_shutter.* \
 rm -f renders/front_ethernet_far_right_no_shutter.png
 
 # Canonical production files inherit the SCAD defaults without overrides:
-# cable-friendly rear entry, four-pad Green friction tray, plain face,
+# cable-friendly rear entry, unified raised Green friction deck, plain face,
 # open LED aperture with no lens or shutter, and no chassis.
 canonical_stl_parts=(
   core
@@ -68,7 +69,7 @@ for part_name in "${canonical_stl_parts[@]}"; do
     -D "part=\"${part_name}\"" ha_green_rack.scad
 done
 cp exports/one_piece.stl \
-   exports/one_piece_rear_cable_friendly_friction_pads_no_shutter_flat_face.stl
+   exports/one_piece_rear_cable_friendly_friction_raised_no_shutter_flat_face.stl
 
 # Optional translucent insert for users who prefer a covered LED window. The
 # production plate itself remains a bare aperture.
@@ -191,7 +192,7 @@ for part_name in green_hybrid_clip_coupon splitter_hybrid_clip_coupon hybrid_cli
     -D "part=\"${part_name}\"" ha_green_rack.scad
 done
 cp exports/one_piece.3mf \
-   exports/one_piece_rear_cable_friendly_friction_pads_no_shutter_flat_face.3mf
+   exports/one_piece_rear_cable_friendly_friction_raised_no_shutter_flat_face.3mf
 for part_name in x2d_plate one_piece; do
   run_openscad -o "exports/${part_name}_legacy_screw_tray.3mf" \
     -D "part=\"${part_name}\"" \
@@ -254,7 +255,7 @@ run_openscad -o exports/keystone_fit_test.3mf \
 run_openscad -o viewer/assembly_preview.3mf \
   -D 'part="assembly_preview"' ha_green_rack.scad
 
-for part_name in mount mount_without_green_tray splitter_floor splitter_end_stops splitter_side_walls green_tray_standard green_tray_friction green_tray_friction_full green_tray_friction_pads green_tray_friction_skeletal insert shutter_open shutter_closed shutter_retainer logo green splitter ports green_ports splitter_ports internal_data_cable input_data_cable dc_cable fasteners rulers led_power led_activity led_health; do
+for part_name in mount mount_without_green_tray splitter_floor splitter_end_stops splitter_side_walls green_tray_standard green_tray_friction green_tray_friction_raised green_tray_friction_full green_tray_friction_pads green_tray_friction_skeletal insert shutter_open shutter_closed shutter_retainer logo green splitter ports green_ports splitter_ports internal_data_cable input_data_cable dc_cable fasteners rulers led_power led_activity led_health; do
   run_openscad -o "viewer/viewer_${part_name}.stl" \
     -D "part=\"viewer_${part_name}\"" \
     -D 'led_shutter_enabled=true' ha_green_rack.scad

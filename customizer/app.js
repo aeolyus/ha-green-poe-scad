@@ -2,7 +2,7 @@
 
 import { validateBinaryStl } from "./mesh-codec.js";
 
-const SOURCE_VERSION = "ffad5e0fbf485ea4b1fd810092395599d612be721e6de51a720178aef443a667";
+const SOURCE_VERSION = "afb8e297110438eac716f609cfe4bfc32e2032752f86c38c973bf8427b6fb592";
 const GENERATOR_CACHE_VERSION = "2";
 const CACHE_DATABASE = "ha-green-rack-customizer-v1";
 const CACHE_STORE = "artifacts";
@@ -12,7 +12,7 @@ const DEFAULTS = Object.freeze({
   customSetback: 60,
   ethernetEntry: "rear",
   frontPosition: "right",
-  trayStyle: "friction_pads",
+  trayStyle: "friction_raised",
   greenClearance: 0.5,
   greenInterference: 0.1,
   splitterClearance: 0.4,
@@ -30,7 +30,7 @@ const DEFAULTS = Object.freeze({
 const LABELS = {
   spacing: {
     compact: "Compact · 35 mm",
-    balanced: "Balanced · 47.5 mm",
+    balanced: "Balanced · 1.75 in clear",
     cable_friendly: "Cable-friendly · 60 mm",
     custom: "Custom",
   },
@@ -40,6 +40,7 @@ const LABELS = {
     left: "Left",
   },
   trayStyle: {
+    friction_raised: "Friction fit · unified raised deck",
     friction_pads: "Friction fit · four pads",
     friction_full: "Friction fit · full honeycomb",
     friction_skeletal: "Friction fit · open frame",
@@ -228,7 +229,7 @@ function viewerHash(config, embedded = false) {
   const g = config.geometry;
   const v = config.viewer;
   const frontMap = { right: "center", far_right: "ha_right", left: "left" };
-  const supportMap = { friction_pads: "pads", friction_full: "full", friction_skeletal: "skeletal", standard: "pads" };
+  const supportMap = { friction_raised: "raised", friction_pads: "pads", friction_full: "full", friction_skeletal: "skeletal", standard: "raised" };
   const spacing = ["compact", "balanced", "cable_friendly"].includes(g.spacing) ? g.spacing : "cable_friendly";
   const params = new URLSearchParams({
     splitter: "tplink",
@@ -330,7 +331,7 @@ function validate(config) {
   if (g.part === "one_piece") messages.push("The one-piece face is 254 mm wide. On an X2D, center it carefully and use no brim; choose the split plate if the slicer rejects the 1 mm side margins.");
   if (g.ethernetEntry === "front" && g.frontKeystoneSide === "far_right" && g.part !== "one_piece") messages.push("The HA-right keystone occupies the detachable ear joint, so this combination must use the one-piece output.");
   if (g.spacing === "compact") messages.push("Compact spacing violates the modeled straight-cable bend targets and is a comparison, not a recommended production choice.");
-  if (g.spacing === "balanced") messages.push("Balanced spacing needs a slim Ethernet cable and remains a physical test fit.");
+  if (g.spacing === "balanced") messages.push("Balanced provides 44.5 mm / 1.75 in from the panel's inside face to the splitter and has been physically checked with the current flexible cable.");
   if (g.spacing === "custom") messages.push("Custom setback values have not been collision-validated by this page.");
   if (g.ethernetEntry === "front" && g.frontKeystoneSide === "left" && setback < 89) messages.push("The left front keystone needs an 89 mm splitter setback for the validated cable path.");
   if (g.greenTrayStyle.startsWith("friction")) messages.push("Print the Green and TP-Link friction coupons before committing to the full plate.");

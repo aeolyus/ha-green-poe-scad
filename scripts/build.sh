@@ -255,7 +255,7 @@ build_shared_viewer_trays() {
 
 build_friction_tray_variants() {
   local part_name
-  for part_name in green_tray_friction green_tray_friction_full green_tray_friction_pads green_tray_friction_skeletal; do
+  for part_name in green_tray_friction green_tray_friction_raised green_tray_friction_full green_tray_friction_pads green_tray_friction_skeletal; do
     launch_scad "viewer/viewer_${part_name}.stl" \
       -D "part=\"viewer_${part_name}\""
   done

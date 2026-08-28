@@ -9,13 +9,13 @@ Designed for:
 - TP-Link TL-PD30G-M2 2.5G PoE+ splitter (80.8 mm published overall length; the physical unit measured a 67.47 × 47.63 mm top plateau, 53.98 mm maximum width, and 23.81 mm height)
 - Bambu Lab X2D
 
-The canonical printable edition is the final selected design: **rear cable entry, 60 mm cable-friendly splitter setback, an integrated Green friction tray with four raised support pads, a plain front with no logo, an open LED viewing aperture with no shutter or lens, visible LEDs, and no surrounding chassis**. The unqualified `core`, `one_piece`, and `x2d_plate` exports all use that combination.
+The canonical printable edition is the final selected design: **rear cable entry, 60 mm cable-friendly splitter setback, a thin unified raised honeycomb deck with direct Green friction fit, a plain front with no logo, an open LED viewing aperture with no shutter or lens, visible LEDs, and no surrounding chassis**. The unqualified `core`, `one_piece`, and `x2d_plate` exports all use that combination.
 
-Smooth continuous tray walls target a light 0.10 mm-per-side friction fit around the physically measured 109.54 mm lower footprint, then flare outward around Home Assistant's published 112 mm maximum cover envelope. Low front/rear stops resist sliding without localized ribs, tabs, or clips. Four broad lands centered on the factory mounting locations carry the Green at the normal 9.025 mm device height while the original 3 mm ventilated honeycomb floor remains low and open. The support and walls are fused into the mount; there is no separate sleeve or Green mounting hardware.
+Smooth continuous tray walls target a light 0.10 mm-per-side friction fit around the physically measured 109.54 mm lower footprint, then flare outward around Home Assistant's published 112 mm maximum cover envelope. Low front/rear stops resist sliding without localized ribs, tabs, or clips. The original 3 mm ventilated honeycomb is translated upward so its top is the normal 9.025 mm device seating plane; the open space below replaces the former four riser columns without filling the tray solid. Annular lands preserve the optional factory screw-hole locations. The Green floor, TP-Link floor, and connecting bridge all share this height, and everything remains fused into the mount.
 
 All device ports face the rear. The TP-Link splitter sits straight on the left with its POWER+DATA IN port toward the rack rear. Its cradle follows the enclosure's symmetric 2.78 mm top and bottom bevel traversals, maintains a conservative 0.05 mm-per-side fit through the profile, and uses four low corner stops that leave both connector centers open. Its LAN/DC outputs face the front internally, and both short jumpers route through the open lane between the two trays before reaching the Green's rear ports.
 
-The front is solid, word-free, logo-free, and has no decorative vents. Its outside corners and exposed tray edges are rounded. Cooling remains open where it matters: the Green's top is unobstructed, the low 15 mm-pitch Green honeycomb ties the tray together below the four pads, and the narrower splitter shelf uses a 10 mm-pitch honeycomb inside its friction walls. The exposed triangular tray braces remain removed.
+The front is solid, word-free, logo-free, and has no decorative vents. Its outside corners and exposed tray edges are rounded. Cooling remains open where it matters: the Green's top is unobstructed, the raised 15 mm-pitch Green honeycomb supports it directly, and the narrower splitter shelf uses a 10 mm-pitch honeycomb inside its friction walls. The exposed triangular tray braces remain removed.
 
 The 15 mm Green pattern is in the same visual scale as the linked UCG-Fiber rack mount and slightly finer than the larger cells visible on the linked USW-Lite-8 PoE enclosure. The TP-Link uses smaller cells because its clear shelf width is only about 42 mm; repeating the 15 mm grid there would leave too few load-sharing junctions.
 
@@ -41,9 +41,9 @@ The updated mockups use a conservative 25 mm external straight-RJ45 boot envelop
 
 The webpage compares three rear-entry TP-Link placements, three front-Ethernet editions, and one SICSOLINK cable-routing mockup:
 
-- **Compact, 35 mm setback:** the collision-aware orange mockups avoid passing through the panel, but require approximately 3.7 mm Ethernet and 7.6 mm DC bend radii; visual comparison only
-- **Balanced, 47.5 mm setback:** DC clears at its full 10 mm radius; the orange Ethernet route clears only by tightening to about 16.2 mm instead of the 21 mm target, so it remains a slim-cable test fit
-- **Cable-friendly, 60 mm setback:** current printable layout; separate cable lanes avoid the panel, devices, and each other while preserving the full 21 mm Ethernet and 10 mm DC bend radii
+- **Compact, 35 mm setback:** 32 mm / 1.26 in from the panel's inside face to the splitter, leaving about 7 mm / 0.28 in after the modeled 25 mm boot; the collision-aware orange mockups require approximately 3.7 mm Ethernet and 7.6 mm DC bend radii, so this remains a visual comparison
+- **Balanced, 47.5 mm setback:** 44.5 mm / 1.75 in of inside clearance, leaving about 19.5 mm / 0.77 in after the modeled boot; Richard's actual flexible cable was comfortable at this spacing, although the conservative generic Ethernet mockup remains orange because it targets a larger 21 mm bend radius
+- **Cable-friendly, 60 mm setback:** current printable layout; 57 mm / 2.24 in of inside clearance leaves about 32 mm / 1.26 in after the modeled boot, and separate cable lanes preserve the full 21 mm Ethernet and 10 mm DC bend radii
 - **Front Ethernet — center gap, 60 mm setback:** the jack sits between the plain left face area and LED window while three layered cable paths preserve the modeled bend radii without increasing printed depth
 - **Front Ethernet — HA right, 60 mm setback:** the jack sits physically to the right of the Green, while a full-radius PoE route loops behind the devices; this is a one-piece-only edition because the keystone occupies the detachable right-ear joint zone
 - **Front Ethernet — left, 89 mm setback:** alternate jack in the left face area; the splitter moves 29 mm rearward so the straight PoE jumper can rise over it safely
@@ -75,13 +75,13 @@ Status: the generated geometry is manifold and dimensionally checked, but the fi
 
 Open `viewer/interactive_viewer.html` in a web browser and choose the splitter, rear/front Ethernet entry, applicable spacing or front-jack position, retention, and optional protection. Those decisions map to the seven modeled layouts: Compact, Balanced, Cable-friendly, Front–center gap, Front–HA right, Front–left, and the angled SICSOLINK cable example. SICSOLINK is an advanced viewer-only study; choosing it disables the TP-Link-only controls without erasing their dormant selections. You can rotate, zoom, or jump between front, rear, top, perspective, retention-detail, and LED-window views. The page is fully self-contained, works offline, and records its selections in the URL hash so a configuration can be bookmarked or shared.
 
-The default view matches the production choice: TP-Link, rear Ethernet, Cable-friendly spacing, raised-tray friction retention with **Four pads**, open trays with no chassis, no logo, no shutter hardware, visible simulated LEDs, and auto-rotation off. The comparison controls can still show the alternate supports, logo, captive shutter, front-entry layouts, other retention studies, and ventilated chassis. Those toggles do not change which files are canonical.
+The default view matches the production choice: TP-Link, rear Ethernet, Cable-friendly spacing, tray friction retention with **Unified raised deck**, open trays with no chassis, no logo, no shutter hardware, visible simulated LEDs, and auto-rotation off. The comparison controls can still show the alternate supports, logo, captive shutter, front-entry layouts, other retention studies, and ventilated chassis. Those toggles do not change which files are canonical.
 
-The **Retention** controls compare the selected integrated friction tray with the earlier M3-screw baseline and other studies. **Hybrid top clips · Green + PoE** keeps the Green's fixed/releasable catch arrangement, while the TP-Link now uses four mirrored rigid catches grown directly from continuous mini walls with no relief cuts or spring tongues. **Rounded vent-frame cages · Green + PoE** is a separate rear-loading comparison inspired by the UCG-Fiber, USW-Lite, and Mauker Chromebox enclosure patterns: honeycomb floors and roofs meet thick rounded side frames with one long capsule vent beside each device. The front stops remain and the rear stays open for insertion and cabling. The Four pads friction tray remains the production geometry until a comparison is physically validated.
+The **Retention** controls compare the selected integrated friction tray with the earlier M3-screw baseline and other studies. **Hybrid top clips · Green + PoE** keeps the Green's fixed/releasable catch arrangement, while the TP-Link now uses four mirrored rigid catches grown directly from continuous mini walls with no relief cuts or spring tongues. **Rounded vent-frame cages · Green + PoE** is a separate rear-loading comparison inspired by the UCG-Fiber, USW-Lite, and Mauker Chromebox enclosure patterns: honeycomb floors and roofs meet thick rounded side frames with one long capsule vent beside each device. The front stops remain and the rear stays open for insertion and cabling. The unified raised deck remains the production geometry until a comparison is physically validated.
 
-The support selector switches among three complete, mutually exclusive friction-tray meshes without reloading the GLB. **Four pads** is the selected production geometry: the low 3 mm honeycomb floor remains ventilated while four broad lands carry the Green. **Full honeycomb** raises the complete lattice and perimeter to the seating plane; **Open frame** replaces the floor with a perimeter, two transverse load paths, a center spine, and the same four lands. Every version includes the same fused friction walls and low stops, with the rear center open for ports and cable service.
+The support selector switches among four complete, mutually exclusive friction-tray meshes without reloading the GLB. **Unified raised deck** is selected: it lifts the original thin 3 mm honeycomb directly to the seating plane and leaves the volume below open. **Four pads** retains the earlier low floor and four raised lands; **Full honeycomb** fills the complete lattice and perimeter up to the seating plane; **Open frame** replaces the floor with a perimeter, two transverse load paths, a center spine, and four lands. Every version includes the same fused friction walls and low stops, with the rear center open for ports and cable service.
 
-The comparison models do not replace tolerance coupons, material-specific clearance tuning, or a physical pull/rattle test. The final Four pads geometry is printable but still needs that physical validation because this is a new design.
+The comparison models do not replace tolerance coupons, material-specific clearance tuning, or a physical pull/rattle test. The unified raised-deck geometry is printable but still needs that physical validation because this is a new design.
 
 The **Optional protection** control compares the default open tray with a ventilated full-width 1U chassis. The chassis adds a removable perforated top-and-side cover plus a low guide frame, enclosing the complete assembly while keeping the rear open for cables. It costs more material and print time than the open tray and has only 0.975 mm nominal clearance above the Green, so it remains a fit-sensitive viewer study. The chassis control is disabled for the above-device captive-strap, X-cage, and ventilated-sleeve concepts because those mechanisms consume the same 1U roof clearance. It is off in existing links unless `protection=airframe` is selected.
 
@@ -98,7 +98,7 @@ work when the HTML file is opened directly, but browsers block module workers
 under `file://`. Review `customizer/vendor/README.md` before public distribution
 of the experimental GPL-2.0 runtime.
 
-The cable models use straight—not right-angle—RJ45 and DC plugs. Orange internal cables identify bend-radius violations; normal blue/black cables meet the modeled envelope. When visible, the window simulates the Green's steady white power light, irregular green activity, and a two-flash yellow heartbeat; timing is illustrative rather than a diagnostic code. Gold three-dimensional rulers use 10 mm ticks, and the page reports the exact 254 mm width, 43 mm height, and layout-specific printed depth. The viewer depicts the one-piece faceplate, so it has no detachable-ear joining bosses. Each of the seven layouts has two GLBs—shutter comparison and open-window/no-shutter—for 14 primary comparison models. Every GLB contains the standard tray, all three mutually exclusive raised-friction tray meshes, the other retention overlays, and its layout-specific optional airframe at the same normal Green/LED coordinates, so switching retention, support style, or protection does not reload or reposition the model. The no-shutter GLBs omit the insert and shutter meshes entirely, leaving the bare aperture. `viewer/home-assistant-green-rack-preview.glb` is the cable-friendly open-window alias; `viewer/home-assistant-green-rack-preview-no_shutter.glb` is retained for compatibility, and `viewer/home-assistant-green-rack-preview-with_shutter.glb` is explicit.
+The cable models use straight—not right-angle—RJ45 and DC plugs. Orange internal cables identify bend-radius violations; normal blue/black cables meet the modeled envelope. When visible, the window simulates the Green's steady white power light, irregular green activity, and a two-flash yellow heartbeat; timing is illustrative rather than a diagnostic code. Gold three-dimensional rulers use 10 mm ticks, and the page reports the exact 254 mm width, 43 mm height, layout-specific printed depth, and panel-to-splitter clearance in millimeters and inches. The viewer depicts the one-piece faceplate, so it has no detachable-ear joining bosses. Each of the seven layouts has two GLBs—shutter comparison and open-window/no-shutter—for 14 primary comparison models. Every GLB contains the standard tray, all four mutually exclusive friction-tray meshes, the other retention overlays, and its layout-specific optional airframe at the same normal Green/LED coordinates, so switching retention, support style, or protection does not reload or reposition the model. The no-shutter GLBs omit the insert and shutter meshes entirely, leaving the bare aperture. `viewer/home-assistant-green-rack-preview.glb` is the cable-friendly open-window alias; `viewer/home-assistant-green-rack-preview-no_shutter.glb` is retained for compatibility, and `viewer/home-assistant-green-rack-preview-with_shutter.glb` is explicit.
 
 The colored Home Assistant Green, TP-Link splitter, connector faces, and cables in these preview files are dimensional mockups only and are not part of the printable plate.
 
@@ -106,7 +106,7 @@ The viewer is a hand-built HTML page using Google's open-source `<model-viewer>`
 
 ## Parts
 
-- `core.stl` — canonical split-core mount: rear entry, Four pads friction tray, plain face, and open LED aperture
+- `core.stl` — canonical split-core mount: rear entry, unified raised friction deck, plain face, and open LED aperture
 - `one_piece.stl` / `.3mf` — the same canonical mount as one 254 mm-wide part, without detachable ears or rear joining bosses
 - `x2d_plate.stl` / `.3mf` — canonical split core and both ears nested for the X2D dual-nozzle area
 - `left_ear.stl` / `right_ear.stl` — detachable rack ears for `core.stl`
@@ -124,7 +124,7 @@ Clearly named optional exports:
 - `*_legacy_screw_tray.*` and `green_spacer*_legacy_screw_tray.*` — prior four-screw Green tray fallback
 - `core_with_logo.*`, `one_piece_with_logo.*`, `x2d_plate_with_logo.*`, `logo_inlay_optional.stl`, and `one_piece_logo_inlay_optional.stl` — optional branded-face study; the inlay only fits a matching `_with_logo` mount
 - `core_with_shutter.*`, `one_piece_with_shutter.*`, `x2d_plate_with_shutter.*`, and `led_shutter_*_optional.*` — optional captive-shutter study
-- `*_front_ethernet_right.*`, `*_front_ethernet_left.*`, and `one_piece_front_ethernet_far_right.*` — optional front-entry comparisons, all otherwise inheriting the final Four pads/plain-face/open-aperture defaults
+- `*_front_ethernet_right.*`, `*_front_ethernet_left.*`, and `one_piece_front_ethernet_far_right.*` — optional front-entry comparisons, all otherwise inheriting the unified-raised-deck/plain-face/open-aperture defaults
 - `keystone_fit_test.stl` / `.3mf` — front-keystone latch coupon
 - The HA-right front-entry comparison is one-piece-only because its keystone occupies the detachable right-ear joint zone
 
@@ -138,9 +138,9 @@ Viewer and render artifacts:
 - Every viewer layout has both a shutter comparison GLB and a paired `-no_shutter.glb` bare-aperture GLB with no lens mesh
 - `viewer/home-assistant-green-rack-front_ethernet.glb` and its no-shutter counterpart are compatibility aliases of the center-gap GLBs
 - `viewer/home-assistant-green-rack-sics_angled.glb` — viewer-only angled SICSOLINK mockup showing its captive cable routing
-- `viewer/viewer_green_tray_friction_full.stl`, `viewer/viewer_green_tray_friction_pads.stl`, and `viewer/viewer_green_tray_friction_skeletal.stl` — mutually exclusive complete friction-tray meshes for Full honeycomb, Four pads, and Open frame support; each includes the fused walls and stops
+- `viewer/viewer_green_tray_friction_raised.stl`, `viewer/viewer_green_tray_friction_pads.stl`, `viewer/viewer_green_tray_friction_full.stl`, and `viewer/viewer_green_tray_friction_skeletal.stl` — mutually exclusive complete friction-tray meshes for Unified raised deck, Four pads, Full honeycomb, and Open frame support; each includes the fused walls and stops
 - `viewer/viewer_retention_hybrid_clips.stl` — viewer-only combined prototype containing the complete four-pad Green top-clip tray plus TP-Link replacement side walls with four mirrored rigid catches
-- `viewer/viewer_retention_ventilated_sleeves.stl` — layout-specific rear-loading sleeve study with honeycomb roofs/floors, four Green support pads, and thick rounded side frames around large capsule vents; no springs or relief slots
+- `viewer/viewer_retention_ventilated_sleeves.stl` — layout-specific rear-loading sleeve study with aligned raised honeycomb floors and thick rounded side frames around large capsule vents; no riser columns, springs, or relief slots
 - `viewer/variants/*/viewer_enclosure_airframe.stl` — viewer-only ventilated 1U chassis study; it is not part of the printable production files
 
 The canonical core is approximately 220 × 144 mm. The one-piece faceplate is 254 mm wide and nominally fits the X2D's 256 mm main-nozzle area with only 1 mm per side; center it carefully and do not use a brim. It does not fit the 235.5 mm dual-nozzle overlap area, so `x2d_plate` remains the lower-risk fallback. The printed tray and modeled cable exits stay within the RackMate T2's approximately 240 mm internal depth.
@@ -162,8 +162,8 @@ The Green needs no mounting screws in the selected friction tray; leave its fact
 - Top/bottom shells: 5
 - Infill: 25–30% gyroid
 - Supports: none for the core; use build-plate-only support beneath the two rear tongues on each ear
-- Print `core.stl` tray-side down
-- Print `one_piece.stl` tray-side down with the main nozzle only, centered and without a brim; use the split plate if Bambu Studio rejects the 1 mm side margins
+- Print `core.stl` faceplate-down: rotate it so the broad front face lies on the build plate. The raised decks then grow edge-on from the panel instead of beginning 6.025 mm above the bed.
+- Print `one_piece.stl` faceplate-down with the main nozzle only, centered and without a brim; use the split plate if Bambu Studio rejects the 1 mm side margins
 - The same orientation applies to optional comparison mounts and the HA-right one-piece file
 - Ear and LED-insert STLs are already exported face-side down; enable support for the ear tongues
 
@@ -252,7 +252,7 @@ bash scripts/build.sh retention slide_latch
 bash scripts/build.sh full
 ```
 
-`viewer` and `glb` accept multiple variant names; omit them to rebuild every comparison layout. `glb` repacks both shutter states for each selected layout. `retention friction_sleeve` rebuilds all three shared friction support styles plus the Full honeycomb compatibility mesh. `retention hybrid_clips` rebuilds a separate overlay for every splitter setback so Compact, Balanced, and Cable-friendly cannot drift out of alignment. OpenSCAD viewer jobs run four at a time by default, adjustable with `VIEWER_BUILD_JOBS`. Partial outputs are written to temporary files and moved into place only after a successful build.
+`viewer` and `glb` accept multiple variant names; omit them to rebuild every comparison layout. `glb` repacks both shutter states for each selected layout. `retention friction_sleeve` rebuilds all four shared friction support styles plus the compatibility alias. `retention hybrid_clips` rebuilds a separate overlay for every splitter setback so Compact, Balanced, and Cable-friendly cannot drift out of alignment. OpenSCAD viewer jobs run four at a time by default, adjustable with `VIEWER_BUILD_JOBS`. Partial outputs are written to temporary files and moved into place only after a successful build.
 
 ## Licensing and attribution
 
@@ -270,6 +270,7 @@ The M3 hole pattern and spacer dimensions were independently reimplemented from 
 - [Home Assistant Green 10-inch 1U mount with editable STEP/Fusion source](https://www.printables.com/model/1752618-home-assistant-green-10-1u-rackmount-with-keystone) — a good proven-looking alternative, but it does not include this PoE splitter cradle
 - [MakerWorld 10-inch Home Assistant Green mount](https://makerworld.com/en/models/1974297-10-inch-rack-mount-for-home-assistant-green#profileId-2123231) — visual reference requested for the icon badge
 - [TP-Link TL-PD30G-M2 official specifications](https://www.tp-link.com/us/business-networking/soho-accessory/tl-pd30g-m2/)
+- [TP-Link TL-POE10R official specifications](https://www.omadanetworks.com/us/business-networking/omada-accessory-poe-adapter/tl-poe10r/) — the enclosure is nominally the same 80.8/81 × 54 × 24 mm size as the TL-PD30G-M2; the substantive differences are Ethernet speed, PoE class, and output power
 - [Simple Icons: Home Assistant](https://simpleicons.org/?q=homeassistant) — SVG geometry used for the badge; Home Assistant is a trademark of Nabu Casa
 
 This model is an independent parametric design. The references above were used to cross-check device envelopes, rack slots, cooling access, and printer fit.

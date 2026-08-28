@@ -16,7 +16,7 @@
 
 $fn = 48;
 
-// [assembly_preview, assembly, one_piece, one_piece_logo_inlay, x2d_plate, core, logo_inlay, left_ear, right_ear, led_insert, led_shutter, led_shutter_retainer, led_shutter_kit, led_fixed_window_kit, green_spacer, green_spacers_4x, fit_test, friction_fit_coupon, green_hybrid_clip_coupon, splitter_fit_coupon, splitter_hybrid_clip_coupon, hybrid_clip_coupon, keystone_fit_test, viewer_mount, viewer_mount_without_green_tray, viewer_splitter_floor, viewer_splitter_side_walls, viewer_splitter_end_stops, viewer_green_tray_standard, viewer_green_tray_friction, viewer_green_tray_friction_full, viewer_green_tray_friction_pads, viewer_green_tray_friction_skeletal, viewer_insert, viewer_shutter_open, viewer_shutter_closed, viewer_shutter_retainer, viewer_logo, viewer_green, viewer_splitter, viewer_ports, viewer_green_ports, viewer_splitter_ports, viewer_keystone_ports, viewer_data_cables, viewer_internal_data_cable, viewer_input_data_cable, viewer_dc_cable, viewer_fasteners, viewer_retention_factory_screws, viewer_retention_slide_latch, viewer_retention_corner_gate, viewer_retention_sled_gate, viewer_retention_padded_rails, viewer_retention_captive_strap, viewer_retention_x_cage, viewer_retention_hybrid_clips, viewer_retention_ventilated_sleeves, viewer_retention_friction_sleeve, viewer_enclosure_airframe, viewer_rulers, viewer_led_power, viewer_led_activity, viewer_led_health]
+// [assembly_preview, assembly, one_piece, one_piece_logo_inlay, x2d_plate, core, logo_inlay, left_ear, right_ear, led_insert, led_shutter, led_shutter_retainer, led_shutter_kit, led_fixed_window_kit, green_spacer, green_spacers_4x, fit_test, friction_fit_coupon, green_hybrid_clip_coupon, splitter_fit_coupon, splitter_hybrid_clip_coupon, hybrid_clip_coupon, keystone_fit_test, viewer_mount, viewer_mount_without_green_tray, viewer_splitter_floor, viewer_splitter_side_walls, viewer_splitter_end_stops, viewer_green_tray_standard, viewer_green_tray_friction, viewer_green_tray_friction_raised, viewer_green_tray_friction_full, viewer_green_tray_friction_pads, viewer_green_tray_friction_skeletal, viewer_insert, viewer_shutter_open, viewer_shutter_closed, viewer_shutter_retainer, viewer_logo, viewer_green, viewer_splitter, viewer_ports, viewer_green_ports, viewer_splitter_ports, viewer_keystone_ports, viewer_data_cables, viewer_internal_data_cable, viewer_input_data_cable, viewer_dc_cable, viewer_fasteners, viewer_retention_factory_screws, viewer_retention_slide_latch, viewer_retention_corner_gate, viewer_retention_sled_gate, viewer_retention_padded_rails, viewer_retention_captive_strap, viewer_retention_x_cage, viewer_retention_hybrid_clips, viewer_retention_ventilated_sleeves, viewer_retention_friction_sleeve, viewer_enclosure_airframe, viewer_rulers, viewer_led_power, viewer_led_activity, viewer_led_health]
 part = "assembly_preview";
 
 // Production geometry uses the TP-Link. Viewer-only builds may override this
@@ -29,10 +29,10 @@ splitter_model = "tplink";
 front_ethernet_enabled = false;
 front_keystone_side = "right";  // [left, right, far_right]
 
-// Green support carried by the printable mount. The production default is the
-// ventilated 3 mm honeycomb floor with four integrated support pads and smooth
-// friction-fit side walls. Legacy and comparison trays remain selectable.
-green_tray_style = "friction_pads";  // [friction_pads, standard, friction_full, friction_skeletal]
+// Green support carried by the printable mount. The production default is a
+// thin honeycomb deck raised directly to the device seating plane, eliminating
+// separate riser columns. Legacy and comparison trays remain selectable.
+green_tray_style = "friction_raised";  // [friction_raised, friction_pads, standard, friction_full, friction_skeletal]
 
 // Physical front-window choice. When false, the face has no actuator slot,
 // moving blade, or rear cartridge.
@@ -111,6 +111,8 @@ green_mount_x = [green_x + (green_w - green_mount_pitch_x) / 2,
 green_mount_y = [green_y + (green_d - green_mount_pitch_y) / 2,
                  green_y + (green_d + green_mount_pitch_y) / 2];
 green_device_z = base_thickness + green_standoff;
+unified_deck_raise = green_standoff;
+unified_deck_z0 = green_device_z - base_thickness;
 
 // TP-Link TL-PD30G-M2. TP-Link publishes 80.8 x 54 x 24 mm overall.
 // The user's physical unit measured 2 1/8 in wide, 15/16 in high, with a
@@ -155,7 +157,8 @@ splitter_y = !is_undef(splitter_y_override)
 // Approximate port centers used only for viewer cable mockups.
 splitter_lan_x = splitter_x + 15.7;
 splitter_dc_x = splitter_x + 37.3;
-splitter_port_z = base_thickness + splitter_h / 2;
+splitter_device_z = unified_deck_raise + base_thickness;
+splitter_port_z = splitter_device_z + splitter_h / 2;
 splitter_input_x = splitter_x + 31.9;
 splitter_input_y = splitter_y + splitter_d;
 
@@ -706,6 +709,8 @@ module green_tray() {
 module production_green_tray() {
     if (green_tray_style == "standard")
         green_tray();
+    else if (green_tray_style == "friction_raised")
+        green_tray_friction_raised_local();
     else if (green_tray_style == "friction_full")
         green_tray_friction_full_local();
     else if (green_tray_style == "friction_skeletal")
@@ -744,7 +749,7 @@ module green_spacers_4x() {
 }
 
 module splitter_transform() {
-    translate([splitter_x, splitter_y, 0])
+    translate([splitter_x, splitter_y, unified_deck_raise])
         children();
 }
 
@@ -890,11 +895,11 @@ module reinforcement_extrude_x(x0, thickness) {
 
 module splitter_spine_reinforcement_local(spine_x, spine_w, spine_y0) {
     rib_t = 2.0;
-    rib_z0 = base_thickness - 0.20;
-    rib_top = 8.0;
+    rib_z0 = unified_deck_raise + base_thickness - 0.20;
+    rib_top = unified_deck_raise + 8.0;
     taper_run = rib_top - rib_z0;
     taper_y0 = splitter_y - taper_run;
-    knee_top = 14.0;
+    knee_top = unified_deck_raise + 14.0;
     knee_run = knee_top - rib_top;
 
     for (x0 = [spine_x, spine_x + spine_w - rib_t]) {
@@ -960,8 +965,8 @@ module device_bridges() {
     bridge_front_y = bridge_straight_front;
     bridge_rear_y = bridge_straight_rear - bridge_web_d;
     bridge_rib_t = 2.4;
-    bridge_rib_z0 = base_thickness - 0.20;
-    bridge_rib_top = 8.0;
+    bridge_rib_z0 = unified_deck_raise + base_thickness - 0.20;
+    bridge_rib_top = unified_deck_raise + 8.0;
     spine_x = splitter_x + splitter_w / 2 - 6.0;
     spine_w = 12.0;
     spine_y0 = face_thickness - 0.20;
@@ -971,12 +976,13 @@ module device_bridges() {
             // Two flush-ended webs tie the straight inner walls together
             // without changing either tray's rounded outer silhouette.
             for (y0 = [bridge_front_y, bridge_rear_y])
-                linear_extrude(height = base_thickness)
-                    device_bridge_web_2d(
-                        y0, bridge_web_d, bridge_x, bridge_w);
+                translate([0, 0, unified_deck_z0])
+                    linear_extrude(height = base_thickness)
+                        device_bridge_web_2d(
+                            y0, bridge_web_d, bridge_x, bridge_w);
 
             // A narrow center spine carries rear-patching loads to the face.
-            translate([spine_x, spine_y0, 0])
+            translate([spine_x, spine_y0, unified_deck_z0])
                 cube([spine_w, splitter_y - face_thickness + 0.40,
                       base_thickness]);
 
@@ -1002,7 +1008,8 @@ module device_bridges() {
             bridge_front_y + (bridge_web_d - 3.2) / 2,
             bridge_rear_y + (bridge_web_d - 3.2) / 2
         ])
-            translate([bridge_x + (bridge_w - 7.5) / 2, y0, -epsilon])
+            translate([bridge_x + (bridge_w - 7.5) / 2, y0,
+                       unified_deck_z0 - epsilon])
                 cube([7.5, 3.2, base_thickness + 2 * epsilon]);
     }
 }
@@ -1857,17 +1864,17 @@ module viewer_splitter_ports(add_ear_offset = true) {
         } else {
             // TP-Link LAN OUT and DC OUT on the front-facing end.
             translate([splitter_lan_x - 8.0, splitter_y - 0.9,
-                       base_thickness + 5.0])
+                       splitter_device_z + 5.0])
                 cube([16.0, 1.8, 14.0]);
             translate([splitter_dc_x, splitter_y - 0.9, splitter_port_z])
                 rotate([90, 0, 0]) cylinder(h = 1.8, d = 8.5, $fn = 28);
 
             // TP-Link voltage selector and POWER+DATA IN on the rear-facing end.
             translate([splitter_x + 8.0, splitter_input_y - 0.9,
-                       base_thickness + 8.5])
+                       splitter_device_z + 8.5])
                 cube([9.0, 1.8, 5.0]);
             translate([splitter_input_x - 8.0, splitter_input_y - 0.9,
-                       base_thickness + 5.0])
+                       splitter_device_z + 5.0])
                 cube([16.0, 1.8, 14.0]);
         }
     }
@@ -2805,20 +2812,9 @@ module retention_x_cage_local() {
 }
 
 module friction_raised_deck_local() {
-    // Continue the exact original tray floor up to the normal Green height,
-    // rather than placing a smaller platform on top.  This makes the concept
-    // read as one thickened tray while retaining the original outer footprint,
-    // honeycomb registration and screw-hole locations.
-    //
-    // A small Z overlap makes a future production union unambiguous.  The
-    // screw-pad islands stop at the base tray: carrying them through this
-    // extension would recreate the four risers the direct-seat concept removes.
-    deck_z = base_thickness - 0.20;
-    deck_h = green_device_z - deck_z;
-
-    translate([0, 0, deck_z])
-        linear_extrude(height = deck_h)
-            green_tray_floor_2d(preserve_screw_pads = false);
+    // Compatibility name retained for older viewer exports. The current
+    // raised deck is a translated 3 mm plate, not a filled 9.025 mm lattice.
+    green_friction_deck_raised();
 }
 
 module honeycomb_tapered_openings_3d(
@@ -2948,6 +2944,16 @@ module green_friction_deck_pads() {
     }
 }
 
+// New production deck: translate the original thin honeycomb upward instead
+// of filling the volume beneath it. Its top is exactly the existing Green
+// seating plane, so the device needs no separate riser columns. Solid annular
+// lands and through holes remain available for optional screw installation.
+module green_friction_deck_raised() {
+    translate([0, 0, unified_deck_z0])
+        linear_extrude(height = base_thickness)
+            green_tray_floor_2d(preserve_screw_pads = true);
+}
+
 module green_friction_skeletal_base_2d() {
     frame_w = 5.0;
     crossbar_w = 7.0;
@@ -3003,7 +3009,9 @@ module green_friction_deck_skeletal() {
     }
 }
 
-module friction_side_walls_local(interference = friction_interference) {
+module friction_side_walls_local(
+    interference = friction_interference,
+    wall_z_override = base_thickness - 0.20) {
     outer_left = green_x - wall_thickness;
     outer_right = green_x + green_inner_w + wall_thickness;
     inner_left = green_x + interference;
@@ -3012,7 +3020,7 @@ module friction_side_walls_local(interference = friction_interference) {
     right_w = outer_right - inner_right;
     wall_y = green_y - 0.20;
     wall_d = green_inner_d + 0.20;
-    wall_z = base_thickness - 0.20;
+    wall_z = wall_z_override;
     base_grip_top = green_device_z + green_lower_base_h;
     cover_relief_top = base_grip_top + green_cover_relief_h;
     guide_top = green_device_z + friction_grip_h + friction_lead_h;
@@ -3160,6 +3168,15 @@ module green_tray_friction_local() {
 
 module green_tray_friction_full_local() {
     green_tray_friction_local();
+}
+
+module green_tray_friction_raised_local() {
+    union() {
+        green_friction_deck_raised();
+        friction_side_walls_local(
+            wall_z_override = unified_deck_z0 - 0.20);
+        friction_end_stops_local();
+    }
 }
 
 module green_tray_friction_pads_local() {
@@ -3669,6 +3686,12 @@ module green_sleeve_floor_pads() {
     }
 }
 
+module green_sleeve_floor_raised() {
+    translate([0, 0, unified_deck_z0])
+        linear_extrude(height = base_thickness)
+            green_sleeve_floor_2d(preserve_screw_pads = true);
+}
+
 // Mauker-style side frame: keep a substantial tapered wall profile and remove
 // one or more large capsule windows. The outer silhouette deliberately stays
 // square at the roof/floor seams, creating full-length, flush load paths; the
@@ -3736,12 +3759,13 @@ module sleeve_roof_panel_local(
 // Rear-loading Green sleeve with Mauker-style rounded side frames. One large
 // capsule vent leaves most of each side open while a thick lower rail, roof
 // rail, and end blocks create a strong continuous frame.
-// The low honeycomb and four short support pads remain beneath the device.
+// The thin honeycomb sits directly at the device seating plane, matching the
+// raised TP-Link floor and bridge without separate support columns.
 module retention_green_ventilated_sleeve_local() {
     sleeve_y0 = face_thickness - 0.20;
     sleeve_depth = green_inner_d + (green_y - face_thickness)
                    + wall_thickness;
-    wall_z0 = base_thickness - 0.20;
+    wall_z0 = unified_deck_z0 - 0.20;
     roof_z0 = green_device_z + green_h;
     roof_top = roof_z0 + sleeve_roof_t;
     inner_left = green_x + friction_interference;
@@ -3780,8 +3804,7 @@ module retention_green_ventilated_sleeve_local() {
         [inner_right, base_grip_top]
     ];
     union() {
-        green_sleeve_floor_pads();
-        friction_end_stop_supports_local(include_rear = false);
+        green_sleeve_floor_raised();
         friction_end_stops_local(include_rear = false);
 
         intersection() {
@@ -4198,7 +4221,11 @@ module viewer_green_tray_standard() {
 }
 
 module viewer_green_tray_friction() {
-    translate([ear_width, 0, 0]) green_tray_friction_local();
+    translate([ear_width, 0, 0]) green_tray_friction_raised_local();
+}
+
+module viewer_green_tray_friction_raised() {
+    translate([ear_width, 0, 0]) green_tray_friction_raised_local();
 }
 
 module viewer_green_tray_friction_full() {
@@ -4410,12 +4437,12 @@ assert(abs(hybrid_splitter_clip_reach
        "TP-Link reach must preserve the requested top overlap");
 assert(abs(hybrid_splitter_clip_clearance) < 0.001,
        "TP-Link friction catches target zero nominal top gap");
-assert(base_thickness + splitter_h + hybrid_splitter_clip_clearance
+assert(splitter_device_z + splitter_h + hybrid_splitter_clip_clearance
            + hybrid_splitter_catch_nose_t <= rack_height,
        "TP-Link hybrid catch exceeds the 1U panel envelope");
 assert(green_device_z + green_h + sleeve_roof_t <= rack_height,
        "Green sleeve roof exceeds the 1U panel envelope");
-assert(base_thickness + splitter_h + sleeve_roof_t <= rack_height,
+assert(splitter_device_z + splitter_h + sleeve_roof_t <= rack_height,
        "TP-Link sleeve roof exceeds the 1U panel envelope");
 assert(sleeve_rear_lead_len > 0
            && sleeve_rear_lead_len < min(green_d, splitter_d),
@@ -4424,7 +4451,7 @@ assert(sleeve_green_frame_t >= 2.20,
        "Green rounded side frames need at least 2.20 mm thickness");
 assert(sleeve_green_frame_open_h
            < green_device_z + green_h + sleeve_roof_t
-             - (base_thickness - 0.20),
+             - (unified_deck_z0 - 0.20),
        "Green capsule vents must fit inside the side-frame height");
 assert(sleeve_splitter_frame_open_h
            < base_thickness + splitter_h + sleeve_roof_t
@@ -4433,13 +4460,18 @@ assert(sleeve_splitter_frame_open_h
 assert(sleeve_green_interference >= 0
            && sleeve_green_interference <= 0.20,
        "Green sleeve interference is outside the coupon-scale range");
+assert(abs(unified_deck_z0 + base_thickness - green_device_z) < 0.001,
+       "Unified raised deck must finish at the Green seating plane");
+assert(abs(splitter_device_z - green_device_z) < 0.001,
+       "Green and TP-Link bottoms must share the unified deck height");
 
 assert(!(front_ethernet_enabled
          && front_keystone_side == "far_right"
          && (part == "core" || part == "x2d_plate")),
        "The HA-right Ethernet edition is one-piece-only; its keystone occupies the detachable right-ear joint zone.");
 
-assert(green_tray_style == "friction_pads"
+assert(green_tray_style == "friction_raised"
+       || green_tray_style == "friction_pads"
        || green_tray_style == "standard"
        || green_tray_style == "friction_full"
        || green_tray_style == "friction_skeletal",
@@ -4508,6 +4540,8 @@ if (part == "assembly_preview") {
     viewer_green_tray_standard();
 } else if (part == "viewer_green_tray_friction") {
     viewer_green_tray_friction();
+} else if (part == "viewer_green_tray_friction_raised") {
+    viewer_green_tray_friction_raised();
 } else if (part == "viewer_green_tray_friction_full") {
     viewer_green_tray_friction_full();
 } else if (part == "viewer_green_tray_friction_pads") {
