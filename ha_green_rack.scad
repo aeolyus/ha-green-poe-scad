@@ -4311,10 +4311,11 @@ module splitter_corner_l_ties_local() {
         }
 }
 
-// Raised-PoE comparison: once both cage roofs are coplanar, two short
-// inverted-U crossbars join their straight side sections. The top skins are
-// flush with both honeycomb roofs, while shallow return flanges provide much
-// more bending and torsional stiffness than flat tabs at minimal mass.
+// Raised-PoE comparison: two short inverted-U crossbars join the coplanar
+// cage roofs, and two matching sloped lower beams join the offset cage floors.
+// Together the four ties make both cages act as one frame. The upper skins
+// stay flush with both honeycomb roofs; the lower beams land directly on each
+// floor without filling the open volume between the devices.
 module unified_roof_cross_bridges_local() {
     splitter_outer_right = splitter_x + splitter_w + splitter_clearance
                            + wall_thickness;
@@ -4350,6 +4351,8 @@ module unified_roof_cross_bridges_local() {
     green_roof_top = green_roof_z0 + sleeve_roof_t;
     splitter_roof_top = splitter_device_z + splitter_h
                         + sleeve_splitter_vertical_clearance + sleeve_roof_t;
+    green_floor_z0 = unified_deck_z0;
+    splitter_floor_z0 = unified_deck_z0 + splitter_vertical_raise;
 
     assert(unified_roof_layout,
            "Unified roof bridges require the raised-PoE layout");
@@ -4358,7 +4361,7 @@ module unified_roof_cross_bridges_local() {
     assert(rear_y > front_y + bridge_d,
            "Unified roof bridges need two separated landing zones");
 
-    for (y0 = [front_y, rear_y])
+    for (y0 = [front_y, rear_y]) {
         union() {
             // The visible top stays exactly flush with both cage roofs.
             translate([
@@ -4384,6 +4387,25 @@ module unified_roof_cross_bridges_local() {
                 bridge_t, return_h
             ]);
         }
+
+        // A short solid ramp joins the two floor skins despite their 8.78 mm
+        // height offset. At this span it is lighter and cleaner than a deep
+        // stepped box, while the paired front/rear beams still resist twist.
+        hull() {
+            translate([
+                bridge_x + visual_seam, y0,
+                splitter_floor_z0
+            ]) cube([
+                bridge_t, bridge_d, base_thickness
+            ]);
+            translate([
+                bridge_x + bridge_w - visual_seam - bridge_t, y0,
+                green_floor_z0
+            ]) cube([
+                bridge_t, bridge_d, base_thickness
+            ]);
+        }
+    }
 }
 
 module retention_ventilated_sleeves_local() {

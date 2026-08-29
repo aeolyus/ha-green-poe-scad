@@ -519,13 +519,14 @@ VARIANTS = [
         "id": "unified_roof",
         "device": "tplink",
         "device_name": "TP-Link TL-PD30G-M2",
-        "label": "Unified roof",
+        "label": "Unified frame",
         "setback": "60 mm setback · TP-Link raised 8.78 mm",
         "dimensions": "254 W × 44.45 H × 143.7 D mm",
         "note": (
             "Alternative rigidity study. The TP-Link cage rises 8.78 mm so "
             "its roof is coplanar with the Green cage. Two short flush "
-            "inverted-U crossbars join the cage roofs, while four corner "
+            "inverted-U crossbars join the cage roofs, two sloped lower "
+            "cross-members join the offset cage floors, and four corner "
             "L-rails continue forward to the faceplate."
         ),
     },
