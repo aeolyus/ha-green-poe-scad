@@ -693,8 +693,8 @@ for variant in VARIANTS:
         **VARIANT_MEASUREMENTS[variant["id"]],
     }
 
-DEFAULT_VARIANT = "cable_friendly"
-PRODUCTION_VARIANT = "cable_friendly"
+DEFAULT_VARIANT = "unified_roof"
+PRODUCTION_VARIANT = "unified_roof"
 
 
 def load_mesh(path: Path) -> Any:

@@ -526,3 +526,5 @@ cp renders/rear.png renders/rear_detail.png
 cp renders/top.png renders/top_detail.png
 
 python3 scripts/build_viewer.py
+cp viewer/interactive_viewer.html viewer/interactive_viewer_offline.html
+python3 scripts/prepare_static_site.py "$project_dir"

@@ -97,14 +97,19 @@
           <span>2</span>
           <div>
             <h2 id="retention-heading">Retention</h2>
-            <p>Select how the Home Assistant Green sits in its tray.</p>
+            <p>Select how both devices are held and tied together.</p>
           </div>
         </div>
         <fieldset>
-          <legend>Green tray</legend>
+          <legend>Retention system</legend>
           <div class="choice-grid two">
             <label class="choice recommended">
-              <input type="radio" name="trayStyle" value="friction_raised" checked>
+              <input type="radio" name="trayStyle" value="unified_dovetail" checked>
+              <strong>Unified rounded cages · dovetail-ready</strong>
+              <small>Current print · snug cages, lower box bridges, sloped upper ties, optional rear gates</small>
+            </label>
+            <label class="choice">
+              <input type="radio" name="trayStyle" value="friction_raised">
               <strong>Friction fit · unified raised deck</strong>
               <small>Thin honeycomb at device height; no riser columns</small>
             </label>
@@ -176,12 +181,12 @@
           </div>
         </div>
         <div class="choice-grid three">
-          <label class="choice">
-            <input type="radio" name="part" value="one_piece" checked>
-            <strong>One piece</strong>
-            <small>254 mm wide; only 1 mm margin per side on X2D</small>
-          </label>
           <label class="choice recommended">
+            <input type="radio" name="part" value="one_piece" checked>
+            <strong>One piece · current print</strong>
+            <small>254 mm wide; center carefully with no brim on X2D</small>
+          </label>
+          <label class="choice">
             <input type="radio" name="part" value="x2d_plate">
             <strong>X2D split plate</strong>
             <small>Core and ears; lower-risk bed fit</small>

@@ -12,7 +12,7 @@ const DEFAULTS = Object.freeze({
   customSetback: 60,
   ethernetEntry: "rear",
   frontPosition: "right",
-  trayStyle: "friction_raised",
+  trayStyle: "unified_dovetail",
   greenClearance: 0.5,
   greenInterference: 0.1,
   splitterClearance: 0.4,
@@ -40,6 +40,7 @@ const LABELS = {
     left: "Left",
   },
   trayStyle: {
+    unified_dovetail: "Rounded cages · unified frame · dovetail-ready",
     friction_raised: "Friction fit · unified raised deck",
     friction_pads: "Friction fit · four pads",
     friction_full: "Friction fit · full honeycomb",
@@ -168,14 +169,24 @@ function effectiveSetback(config) {
   return 60;
 }
 
+function usesUnifiedDovetail(g) {
+  return g.greenTrayStyle === "unified_dovetail";
+}
+
+function effectivePart(g) {
+  return usesUnifiedDovetail(g) ? "one_piece_dovetail_ready_print" : g.part;
+}
+
 function scadParameters(config) {
   const g = config.geometry;
+  const unifiedDovetail = usesUnifiedDovetail(g);
   const params = {
-    part: g.part,
+    part: effectivePart(g),
     splitter_model: g.splitterModel,
+    device_layout: unifiedDovetail ? "unified_roof" : "side_by_side",
     front_ethernet_enabled: g.ethernetEntry === "front",
     front_keystone_side: g.frontKeystoneSide,
-    green_tray_style: g.greenTrayStyle,
+    green_tray_style: unifiedDovetail ? "friction_raised" : g.greenTrayStyle,
     led_shutter_enabled: g.ledShutterEnabled,
     led_window_insert_enabled: g.ledWindowInsertEnabled,
     face_logo_enabled: g.faceLogoEnabled,
@@ -199,6 +210,9 @@ function scadLiteral(value) {
 
 function outputStem(config) {
   const g = config.geometry;
+  if (usesUnifiedDovetail(g)) {
+    return "one_piece_rear_cable_friendly_unified_frame_dovetail_ready";
+  }
   const entry = g.ethernetEntry === "rear" ? "rear" : `front_${g.frontKeystoneSide}`;
   const spacing = g.spacing === "custom" ? `${effectiveSetback(config)}mm` : g.spacing;
   const windowMode = g.ledShutterEnabled ? "shutter" : "open_window";
@@ -228,23 +242,28 @@ function openscadPreset(config) {
 function viewerHash(config, embedded = false) {
   const g = config.geometry;
   const v = config.viewer;
+  const unifiedDovetail = usesUnifiedDovetail(g);
   const frontMap = { right: "center", far_right: "ha_right", left: "left" };
   const supportMap = { friction_raised: "raised", friction_pads: "pads", friction_full: "full", friction_skeletal: "skeletal", standard: "raised" };
-  const spacing = ["compact", "balanced", "cable_friendly"].includes(g.spacing) ? g.spacing : "cable_friendly";
+  const spacing = unifiedDovetail
+    ? "unified_roof"
+    : (["compact", "balanced", "cable_friendly"].includes(g.spacing) ? g.spacing : "cable_friendly");
   const params = new URLSearchParams({
     splitter: "tplink",
     spacing,
     entry: g.ethernetEntry,
     front: frontMap[g.frontKeystoneSide],
-    retention: g.greenTrayStyle === "standard" ? "factory_screws" : "friction_sleeve",
-    support: supportMap[g.greenTrayStyle],
+    retention: unifiedDovetail
+      ? "dovetail_gates"
+      : (g.greenTrayStyle === "standard" ? "factory_screws" : "friction_sleeve"),
+    support: unifiedDovetail ? "raised" : supportMap[g.greenTrayStyle],
     protection: "open",
     green: v.showGreen ? "1" : "0",
     poe: v.showSplitter ? "1" : "0",
     cables: v.showCables ? "1" : "0",
     logo: g.faceLogoEnabled ? "1" : "0",
     shutter: g.ledShutterEnabled ? "1" : "0",
-    open: "0",
+    open: "1",
     leds: v.simulateLeds ? "1" : "0",
     mechanism: "0",
     highlight: "0",
@@ -334,26 +353,54 @@ function validate(config) {
   if (g.spacing === "balanced") messages.push("Balanced provides 44.5 mm / 1.75 in from the panel's inside face to the splitter and has been physically checked with the current flexible cable.");
   if (g.spacing === "custom") messages.push("Custom setback values have not been collision-validated by this page.");
   if (g.ethernetEntry === "front" && g.frontKeystoneSide === "left" && setback < 89) messages.push("The left front keystone needs an 89 mm splitter setback for the validated cable path.");
+  if (usesUnifiedDovetail(g)) messages.push("This matches the active print: the snug rounded cages provide primary retention, while the separately printed dovetail gates remain optional.");
   if (g.greenTrayStyle.startsWith("friction")) messages.push("Print the Green and TP-Link friction coupons before committing to the full plate.");
   return messages;
 }
 
 function updateChoiceAvailability(config) {
   const isFront = config.geometry.ethernetEntry === "front";
+  const unifiedDovetail = usesUnifiedDovetail(config.geometry);
   frontPositionSection.hidden = !isFront;
   const farRight = form.querySelector('[name="frontPosition"][value="far_right"]');
   const nonOnePiece = config.geometry.part !== "one_piece";
   farRight.closest("label").classList.toggle("invalid-choice", isFront && nonOnePiece);
+  form.querySelectorAll('[name="part"]').forEach(input => {
+    const disabled = unifiedDovetail && input.value !== "one_piece";
+    input.disabled = disabled;
+    input.closest("label").classList.toggle("invalid-choice", disabled);
+  });
+  form.querySelectorAll('[name="spacing"]').forEach(input => {
+    const disabled = unifiedDovetail && input.value !== "cable_friendly";
+    input.disabled = disabled;
+    input.closest("label").classList.toggle("invalid-choice", disabled);
+  });
+  form.querySelectorAll('[name="ethernetEntry"]').forEach(input => {
+    const disabled = unifiedDovetail && input.value !== "rear";
+    input.disabled = disabled;
+    input.closest("label").classList.toggle("invalid-choice", disabled);
+  });
+  customSpacingToggle.disabled = unifiedDovetail;
 }
 
 function updateSummary() {
   let config = getConfig();
-  updateChoiceAvailability(config);
+
+  if (usesUnifiedDovetail(config.geometry)) {
+    form.querySelector('[name="spacing"][value="cable_friendly"]').checked = true;
+    form.querySelector('[name="ethernetEntry"][value="rear"]').checked = true;
+    form.querySelector('[name="part"][value="one_piece"]').checked = true;
+    customSpacingEnabled = false;
+    customSetbackControl.hidden = true;
+    customSpacingToggle.textContent = "Use a custom setback";
+    config = getConfig();
+  }
 
   if (config.geometry.ethernetEntry === "front" && config.geometry.frontKeystoneSide === "far_right" && config.geometry.part !== "one_piece") {
     form.querySelector('[name="part"][value="one_piece"]').checked = true;
     config = getConfig();
   }
+  updateChoiceAvailability(config);
 
   const g = config.geometry;
   const entryLabel = g.ethernetEntry === "rear" ? "Rear" : `Front · ${LABELS.frontPosition[g.frontKeystoneSide]}`;
@@ -464,6 +511,15 @@ function setGenerationStatus(state, progress, message, detail) {
 }
 
 function expectedGeometry(config) {
+  if (usesUnifiedDovetail(config.geometry)) {
+    return {
+      maxBounds: [[0, 0, 0], [254, 44.45, 143.7]],
+      extent: [254, 44.45, 143.7],
+      extentTolerance: 0.08,
+      maxTriangles: 250000,
+      componentCount: 5,
+    };
+  }
   const part = config.geometry.part;
   const mountDepth = Math.max(120, effectiveSetback(config) + 83.7);
   return {

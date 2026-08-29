@@ -125,6 +125,7 @@ export function validateBinaryStl(input, expected = {}) {
   }
 
   const sums = new Map();
+  const componentBounds = new Map();
   for (let triangle = 0; triangle < triangleCount; triangle += 1) {
     const ids = triangleIds.slice(triangle * 3, triangle * 3 + 3);
     const a = vertexValues.slice(ids[0] * 3, ids[0] * 3 + 3);
@@ -142,8 +143,46 @@ export function validateBinaryStl(input, expected = {}) {
     state.correction = (next - state.sum) - corrected;
     state.sum = next;
     sums.set(root, state);
+    const componentBound = componentBounds.get(root)
+      || [[Infinity, Infinity, Infinity], [-Infinity, -Infinity, -Infinity]];
+    for (const point of [a, b, c]) {
+      for (let axis = 0; axis < 3; axis += 1) {
+        componentBound[0][axis] = Math.min(componentBound[0][axis], point[axis]);
+        componentBound[1][axis] = Math.max(componentBound[1][axis], point[axis]);
+      }
+    }
+    componentBounds.set(root, componentBound);
   }
-  for (const state of sums.values()) assert(state.sum > 1e-6, "Mesh contains a zero-volume or inward-wound component");
+  for (const [root, state] of sums) {
+    assert(Math.abs(state.sum) > 1e-6, "Mesh contains a zero-volume component");
+    const componentBound = componentBounds.get(root);
+    assert(
+      [0, 1, 2].every(
+        axis => componentBound[1][axis] - componentBound[0][axis] > 1e-6,
+      ),
+      "Mesh contains a zero-thickness component",
+    );
+  }
+
+  // A negative shell is valid when it is a sealed cavity nested inside a
+  // positive outer shell. Reject detached inward-wound solids while allowing
+  // hollow box beams such as the selected unified-frame mount.
+  const positiveRoots = [...sums]
+    .filter(([, state]) => state.sum > 0)
+    .map(([root]) => root);
+  for (const [root, state] of sums) {
+    if (state.sum > 0) continue;
+    const inner = componentBounds.get(root);
+    const nested = positiveRoots.some(outerRoot => {
+      const outer = componentBounds.get(outerRoot);
+      return inner[0].every((minimum, axis) => (
+        outer[0][axis] <= minimum && outer[1][axis] >= inner[1][axis]
+      ));
+    });
+    assert(nested, "Mesh contains a detached inward-wound component");
+  }
+  const volumeMm3 = [...sums.values()].reduce((sum, state) => sum + state.sum, 0);
+  assert(volumeMm3 > 1e-6, "Mesh has non-positive total volume");
   if (expected.componentCount != null) {
     assert(
       sums.size === expected.componentCount,
@@ -159,7 +198,7 @@ export function validateBinaryStl(input, expected = {}) {
     componentCount: sums.size,
     bounds,
     extent,
-    volumeMm3: [...sums.values()].reduce((sum, state) => sum + state.sum, 0),
+    volumeMm3,
   };
 }
 

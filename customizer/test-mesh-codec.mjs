@@ -1,9 +1,13 @@
 import assert from "node:assert/strict";
 import { makeThreeMf, validateBinaryStl } from "./mesh-codec.js";
 
-function tetrahedron() {
-  const points = [[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]];
-  const faces = [[0, 2, 1], [0, 1, 3], [0, 3, 2], [1, 2, 3]];
+function tetrahedron(offset = [0, 0, 0], scale = 1, inward = false) {
+  const points = [[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    .map(point => point.map((value, axis) => offset[axis] + value * scale));
+  const outwardFaces = [[0, 2, 1], [0, 1, 3], [0, 3, 2], [1, 2, 3]];
+  const faces = inward
+    ? outwardFaces.map(([a, b, c]) => [a, c, b])
+    : outwardFaces;
   const bytes = new Uint8Array(84 + faces.length * 50);
   const view = new DataView(bytes.buffer);
   view.setUint32(80, faces.length, true);
@@ -13,6 +17,22 @@ function tetrahedron() {
       view.setFloat32(offset + corner * 12 + axis * 4, value, true);
     }));
   });
+  return bytes;
+}
+
+function combine(...meshes) {
+  const triangleCount = meshes.reduce(
+    (sum, mesh) => sum + new DataView(mesh.buffer).getUint32(80, true),
+    0,
+  );
+  const bytes = new Uint8Array(84 + triangleCount * 50);
+  const view = new DataView(bytes.buffer);
+  view.setUint32(80, triangleCount, true);
+  let offset = 84;
+  for (const mesh of meshes) {
+    bytes.set(mesh.slice(84), offset);
+    offset += mesh.length - 84;
+  }
   return bytes;
 }
 
@@ -35,6 +55,17 @@ assert.throws(() => validateBinaryStl(broken), /length/);
 assert.throws(
   () => validateBinaryStl(bytes, { componentCount: 2 }),
   /component count/,
+);
+
+const hollow = combine(
+  tetrahedron([0, 0, 0], 4),
+  tetrahedron([0.5, 0.5, 0.5], 0.5, true),
+);
+const hollowMesh = validateBinaryStl(hollow, { componentCount: 2 });
+assert.ok(hollowMesh.volumeMm3 > 0);
+assert.throws(
+  () => validateBinaryStl(combine(bytes, tetrahedron([2, 2, 2], 1, true))),
+  /detached inward-wound component/,
 );
 
 console.log("mesh-codec tests pass");

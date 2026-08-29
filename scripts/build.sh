@@ -377,6 +377,8 @@ run_glb_build() {
   else
     python3 scripts/build_viewer.py
   fi
+  cp viewer/interactive_viewer.html viewer/interactive_viewer_offline.html
+  python3 scripts/prepare_static_site.py "$project_dir"
 }
 
 target="${1:-help}"
@@ -391,6 +393,8 @@ case "$target" in
       exit 2
     fi
     python3 scripts/build_viewer.py --html-only
+    cp viewer/interactive_viewer.html viewer/interactive_viewer_offline.html
+    python3 scripts/prepare_static_site.py "$project_dir"
     ;;
   glb)
     run_glb_build "$@"

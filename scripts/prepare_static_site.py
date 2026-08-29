@@ -47,6 +47,7 @@ def write_manifest(root: Path) -> None:
             or ".git" in relative.parts
             or "__pycache__" in relative.parts
             or path.name == "SITE_MANIFEST.json"
+            or path.name == "interactive_viewer_offline.html"
             or path.suffix == ".pyc"
         ):
             continue
