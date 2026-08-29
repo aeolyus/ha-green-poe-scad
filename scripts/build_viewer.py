@@ -463,6 +463,8 @@ TPLINK_ONLY_RETENTION_FILENAMES = {
 }
 
 STACKED_VARIANT_ID = "stacked_center"
+UNIFIED_ROOF_VARIANT_ID = "unified_roof"
+UNIFIED_ROOF_BRIDGES_FILENAME = "viewer_unified_roof_cross_bridges.stl"
 STACKED_UNSUPPORTED_RETENTION_FILENAMES = {
     "viewer_retention_dovetail_gates.stl",
 }
@@ -511,6 +513,20 @@ VARIANTS = [
             "Current printable and straight-cable baseline. Separate X/Z "
             "lanes keep both jumpers clear of the panel, devices, and each "
             "other while preserving the full 21 mm RJ45 and 10 mm DC bends."
+        ),
+    },
+    {
+        "id": "unified_roof",
+        "device": "tplink",
+        "device_name": "TP-Link TL-PD30G-M2",
+        "label": "Unified roof",
+        "setback": "60 mm setback · TP-Link raised 8.78 mm",
+        "dimensions": "254 W × 44.45 H × 143.7 D mm",
+        "note": (
+            "Alternative rigidity study. The TP-Link cage rises 8.78 mm so "
+            "its roof is coplanar with the Green cage. Two short flush "
+            "inverted-U crossbars join the cage roofs, while four corner "
+            "L-rails continue forward to the faceplate."
         ),
     },
     {
@@ -619,6 +635,14 @@ VARIANT_MEASUREMENTS = {
         "clearance_mm": 57.0,
         "clearance_detail": "After 25 mm boot",
         "clearance_detail_mm": 32.0,
+    },
+    "unified_roof": {
+        "depth_mm": 143.7,
+        "chassis_depth_mm": 185.0,
+        "clearance_label": "Panel → PoE face",
+        "clearance_mm": 57.0,
+        "clearance_detail": "PoE raised above baseline",
+        "clearance_detail_mm": 8.78125,
     },
     STACKED_VARIANT_ID: {
         "depth_mm": 202.4,
@@ -791,9 +815,22 @@ def load_variants(
                             continue
                 else:
                     source_path = VIEWER / filename
+                mesh = load_mesh(source_path)
+                if variant["id"] == UNIFIED_ROOF_VARIANT_ID \
+                        and filename in TPLINK_ONLY_RETENTION_FILENAMES:
+                    bridge_path = variant_dir / UNIFIED_ROOF_BRIDGES_FILENAME
+                    if not bridge_path.is_file():
+                        raise FileNotFoundError(
+                            "Missing unified-roof crossbar mesh: "
+                            f"{bridge_path}"
+                        )
+                    import trimesh
+                    mesh = trimesh.util.concatenate(
+                        [mesh, load_mesh(bridge_path)]
+                    )
+                    mesh.units = "mm"
                 loaded_parts.append(
-                    (filename, name, color, roughness, emissive,
-                     load_mesh(source_path))
+                    (filename, name, color, roughness, emissive, mesh)
                 )
             configurations[configuration] = loaded_parts
         loaded[variant["id"]] = configurations

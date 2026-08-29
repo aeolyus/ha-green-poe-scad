@@ -10,6 +10,7 @@ variant_ids=(
   compact
   balanced
   cable_friendly
+  unified_roof
   stacked_center
   front_ethernet_right
   front_ethernet_far_right
@@ -54,6 +55,7 @@ variant_spec() {
     compact) echo 'compact:tplink:35:false:right:side_by_side' ;;
     balanced) echo 'balanced:tplink:47.5:false:right:side_by_side' ;;
     cable_friendly) echo 'cable_friendly:tplink:60:false:right:side_by_side' ;;
+    unified_roof) echo 'unified_roof:tplink:60:false:right:unified_roof' ;;
     stacked_center) echo 'stacked_center:tplink:145.56875:false:right:stacked_center' ;;
     front_ethernet_right) echo 'front_ethernet_right:tplink:60:true:right:side_by_side' ;;
     front_ethernet_far_right) echo 'front_ethernet_far_right:tplink:60:true:far_right:side_by_side' ;;
@@ -203,7 +205,7 @@ build_variant_dovetail_gates_overlay() {
   fi
   IFS=: read -r variant_id variant_model variant_y variant_front variant_side variant_layout \
     <<< "$spec"
-  if [[ "$variant_model" != "tplink" || "$variant_layout" != "side_by_side" ]]; then
+  if [[ "$variant_model" != "tplink" || "$variant_layout" == "stacked_center" ]]; then
     return
   fi
   variant_dir="viewer/variants/${variant_id}"
@@ -254,6 +256,14 @@ build_viewer_variant() {
         -D "front_keystone_side=\"${variant_side}\"" \
         -D 'led_shutter_enabled=true'
     done
+  fi
+
+  if [[ "$variant_layout" == "unified_roof" ]]; then
+    launch_scad "${variant_dir}/viewer_unified_roof_cross_bridges.stl" \
+      -D 'part="viewer_unified_roof_cross_bridges"' \
+      -D "splitter_model=\"${variant_model}\"" \
+      -D "splitter_y_override=${variant_y}" \
+      -D "device_layout=\"${variant_layout}\""
   fi
 
   if [[ "$variant_front" == "true" ]]; then

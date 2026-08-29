@@ -12,6 +12,8 @@ intersection() {
     translate([ear_width, 0, 0]) union() {
         device_bridges();
         splitter_corner_l_ties_local();
+        if (unified_roof_layout)
+            unified_roof_cross_bridges_local();
     }
     union() {
         viewer_internal_data_cable();

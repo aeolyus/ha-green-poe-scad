@@ -16,7 +16,7 @@
 
 $fn = 48;
 
-// [assembly_preview, assembly, one_piece, one_piece_ventilated_sleeves, one_piece_ventilated_sleeves_print, one_piece_dovetail_ready, one_piece_dovetail_ready_print, dovetail_gates_plate, one_piece_logo_inlay, x2d_plate, x2d_plate_ventilated_sleeves, core, core_ventilated_sleeves, logo_inlay, left_ear, right_ear, led_insert, led_shutter, led_shutter_retainer, led_shutter_kit, led_fixed_window_kit, green_spacer, green_spacers_4x, fit_test, friction_fit_coupon, green_hybrid_clip_coupon, splitter_fit_coupon, splitter_hybrid_clip_coupon, hybrid_clip_coupon, green_vent_frame_coupon, splitter_vent_frame_coupon, vent_frame_coupon, dovetail_rail_coupon, green_dovetail_gate, splitter_dovetail_gate, keystone_fit_test, viewer_mount, viewer_mount_without_green_tray, viewer_splitter_floor, viewer_splitter_side_walls, viewer_splitter_end_stops, viewer_green_tray_standard, viewer_green_tray_friction, viewer_green_tray_friction_raised, viewer_green_tray_friction_full, viewer_green_tray_friction_pads, viewer_green_tray_friction_skeletal, viewer_insert, viewer_shutter_open, viewer_shutter_closed, viewer_shutter_retainer, viewer_logo, viewer_green, viewer_splitter, viewer_ports, viewer_green_ports, viewer_keystone_ports, viewer_data_cables, viewer_internal_data_cable, viewer_input_data_cable, viewer_dc_cable, viewer_fasteners, viewer_retention_factory_screws, viewer_retention_slide_latch, viewer_retention_corner_gate, viewer_retention_sled_gate, viewer_retention_padded_rails, viewer_retention_captive_strap, viewer_retention_x_cage, viewer_retention_hybrid_clips, viewer_retention_ventilated_sleeves, viewer_retention_dovetail_gates, viewer_retention_friction_sleeve, viewer_enclosure_airframe, viewer_rulers, viewer_led_power, viewer_led_activity, viewer_led_health]
+// [assembly_preview, assembly, one_piece, one_piece_ventilated_sleeves, one_piece_ventilated_sleeves_print, one_piece_dovetail_ready, one_piece_dovetail_ready_print, dovetail_gates_plate, one_piece_logo_inlay, x2d_plate, x2d_plate_ventilated_sleeves, core, core_ventilated_sleeves, logo_inlay, left_ear, right_ear, led_insert, led_shutter, led_shutter_retainer, led_shutter_kit, led_fixed_window_kit, green_spacer, green_spacers_4x, fit_test, friction_fit_coupon, green_hybrid_clip_coupon, splitter_fit_coupon, splitter_hybrid_clip_coupon, hybrid_clip_coupon, green_vent_frame_coupon, splitter_vent_frame_coupon, vent_frame_coupon, dovetail_rail_coupon, green_dovetail_gate, splitter_dovetail_gate, keystone_fit_test, viewer_mount, viewer_mount_without_green_tray, viewer_splitter_floor, viewer_splitter_side_walls, viewer_splitter_end_stops, viewer_green_tray_standard, viewer_green_tray_friction, viewer_green_tray_friction_raised, viewer_green_tray_friction_full, viewer_green_tray_friction_pads, viewer_green_tray_friction_skeletal, viewer_insert, viewer_shutter_open, viewer_shutter_closed, viewer_shutter_retainer, viewer_logo, viewer_green, viewer_splitter, viewer_ports, viewer_green_ports, viewer_keystone_ports, viewer_data_cables, viewer_internal_data_cable, viewer_input_data_cable, viewer_dc_cable, viewer_fasteners, viewer_retention_factory_screws, viewer_retention_slide_latch, viewer_retention_corner_gate, viewer_retention_sled_gate, viewer_retention_padded_rails, viewer_retention_captive_strap, viewer_retention_x_cage, viewer_retention_hybrid_clips, viewer_retention_ventilated_sleeves, viewer_retention_dovetail_gates, viewer_retention_friction_sleeve, viewer_unified_roof_cross_bridges, viewer_enclosure_airframe, viewer_rulers, viewer_led_power, viewer_led_activity, viewer_led_health]
 part = "assembly_preview";
 
 // Production geometry uses the TP-Link. Viewer-only builds may override this
@@ -26,8 +26,9 @@ splitter_model = "tplink";
 // Viewer-only arrangement switch. The production files retain the selected
 // cable-friendly side-by-side layout; "stacked_center" centers the Green and
 // rotates the TP-Link across the rack directly behind it.
-device_layout = "side_by_side";  // [side_by_side, stacked_center]
+device_layout = "side_by_side";  // [side_by_side, unified_roof, stacked_center]
 stacked_center_layout = device_layout == "stacked_center";
+unified_roof_layout = device_layout == "unified_roof";
 
 // Cable-friendly production layout: rear PoE/Ethernet entry with the TP-Link
 // set back 60 mm from the face. Front-entry editions and other setbacks remain
@@ -159,6 +160,12 @@ splitter_lower_bevel_inset = splitter_side_bevel_inset;
 splitter_upper_bevel_inset = splitter_side_bevel_inset;
 splitter_upper_end_bevel_inset =
     (splitter_d - splitter_top_flat_d) / 2;
+// Viewer comparison: raise the TP-Link until its 1.6 mm cage roof is exactly
+// coplanar with the Green cage roof. The value is the difference between the
+// measured enclosure heights plus their respective roof clearances.
+splitter_unified_roof_raise = 8.78125;
+splitter_vertical_raise = unified_roof_layout
+    ? splitter_unified_roof_raise : 0;
 splitter_lan_local_x = 15.7;
 splitter_dc_local_x = 37.3;
 splitter_input_local_x = 31.9;
@@ -180,7 +187,8 @@ splitter_y = !is_undef(splitter_y_override)
 // Approximate port centers used only for viewer cable mockups.
 splitter_lan_x = splitter_x + splitter_lan_local_x;
 splitter_dc_x = splitter_x + splitter_dc_local_x;
-splitter_device_z = unified_deck_raise + base_thickness;
+splitter_device_z = unified_deck_raise + splitter_vertical_raise
+                    + base_thickness;
 splitter_port_z = splitter_device_z + splitter_h / 2;
 splitter_input_x = splitter_x + splitter_input_local_x;
 splitter_input_y = splitter_y + splitter_d;
@@ -854,7 +862,10 @@ module splitter_transform() {
                    unified_deck_raise])
             rotate([0, 0, 90]) children();
     else
-        translate([splitter_x, splitter_y, unified_deck_raise])
+        translate([
+            splitter_x, splitter_y,
+            unified_deck_raise + splitter_vertical_raise
+        ])
             children();
 }
 
@@ -1033,8 +1044,8 @@ module side_by_side_device_bridges() {
                           + wall_thickness;
     green_outer_front = face_thickness - 0.20;
     green_outer_rear = green_y + green_inner_d + wall_thickness;
-    bridge_x = splitter_outer_right - 0.20;
-    bridge_w = green_outer_left - splitter_outer_right + 0.40;
+    bridge_x = splitter_outer_right;
+    bridge_w = green_outer_left - splitter_outer_right;
     bridge_target_d = 14.0;
     bridge_pair_gap = 2.0;
 
@@ -1118,7 +1129,7 @@ module stacked_center_device_bridge() {
 
 module device_bridges() {
     if (stacked_center_layout) stacked_center_device_bridge();
-    else side_by_side_device_bridges();
+    else if (!unified_roof_layout) side_by_side_device_bridges();
 }
 
 module sics_transform() {
@@ -4258,8 +4269,9 @@ module splitter_corner_l_ties_local() {
     cage_front_y = splitter_y - splitter_clearance - wall_thickness;
     tie_y1 = cage_front_y + sleeve_roof_border;
     tie_d = tie_y1 - tie_y0;
-    floor_z0 = unified_deck_z0;
-    splitter_roof_top = unified_deck_raise + base_thickness + splitter_h
+    floor_z0 = unified_deck_z0 + splitter_vertical_raise;
+    splitter_roof_top = unified_deck_raise + splitter_vertical_raise
+                        + base_thickness + splitter_h
                         + sleeve_splitter_vertical_clearance + sleeve_roof_t;
     roof_z0 = splitter_roof_top - sleeve_roof_t;
 
@@ -4296,6 +4308,81 @@ module splitter_corner_l_ties_local() {
                 outer_right - tie_t, tie_y0,
                 splitter_roof_top - tie_leg
             ]) cube([tie_t, tie_d, tie_leg]);
+        }
+}
+
+// Raised-PoE comparison: once both cage roofs are coplanar, two short
+// inverted-U crossbars join their straight side sections. The top skins are
+// flush with both honeycomb roofs, while shallow return flanges provide much
+// more bending and torsional stiffness than flat tabs at minimal mass.
+module unified_roof_cross_bridges_local() {
+    splitter_outer_right = splitter_x + splitter_w + splitter_clearance
+                           + wall_thickness;
+    green_outer_w = green_w + 2 * sleeve_green_side_clearance
+                    + 2 * sleeve_green_frame_t;
+    green_outer_left = green_x + green_w / 2 - green_outer_w / 2;
+    splitter_outer_front = splitter_y - splitter_clearance - wall_thickness;
+    splitter_outer_rear = splitter_y + splitter_d + splitter_clearance
+                          + wall_thickness;
+    green_outer_front = face_thickness - 0.20;
+    green_outer_depth = green_inner_d + (green_y - face_thickness)
+                        + wall_thickness;
+    green_outer_rear = green_outer_front + green_outer_depth;
+    bridge_x = splitter_outer_right - 0.20;
+    bridge_w = green_outer_left - splitter_outer_right + 0.40;
+    bridge_d = 12.0;
+    bridge_t = sleeve_roof_t;
+    return_h = 5.0;
+    // This branch is currently a viewer study. Keep a visually negligible
+    // gap from each cage so the crossbars remain clean independent shells;
+    // a selected production version will receive dedicated fused sockets.
+    visual_seam = 0.05;
+    straight_front = max(
+        splitter_outer_front + tray_corner_r,
+        green_outer_front + tray_corner_r);
+    straight_rear = min(
+        splitter_outer_rear - tray_corner_r,
+        green_outer_rear - tray_corner_r);
+    front_y = straight_front;
+    rear_y = straight_rear - bridge_d;
+    green_roof_z0 = green_device_z + green_h
+                    + sleeve_green_vertical_clearance;
+    green_roof_top = green_roof_z0 + sleeve_roof_t;
+    splitter_roof_top = splitter_device_z + splitter_h
+                        + sleeve_splitter_vertical_clearance + sleeve_roof_t;
+
+    assert(unified_roof_layout,
+           "Unified roof bridges require the raised-PoE layout");
+    assert(abs(green_roof_top - splitter_roof_top) < 0.001,
+           "Unified roof bridge endpoints must be coplanar");
+    assert(rear_y > front_y + bridge_d,
+           "Unified roof bridges need two separated landing zones");
+
+    for (y0 = [front_y, rear_y])
+        union() {
+            // The visible top stays exactly flush with both cage roofs.
+            translate([
+                bridge_x + visual_seam, y0,
+                green_roof_z0
+            ]) cube([
+                bridge_w - 2 * visual_seam,
+                bridge_d, sleeve_roof_t
+            ]);
+            translate([
+                bridge_x + visual_seam, y0,
+                green_roof_top - return_h
+            ]) cube([
+                bridge_w - 2 * visual_seam,
+                bridge_t, return_h
+            ]);
+            translate([
+                bridge_x + visual_seam,
+                y0 + bridge_d - bridge_t,
+                green_roof_top - return_h
+            ]) cube([
+                bridge_w - 2 * visual_seam,
+                bridge_t, return_h
+            ]);
         }
 }
 
@@ -5206,6 +5293,14 @@ module viewer_retention_friction_sleeve() {
     translate([ear_width, 0, 0]) retention_friction_sleeve_local();
 }
 
+// Kept as a separate closed viewer shell while this alternative remains a
+// comparison study. The GLB builder combines it with either cage retention
+// overlay, avoiding fragile coplanar boolean seams in the preview export.
+module viewer_unified_roof_cross_bridges() {
+    if (unified_roof_layout)
+        translate([ear_width, 0, 0]) unified_roof_cross_bridges_local();
+}
+
 module viewer_retention_selected(mode) {
     if (mode == "factory_screws") viewer_retention_factory_screws();
     else if (mode == "slide_latch") viewer_retention_slide_latch();
@@ -5532,9 +5627,19 @@ assert(abs(led_status_z
        "Preview LEDs must remain centered on the measured illuminated band");
 assert(abs(unified_deck_z0 + base_thickness - green_device_z) < 0.001,
        "Unified raised deck must finish at the Green seating plane");
-assert(abs(splitter_device_z - green_device_z) < 0.001,
-       "Green and TP-Link bottoms must share the unified deck height");
+assert(unified_roof_layout
+       || abs(splitter_device_z - green_device_z) < 0.001,
+       "Standard Green and TP-Link bottoms must share the unified deck height");
+assert(!unified_roof_layout
+       || abs(
+           green_device_z + green_h + sleeve_green_vertical_clearance
+               + sleeve_roof_t
+           - (splitter_device_z + splitter_h
+              + sleeve_splitter_vertical_clearance + sleeve_roof_t)
+       ) < 0.001,
+       "Unified-roof layout must align both cage roof surfaces");
 assert(device_layout == "side_by_side"
+       || device_layout == "unified_roof"
        || device_layout == "stacked_center",
        str("Unknown device_layout: ", device_layout));
 assert(!stacked_center_layout || !front_ethernet_enabled,
@@ -5712,6 +5817,8 @@ if (part == "assembly_preview") {
     viewer_retention_dovetail_gates();
 } else if (part == "viewer_retention_friction_sleeve") {
     viewer_retention_friction_sleeve();
+} else if (part == "viewer_unified_roof_cross_bridges") {
+    viewer_unified_roof_cross_bridges();
 } else if (part == "viewer_enclosure_airframe") {
     viewer_enclosure_airframe();
 } else if (part == "viewer_rulers") {
