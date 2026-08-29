@@ -276,10 +276,20 @@ front_keystone_body_depth = 31.0;  // conservative viewer planning envelope
 // Front status-window geometry. The three preview LEDs are intentionally an
 // approximate visual simulation: official documentation identifies their
 // white/green/yellow roles but does not publish a mechanical LED drawing.
+// Richard's physical measurement places the illuminated strip 3/4 in below
+// the enclosure top and 4/32 in above its bottom. Center the smaller viewing
+// aperture on that measured band rather than on the older image estimate.
+green_led_top_margin = 19.05;
+green_led_bottom_margin = 3.175;
+green_led_band_h = green_h
+                   - green_led_top_margin - green_led_bottom_margin;
+green_led_center_from_bottom =
+    green_led_bottom_margin + green_led_band_h / 2;
 led_window_w = 92.0;
 led_window_h = 8.0;
-led_window_x = green_x + (green_inner_w - led_window_w) / 2;
-led_window_z = 10.0 + green_standoff;
+led_window_x = green_x + (green_w - led_window_w) / 2;
+led_window_z = green_device_z
+               + green_led_center_from_bottom - led_window_h / 2;
 // Image-derived LED offsets are referenced to the enclosure center, not its
 // measured lower-left edge. This preserves their visual alignment when the
 // physical bottom-width estimate changes; caliper measurements can replace
@@ -386,7 +396,9 @@ dovetail_gate_recess_clearance = 0.10;
 dovetail_gate_contact_clearance = 0.05;
 dovetail_gate_contact_lead_h = 0.80;
 dovetail_gate_contact_lead_relief = 0.35;
-dovetail_gate_contact_slot_clearance = 0.25;
+dovetail_gate_contact_slot_clearance = 0.05;
+dovetail_gate_top_skin_t = 0.80;
+dovetail_gate_top_seam = epsilon;
 dovetail_green_contact_bottom = green_device_z + 0.60;
 dovetail_green_contact_top = green_device_z + 4.20;
 dovetail_splitter_contact_bottom =
@@ -4507,16 +4519,38 @@ module dovetail_gate_frame_local(
         ]) rounded_prism_z(
                 gate_x1 - gate_x0,
                 dovetail_gate_t, dovetail_gate_bar_h, 0.65);
-        // Fill the forward part of the lower-beam travel opening when the gate
-        // is seated. This center tongue makes the top surface continuous while
-        // leaving the receiver material intact beside both dovetails.
+        // A thin stepped cap hides the functional clearance around the H-frame
+        // and the lower-beam travel opening. Its underside stays above the
+        // enclosure, while a one-epsilon seam keeps gate and cage as separate
+        // printable parts instead of merging their coplanar top surfaces.
         translate([
-            contact_x0, contact_y,
-            roof_top - dovetail_gate_bar_h
+            gate_x0 - dovetail_gate_recess_clearance
+                + dovetail_gate_top_seam,
+            gate_y - dovetail_gate_recess_clearance
+                + dovetail_gate_top_seam,
+            roof_top - dovetail_gate_top_skin_t
         ]) rounded_prism_z(
-                contact_x1 - contact_x0,
-                gate_rear_y - contact_y,
-                dovetail_gate_bar_h, 0.65);
+                gate_x1 - gate_x0
+                    + 2 * (dovetail_gate_recess_clearance
+                           - dovetail_gate_top_seam),
+                gate_rear_y - gate_y
+                    + dovetail_gate_recess_clearance
+                    - dovetail_gate_top_seam,
+                dovetail_gate_top_skin_t, 0.10);
+        translate([
+            contact_x0 - dovetail_gate_contact_slot_clearance
+                + dovetail_gate_top_seam,
+            contact_y - dovetail_gate_contact_slot_clearance
+                + dovetail_gate_top_seam,
+            roof_top - dovetail_gate_top_skin_t
+        ]) rounded_prism_z(
+                contact_x1 - contact_x0
+                    + 2 * (dovetail_gate_contact_slot_clearance
+                           - dovetail_gate_top_seam),
+                gate_rear_y - contact_y
+                    + dovetail_gate_contact_slot_clearance
+                    - dovetail_gate_top_seam,
+                dovetail_gate_top_skin_t, 0.10);
 
         for (center_x = [left_center, right_center]) {
             translate([
@@ -5433,6 +5467,14 @@ assert(dovetail_gate_contact_clearance >= 0
 assert(dovetail_lock_h + dovetail_top_lead_h
            < splitter_h + sleeve_roof_t - dovetail_bottom_stop_h,
        "Dovetail taper and lead-in must fit the shorter TP-Link gate");
+assert(green_led_band_h > 0,
+       "Measured Green LED margins must leave a positive illuminated band");
+assert(abs(led_window_x + led_window_w / 2
+           - (green_x + green_w / 2)) < 0.001,
+       "LED aperture must remain centered on the measured Green body");
+assert(abs(led_status_z
+           - (green_device_z + green_led_center_from_bottom)) < 0.001,
+       "Preview LEDs must remain centered on the measured illuminated band");
 assert(abs(unified_deck_z0 + base_thickness - green_device_z) < 0.001,
        "Unified raised deck must finish at the Green seating plane");
 assert(abs(splitter_device_z - green_device_z) < 0.001,
