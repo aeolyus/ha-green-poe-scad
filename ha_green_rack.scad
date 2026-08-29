@@ -4528,7 +4528,7 @@ module dovetail_gate_frame_local(
                     + dovetail_stop_clearance
             ]) cube([
                 dovetail_neck_w,
-                dovetail_gate_neck_overlap + epsilon,
+                dovetail_gate_neck_overlap,
                 gate_h - dovetail_bottom_stop_h - 0.30
                     - dovetail_stop_clearance
             ]);
