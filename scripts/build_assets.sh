@@ -65,6 +65,14 @@ for part_name in "${canonical_stl_parts[@]}"; do
   run_openscad -o "exports/${part_name}.stl" \
     -D "part=\"${part_name}\"" ha_green_rack.scad
 done
+# Physically validated rounded-cage release candidate. These targets are
+# already faceplate-down and intentionally omit the optional dovetail gates.
+run_openscad --backend=CGAL \
+  -o exports/one_piece_rear_cable_friendly_vent_frame_no_dovetail.stl \
+  -D 'part="one_piece_ventilated_sleeves_print"' ha_green_rack.scad
+run_openscad --backend=CGAL \
+  -o exports/x2d_plate_rear_cable_friendly_vent_frame_no_dovetail.stl \
+  -D 'part="x2d_plate_ventilated_sleeves"' ha_green_rack.scad
 for part_name in green_hybrid_clip_coupon splitter_hybrid_clip_coupon hybrid_clip_coupon green_vent_frame_coupon splitter_vent_frame_coupon vent_frame_coupon dovetail_rail_coupon; do
   # Force CGAL for these fit-critical coupons. Some Manifold STL exports can
   # retain zero-volume sliver components even when their visible shell looks
@@ -192,6 +200,12 @@ for part_name in x2d_plate one_piece; do
   run_openscad --backend=CGAL -o "exports/${part_name}.3mf" \
     -D "part=\"${part_name}\"" ha_green_rack.scad
 done
+run_openscad --backend=CGAL \
+  -o exports/one_piece_rear_cable_friendly_vent_frame_no_dovetail.3mf \
+  -D 'part="one_piece_ventilated_sleeves_print"' ha_green_rack.scad
+run_openscad --backend=CGAL \
+  -o exports/x2d_plate_rear_cable_friendly_vent_frame_no_dovetail.3mf \
+  -D 'part="x2d_plate_ventilated_sleeves"' ha_green_rack.scad
 for part_name in fit_test friction_fit_coupon splitter_fit_coupon; do
   run_openscad -o "exports/${part_name}.3mf" \
     -D "part=\"${part_name}\"" ha_green_rack.scad

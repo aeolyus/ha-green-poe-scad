@@ -16,7 +16,7 @@
 
 $fn = 48;
 
-// [assembly_preview, assembly, one_piece, one_piece_logo_inlay, x2d_plate, core, logo_inlay, left_ear, right_ear, led_insert, led_shutter, led_shutter_retainer, led_shutter_kit, led_fixed_window_kit, green_spacer, green_spacers_4x, fit_test, friction_fit_coupon, green_hybrid_clip_coupon, splitter_fit_coupon, splitter_hybrid_clip_coupon, hybrid_clip_coupon, green_vent_frame_coupon, splitter_vent_frame_coupon, vent_frame_coupon, dovetail_rail_coupon, green_dovetail_gate, splitter_dovetail_gate, keystone_fit_test, viewer_mount, viewer_mount_without_green_tray, viewer_splitter_floor, viewer_splitter_side_walls, viewer_splitter_end_stops, viewer_green_tray_standard, viewer_green_tray_friction, viewer_green_tray_friction_raised, viewer_green_tray_friction_full, viewer_green_tray_friction_pads, viewer_green_tray_friction_skeletal, viewer_insert, viewer_shutter_open, viewer_shutter_closed, viewer_shutter_retainer, viewer_logo, viewer_green, viewer_splitter, viewer_ports, viewer_green_ports, viewer_splitter_ports, viewer_keystone_ports, viewer_data_cables, viewer_internal_data_cable, viewer_input_data_cable, viewer_dc_cable, viewer_fasteners, viewer_retention_factory_screws, viewer_retention_slide_latch, viewer_retention_corner_gate, viewer_retention_sled_gate, viewer_retention_padded_rails, viewer_retention_captive_strap, viewer_retention_x_cage, viewer_retention_hybrid_clips, viewer_retention_ventilated_sleeves, viewer_retention_dovetail_gates, viewer_retention_friction_sleeve, viewer_enclosure_airframe, viewer_rulers, viewer_led_power, viewer_led_activity, viewer_led_health]
+// [assembly_preview, assembly, one_piece, one_piece_ventilated_sleeves, one_piece_ventilated_sleeves_print, one_piece_logo_inlay, x2d_plate, x2d_plate_ventilated_sleeves, core, core_ventilated_sleeves, logo_inlay, left_ear, right_ear, led_insert, led_shutter, led_shutter_retainer, led_shutter_kit, led_fixed_window_kit, green_spacer, green_spacers_4x, fit_test, friction_fit_coupon, green_hybrid_clip_coupon, splitter_fit_coupon, splitter_hybrid_clip_coupon, hybrid_clip_coupon, green_vent_frame_coupon, splitter_vent_frame_coupon, vent_frame_coupon, dovetail_rail_coupon, green_dovetail_gate, splitter_dovetail_gate, keystone_fit_test, viewer_mount, viewer_mount_without_green_tray, viewer_splitter_floor, viewer_splitter_side_walls, viewer_splitter_end_stops, viewer_green_tray_standard, viewer_green_tray_friction, viewer_green_tray_friction_raised, viewer_green_tray_friction_full, viewer_green_tray_friction_pads, viewer_green_tray_friction_skeletal, viewer_insert, viewer_shutter_open, viewer_shutter_closed, viewer_shutter_retainer, viewer_logo, viewer_green, viewer_splitter, viewer_ports, viewer_green_ports, viewer_keystone_ports, viewer_data_cables, viewer_internal_data_cable, viewer_input_data_cable, viewer_dc_cable, viewer_fasteners, viewer_retention_factory_screws, viewer_retention_slide_latch, viewer_retention_corner_gate, viewer_retention_sled_gate, viewer_retention_padded_rails, viewer_retention_captive_strap, viewer_retention_x_cage, viewer_retention_hybrid_clips, viewer_retention_ventilated_sleeves, viewer_retention_dovetail_gates, viewer_retention_friction_sleeve, viewer_enclosure_airframe, viewer_rulers, viewer_led_power, viewer_led_activity, viewer_led_health]
 part = "assembly_preview";
 
 // Production geometry uses the TP-Link. Viewer-only builds may override this
@@ -344,7 +344,7 @@ splitter_honeycomb_end_inset = 5.0;
 // and Mauker Chromebox rack cases. Thin honeycomb floors/roofs are joined by
 // thick rounded side frames with large capsule-shaped ventilation openings.
 sleeve_roof_t = 1.60;
-sleeve_green_side_clearance = 0.20;
+sleeve_green_side_clearance = 0.30;
 sleeve_green_vertical_clearance = 0.10;
 sleeve_splitter_side_clearance = 0.10;
 sleeve_splitter_vertical_clearance = 0.05;
@@ -1432,6 +1432,40 @@ module one_piece_mount_without_green_tray() {
     }
 }
 
+// Production rounded-cage mount. Unlike the browser assembly, this is a
+// single printable union with no mock devices, LED simulation, or dovetail
+// hardware. The validated Green and TP-Link cages replace both legacy trays.
+module one_piece_ventilated_sleeves_mount() {
+    union() {
+        one_piece_mount_without_green_tray();
+        translate([ear_width, 0, 0])
+            retention_ventilated_sleeves_local();
+    }
+}
+
+module core_without_device_trays() {
+    difference() {
+        union() {
+            cube([core_width, face_thickness, rack_height]);
+            device_bridges();
+            core_joint_bosses();
+        }
+
+        led_window_cut();
+        if (led_shutter_enabled) led_shutter_pocket_cut();
+        face_logo_cut();
+        front_keystone_cut();
+        core_joint_pilot_holes();
+    }
+}
+
+module core_ventilated_sleeves_mount() {
+    union() {
+        core_without_device_trays();
+        retention_ventilated_sleeves_local();
+    }
+}
+
 module one_piece_logo_inlay() {
     translate([ear_width, 0, 0]) face_logo_inlay();
 }
@@ -1711,6 +1745,16 @@ module core_face_down_print() {
     translate([0, rack_height, 0]) rotate([90, 0, 0]) core();
 }
 
+module one_piece_ventilated_sleeves_face_down_print() {
+    translate([0, rack_height, 0]) rotate([90, 0, 0])
+        one_piece_ventilated_sleeves_mount();
+}
+
+module core_ventilated_sleeves_face_down_print() {
+    translate([0, rack_height, 0]) rotate([90, 0, 0])
+        core_ventilated_sleeves_mount();
+}
+
 module led_lens_print() {
     translate([2.0, 10.0, 0]) rotate([90, 0, 0]) led_insert();
 }
@@ -1781,6 +1825,15 @@ module x2d_plate() {
     }
     if (green_tray_style == "standard")
         translate([190.0, loose_parts_y, 0]) green_spacers_4x();
+}
+
+module x2d_plate_ventilated_sleeves() {
+    // Safer split alternative to the 254 mm one-piece print. The complete
+    // validated cage core and both ears are already faceplate-down.
+    loose_parts_y = 50.0;
+    core_ventilated_sleeves_face_down_print();
+    translate([0, loose_parts_y, 0]) left_ear_print();
+    translate([38.0, loose_parts_y, 0]) right_ear_print();
 }
 
 module cable_path(points, diameter = 3.0) {
@@ -4024,14 +4077,15 @@ module retention_green_ventilated_sleeve_local() {
     sleeve_y0 = face_thickness - 0.20;
     sleeve_depth = green_inner_d + (green_y - face_thickness)
                    + wall_thickness;
-    wall_z0 = unified_deck_z0 - 0.20;
+    wall_z0 = unified_deck_z0;
     // The broad honeycomb roof clears the measured top by 0.10 mm. Combined
-    // with 0.20 mm lateral clearance per side, this avoids stacking deliberate
+    // with 0.30 mm lateral clearance per side, this avoids stacking deliberate
     // interference on top of normal FDM inner-feature shrinkage.
     // Its underside and both side-fit profiles remain constant front-to-back.
     roof_z0 = green_device_z + green_h
               + sleeve_green_vertical_clearance;
     roof_top = roof_z0 + sleeve_roof_t;
+    wall_top = roof_top - 0.20;
     inner_left = green_x - sleeve_green_side_clearance;
     inner_right = green_x + green_w + sleeve_green_side_clearance;
     top_left = green_x + (green_w - green_top_w) / 2
@@ -4054,14 +4108,14 @@ module retention_green_ventilated_sleeve_local() {
         [inner_left, wall_z0],
         [inner_left, upper_taper_start],
         [top_left, roof_z0],
-        [top_left, roof_top],
-        [outer_left, roof_top]
+        [top_left, wall_top],
+        [outer_left, wall_top]
     ];
     right_profile = [
         [inner_right, wall_z0],
         [outer_right, wall_z0],
-        [outer_right, roof_top],
-        [top_right, roof_top],
+        [outer_right, wall_top],
+        [top_right, wall_top],
         [top_right, roof_z0],
         [inner_right, upper_taper_start]
     ];
@@ -4115,7 +4169,7 @@ module retention_splitter_ventilated_sleeve_local() {
     inner_right = splitter_w + sleeve_splitter_side_clearance;
     outer_y = -splitter_clearance - wall_thickness;
     outer_depth = splitter_inner_d + 2 * wall_thickness;
-    wall_z0 = base_thickness - 0.20;
+    wall_z0 = 0;
     lower_inner_left = inner_left + splitter_lower_bevel_inset;
     lower_inner_right = inner_right - splitter_lower_bevel_inset;
     lower_bevel_top = base_thickness + splitter_lower_bevel_h;
@@ -4127,6 +4181,7 @@ module retention_splitter_ventilated_sleeve_local() {
     roof_z0 = base_thickness + splitter_h
               + sleeve_splitter_vertical_clearance;
     roof_top = roof_z0 + sleeve_roof_t;
+    wall_top = roof_top - 0.20;
     frame_openings = [[
         sleeve_splitter_frame_open_z,
         outer_y + sleeve_splitter_frame_end_border,
@@ -4137,20 +4192,22 @@ module retention_splitter_ventilated_sleeve_local() {
     left_profile = [
         [outer_left, wall_z0],
         [lower_inner_left, wall_z0],
+        [lower_inner_left, base_thickness],
         [inner_left, lower_bevel_top],
         [inner_left, upper_bevel_bottom],
         [top_inner_left, roof_z0],
-        [top_inner_left, roof_top],
-        [outer_left, roof_top]
+        [top_inner_left, wall_top],
+        [outer_left, wall_top]
     ];
     right_profile = [
         [lower_inner_right, wall_z0],
         [outer_right, wall_z0],
-        [outer_right, roof_top],
-        [top_inner_right, roof_top],
+        [outer_right, wall_top],
+        [top_inner_right, wall_top],
         [top_inner_right, roof_z0],
         [inner_right, upper_bevel_bottom],
-        [inner_right, lower_bevel_top]
+        [inner_right, lower_bevel_top],
+        [lower_inner_right, base_thickness]
     ];
     union() {
         linear_extrude(height = base_thickness)
@@ -4464,7 +4521,7 @@ module green_dovetail_receivers_local() {
               + 2 * sleeve_green_frame_t;
     outer_left = green_x + green_w / 2 - outer_w / 2;
     outer_right = outer_left + outer_w;
-    wall_z0 = unified_deck_z0 - 0.20;
+    wall_z0 = unified_deck_z0;
     roof_top = green_device_z + green_h
                + sleeve_green_vertical_clearance + sleeve_roof_t;
     sleeve_y0 = face_thickness - 0.20;
@@ -4482,7 +4539,7 @@ module green_dovetail_gate_local() {
               + 2 * sleeve_green_frame_t;
     outer_left = green_x + green_w / 2 - outer_w / 2;
     outer_right = outer_left + outer_w;
-    wall_z0 = unified_deck_z0 - 0.20;
+    wall_z0 = unified_deck_z0;
     roof_top = green_device_z + green_h
                + sleeve_green_vertical_clearance + sleeve_roof_t;
     sleeve_y0 = face_thickness - 0.20;
@@ -4501,7 +4558,7 @@ module green_dovetail_gate_local() {
 module splitter_dovetail_receivers_local() {
     outer_left = -splitter_clearance - wall_thickness;
     outer_right = splitter_w + splitter_clearance + wall_thickness;
-    wall_z0 = base_thickness - 0.20;
+    wall_z0 = 0;
     roof_top = base_thickness + splitter_h
                + sleeve_splitter_vertical_clearance + sleeve_roof_t;
     outer_y = -splitter_clearance - wall_thickness;
@@ -4516,7 +4573,7 @@ module splitter_dovetail_receivers_local() {
 module splitter_dovetail_gate_local() {
     outer_left = -splitter_clearance - wall_thickness;
     outer_right = splitter_w + splitter_clearance + wall_thickness;
-    wall_z0 = base_thickness - 0.20;
+    wall_z0 = 0;
     roof_top = base_thickness + splitter_h
                + sleeve_splitter_vertical_clearance + sleeve_roof_t;
     outer_y = -splitter_clearance - wall_thickness;
@@ -4541,7 +4598,7 @@ module green_dovetail_gate_print() {
     outer_left = green_x + green_w / 2 - outer_w / 2;
     gate_x0 = dovetail_left_center(outer_left)
               - dovetail_gate_post_w / 2;
-    wall_z0 = unified_deck_z0 - 0.20;
+    wall_z0 = unified_deck_z0;
     sleeve_y0 = face_thickness - 0.20;
     sleeve_depth = green_inner_d + (green_y - face_thickness)
                    + wall_thickness;
@@ -4556,7 +4613,7 @@ module splitter_dovetail_gate_print() {
     outer_left = -splitter_clearance - wall_thickness;
     gate_x0 = dovetail_left_center(outer_left)
               - dovetail_gate_post_w / 2;
-    wall_z0 = base_thickness - 0.20;
+    wall_z0 = 0;
     outer_y = -splitter_clearance - wall_thickness;
     outer_depth = splitter_inner_d + 2 * wall_thickness;
     gate_y = outer_y + outer_depth + dovetail_rear_extension + 0.35;
@@ -4575,7 +4632,7 @@ module green_dovetail_cage_local() {
               + 2 * sleeve_green_frame_t;
     outer_left = green_x + green_w / 2 - outer_w / 2;
     outer_right = outer_left + outer_w;
-    wall_z0 = unified_deck_z0 - 0.20;
+    wall_z0 = unified_deck_z0;
     roof_top = green_device_z + green_h
                + sleeve_green_vertical_clearance + sleeve_roof_t;
     sleeve_y0 = face_thickness - 0.20;
@@ -4601,7 +4658,7 @@ module green_dovetail_cage_local() {
 module splitter_dovetail_cage_local() {
     outer_left = -splitter_clearance - wall_thickness;
     outer_right = splitter_w + splitter_clearance + wall_thickness;
-    wall_z0 = base_thickness - 0.20;
+    wall_z0 = 0;
     roof_top = base_thickness + splitter_h
                + sleeve_splitter_vertical_clearance + sleeve_roof_t;
     outer_y = -splitter_clearance - wall_thickness;
@@ -5335,12 +5392,20 @@ if (part == "assembly_preview") {
     assembly(false);
 } else if (part == "one_piece") {
     one_piece_mount();
+} else if (part == "one_piece_ventilated_sleeves") {
+    one_piece_ventilated_sleeves_mount();
+} else if (part == "one_piece_ventilated_sleeves_print") {
+    one_piece_ventilated_sleeves_face_down_print();
 } else if (part == "one_piece_logo_inlay") {
     one_piece_logo_inlay();
 } else if (part == "x2d_plate") {
     x2d_plate();
+} else if (part == "x2d_plate_ventilated_sleeves") {
+    x2d_plate_ventilated_sleeves();
 } else if (part == "core") {
     core();
+} else if (part == "core_ventilated_sleeves") {
+    core_ventilated_sleeves_mount();
 } else if (part == "logo_inlay") {
     face_logo_inlay();
 } else if (part == "left_ear") {
