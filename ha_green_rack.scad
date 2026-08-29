@@ -1024,43 +1024,6 @@ module device_bridge_box_local(
     }
 }
 
-// Hollow rectangular spine from the faceplate to the TP-Link floor. Unlike
-// the former edge flanges and triangular knees, its section is constant and
-// contains no permanent print-support geometry. Faceplate-down, this tube
-// grows directly from the panel; slicer-generated support may be placed only
-// beneath the TP-Link cage's outer wings if desired.
-module splitter_spine_box_local(
-    spine_x, spine_w, spine_y0, spine_d,
-    wall_t, box_top) {
-    box_bottom = unified_deck_z0;
-    cavity_bottom = box_bottom + base_thickness;
-    cavity_top = box_top - wall_t;
-
-    assert(spine_w > 2 * wall_t,
-           "Splitter spine needs room between its side walls");
-    assert(spine_d > wall_t,
-           "Splitter spine needs a positive hollow length");
-    assert(cavity_top > cavity_bottom,
-           "Splitter spine needs a positive hollow core");
-
-    difference() {
-        translate([spine_x, spine_y0, box_bottom])
-            cube([spine_w, spine_d, box_top - box_bottom]);
-
-        // Keep a front end wall against the panel and leave the rear open into
-        // the splitter bay so this is a vented tube rather than a sealed void.
-        translate([
-            spine_x + wall_t,
-            spine_y0 + wall_t,
-            cavity_bottom
-        ]) cube([
-                spine_w - 2 * wall_t,
-                spine_d - wall_t + epsilon,
-                cavity_top - cavity_bottom
-            ]);
-    }
-}
-
 module side_by_side_device_bridges() {
     splitter_outer_right = splitter_x + splitter_w + splitter_clearance
                            + wall_thickness;
@@ -1097,7 +1060,10 @@ module side_by_side_device_bridges() {
     spine_x = splitter_x + splitter_w / 2 - 6.0;
     spine_w = 12.0;
     spine_y0 = face_thickness - 0.20;
-    spine_d = splitter_y - face_thickness + 0.40;
+    // Continue through the cage's solid front floor border. Because this tie
+    // has exactly the same Z range as the cage floor, the union is seamless
+    // and leaves no raised ridge inside the device cavity.
+    spine_d = splitter_outer_front + sleeve_roof_border - spine_y0;
 
     union() {
         // Two closed hollow beams tie the straight cage walls together. Their
@@ -1109,11 +1075,11 @@ module side_by_side_device_bridges() {
                 y0, bridge_web_d, bridge_x, bridge_w,
                 bridge_box_wall, bridge_box_top);
 
-        // A constant hollow center spine carries the splitter load back to
-        // the face without permanent triangular braces.
-        splitter_spine_box_local(
-            spine_x, spine_w, spine_y0, spine_d,
-            bridge_box_wall, bridge_box_top);
+        // Flat lower tie: flush with the splitter floor instead of projecting
+        // above the seating plane. The matching roof tie in the rounded cage
+        // completes a deep frame without a visible internal ridge.
+        translate([spine_x, spine_y0, unified_deck_z0])
+            cube([spine_w, spine_d, base_thickness]);
     }
 }
 
@@ -4287,33 +4253,31 @@ module retention_splitter_ventilated_sleeve_local() {
     }
 }
 
-// Upper tie from the faceplate to the center of the TP-Link cage roof. The
-// lower hollow spine and this roof tie form a deep frame in side view, which
-// resists splitter sag and twist far more effectively than thickening the
-// lower floor alone. It begins inside the faceplate and lands on the solid
-// front roof border, stays below the 1U outline, and grows directly from the
-// faceplate in the face-down print orientation.
+// Upper tie from the faceplate to the center of the TP-Link cage roof. It is
+// exactly coplanar with the roof rather than sitting on top as a visible rib.
+// Together with the flush lower floor tie, it forms a deep frame in side view
+// that resists splitter sag and twist. It begins inside the faceplate, lands
+// on the solid front roof border, remains below the 1U outline, and grows
+// directly from the faceplate in the face-down print orientation.
 module splitter_upper_face_tie_local() {
     tie_w = 12.0;
-    tie_h = 3.0;
     root_overlap = 0.20;
-    roof_overlap = 0.20;
     tie_x = splitter_x + splitter_w / 2 - tie_w / 2;
     tie_y0 = face_thickness - root_overlap;
     cage_front_y = splitter_y - splitter_clearance - wall_thickness;
     tie_y1 = cage_front_y + sleeve_roof_border;
     splitter_roof_top = unified_deck_raise + base_thickness + splitter_h
                         + sleeve_splitter_vertical_clearance + sleeve_roof_t;
-    tie_z0 = splitter_roof_top - roof_overlap;
+    tie_z0 = splitter_roof_top - sleeve_roof_t;
 
     assert(tie_y1 > tie_y0,
            "Splitter upper tie needs a positive span");
-    assert(tie_z0 + tie_h <= rack_height,
+    assert(tie_z0 + sleeve_roof_t <= rack_height,
            "Splitter upper tie must remain within the 1U panel height");
 
     if (!stacked_center_layout && splitter_model == "tplink")
         translate([tie_x, tie_y0, tie_z0])
-            cube([tie_w, tie_y1 - tie_y0, tie_h]);
+            cube([tie_w, tie_y1 - tie_y0, sleeve_roof_t]);
 }
 
 module retention_ventilated_sleeves_local() {
