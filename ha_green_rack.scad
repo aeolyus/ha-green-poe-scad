@@ -371,8 +371,8 @@ dovetail_neck_w = 2.60;
 dovetail_head_w = 5.80;
 dovetail_running_clearance = 0.25;
 dovetail_lock_clearance = 0.00;
-dovetail_receiver_wall = 1.20;
-dovetail_rear_extension = 2.00;
+dovetail_receiver_wall = 1.30;
+dovetail_rear_extension = 0.00;
 dovetail_bottom_stop_h = 1.20;
 dovetail_stop_clearance = 0.05;
 dovetail_lock_h = 7.0;
@@ -381,6 +381,8 @@ dovetail_top_lead_extra = 0.35;
 dovetail_gate_t = 2.40;
 dovetail_gate_post_w = 6.20;
 dovetail_gate_bar_h = 3.20;
+dovetail_gate_neck_overlap = 0.40;
+dovetail_gate_recess_clearance = 0.10;
 dovetail_gate_contact_clearance = 0.05;
 dovetail_gate_contact_lead_h = 0.80;
 dovetail_gate_contact_lead_relief = 0.35;
@@ -4355,7 +4357,7 @@ module dovetail_receiver_pair_local(
     outer_left, outer_right, cage_rear_y,
     wall_z0, roof_top,
     lock_clearance = dovetail_lock_clearance) {
-    mouth_y = cage_rear_y + 0.10;
+    mouth_y = cage_rear_y;
     for (center_x = [dovetail_left_center(outer_left),
                      dovetail_right_center(outer_right)])
         dovetail_receiver_tower_local(
@@ -4371,7 +4373,7 @@ module dovetail_receiver_channel_pair_local(
     outer_left, outer_right, cage_rear_y,
     wall_z0, roof_top,
     lock_clearance = dovetail_lock_clearance) {
-    mouth_y = cage_rear_y + 0.10;
+    mouth_y = cage_rear_y;
     track_z0 = wall_z0 + dovetail_bottom_stop_h;
     track_h = roof_top - track_z0;
 
@@ -4471,8 +4473,8 @@ module dovetail_gate_frame_local(
     contact_bottom_z, contact_top_z) {
     left_center = dovetail_left_center(outer_left);
     right_center = dovetail_right_center(outer_right);
-    mouth_y = cage_rear_y + 0.10;
-    gate_y = cage_rear_y + 0.35;
+    mouth_y = cage_rear_y;
+    gate_y = cage_rear_y - dovetail_gate_t;
     gate_x0 = left_center - dovetail_gate_post_w / 2;
     gate_x1 = right_center + dovetail_gate_post_w / 2;
     contact_x0 = left_center + dovetail_receiver_w() / 2
@@ -4521,17 +4523,46 @@ module dovetail_gate_frame_local(
             // remaining inside the receiver's open throat.
             translate([
                 center_x - dovetail_neck_w / 2,
-                mouth_y - epsilon,
+                mouth_y - dovetail_gate_neck_overlap,
                 wall_z0 + dovetail_bottom_stop_h
                     + dovetail_stop_clearance
             ]) cube([
                 dovetail_neck_w,
-                gate_y - mouth_y + 2 * epsilon,
+                dovetail_gate_neck_overlap + epsilon,
                 gate_h - dovetail_bottom_stop_h - 0.30
                     - dovetail_stop_clearance
             ]);
         }
     }
+}
+
+// Pocket only the rear H-frame into the last section of the cage. The
+// dovetail heads remain captured farther forward inside locally thickened
+// sidewall ends, while the installed gate's rear and top faces finish flush
+// with the surrounding cage surfaces.
+module dovetail_gate_frame_recess_local(
+    outer_left, outer_right,
+    cage_rear_y, wall_z0, roof_top) {
+    left_center = dovetail_left_center(outer_left);
+    right_center = dovetail_right_center(outer_right);
+    gate_x0 = left_center - dovetail_gate_post_w / 2;
+    gate_x1 = right_center + dovetail_gate_post_w / 2;
+    gate_y = cage_rear_y - dovetail_gate_t;
+    recess_y = gate_y - dovetail_gate_recess_clearance;
+    recess_d = dovetail_gate_t
+               + dovetail_gate_recess_clearance + epsilon;
+
+    // Clear the complete vertical swept envelope of the flush rear H-frame.
+    // Material forward of this shallow pocket still surrounds the buried
+    // dovetail heads and ties each receiver into the cage sidewall.
+    translate([
+        gate_x0 - dovetail_gate_recess_clearance,
+        recess_y, wall_z0 - epsilon
+    ]) cube([
+        gate_x1 - gate_x0 + 2 * dovetail_gate_recess_clearance,
+        recess_d,
+        roof_top - wall_z0 + 2 * epsilon
+    ]);
 }
 
 module green_dovetail_receivers_local() {
@@ -4620,8 +4651,7 @@ module green_dovetail_gate_print() {
     sleeve_y0 = face_thickness - 0.20;
     sleeve_depth = green_inner_d + (green_y - face_thickness)
                    + wall_thickness;
-    gate_y = sleeve_y0 + sleeve_depth + dovetail_rear_extension + 0.35;
-    gate_rear_y = gate_y + dovetail_gate_t;
+    gate_rear_y = sleeve_y0 + sleeve_depth + dovetail_rear_extension;
 
     translate([-gate_x0, -wall_z0, gate_rear_y])
         rotate([-90, 0, 0]) green_dovetail_gate_local();
@@ -4634,17 +4664,15 @@ module splitter_dovetail_gate_print() {
     wall_z0 = 0;
     outer_y = -splitter_clearance - wall_thickness;
     outer_depth = splitter_inner_d + 2 * wall_thickness;
-    gate_y = outer_y + outer_depth + dovetail_rear_extension + 0.35;
-    gate_rear_y = gate_y + dovetail_gate_t;
+    gate_rear_y = outer_y + outer_depth + dovetail_rear_extension;
 
     translate([-gate_x0, -wall_z0, gate_rear_y])
         rotate([-90, 0, 0]) splitter_dovetail_gate_local();
 }
 
-// Rounded cages plus two installed removable rear gates. The receivers sit
-// entirely inside the cages' outer side-wall planes, removing the former
-// external brim. Their station is extended rearward far enough that the wider
-// buried dovetail heads occupy only the empty space behind each device.
+// Rounded cages plus two installed removable rear gates. The receiver tracks
+// are buried in locally thickened rear sidewall ends, and the H-frames occupy
+// matching shallow pockets so their rear faces finish flush with the cages.
 module green_dovetail_cage_local() {
     outer_w = green_w + 2 * sleeve_green_side_clearance
               + 2 * sleeve_green_frame_t;
@@ -4663,16 +4691,17 @@ module green_dovetail_cage_local() {
             retention_green_ventilated_sleeve_local();
             green_dovetail_receivers_local();
         }
+        dovetail_gate_frame_recess_local(
+            outer_left, outer_right,
+            receiver_y, wall_z0, roof_top);
         dovetail_receiver_channel_pair_local(
             outer_left, outer_right, receiver_y,
             wall_z0, roof_top);
         dovetail_gate_contact_slot_local(
             dovetail_left_center(outer_left)
-                + dovetail_receiver_w() / 2
-                + dovetail_gate_contact_slot_clearance,
+                - dovetail_gate_post_w / 2,
             dovetail_right_center(outer_right)
-                - dovetail_receiver_w() / 2
-                - dovetail_gate_contact_slot_clearance,
+                + dovetail_gate_post_w / 2,
             green_y + green_d,
             receiver_y, roof_top);
     }
@@ -4693,16 +4722,17 @@ module splitter_dovetail_cage_local() {
             retention_splitter_ventilated_sleeve_local();
             splitter_dovetail_receivers_local();
         }
+        dovetail_gate_frame_recess_local(
+            outer_left, outer_right,
+            receiver_y, wall_z0, roof_top);
         dovetail_receiver_channel_pair_local(
             outer_left, outer_right, receiver_y,
             wall_z0, roof_top);
         dovetail_gate_contact_slot_local(
             dovetail_left_center(outer_left)
-                + dovetail_receiver_w() / 2
-                + dovetail_gate_contact_slot_clearance,
+                - dovetail_gate_post_w / 2,
             dovetail_right_center(outer_right)
-                - dovetail_receiver_w() / 2
-                - dovetail_gate_contact_slot_clearance,
+                + dovetail_gate_post_w / 2,
             splitter_d,
             receiver_y, roof_top);
     }
