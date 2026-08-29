@@ -988,47 +988,6 @@ module splitter_tray_without_side_walls() {
         }
 }
 
-// Extrude a Z/Y structural profile through X. These ribs are deliberately
-// bounded below the straight-plug envelopes and use only vertical or
-// 45-degree surfaces for support-free faceplate-down printing.
-module reinforcement_extrude_x(x0, thickness) {
-    translate([x0 + thickness, 0, 0])
-        rotate([0, -90, 0])
-            linear_extrude(height = thickness)
-                children();
-}
-
-module splitter_spine_reinforcement_local(spine_x, spine_w, spine_y0) {
-    rib_t = 2.0;
-    rib_z0 = unified_deck_raise + base_thickness - 0.20;
-    rib_top = unified_deck_raise + 8.0;
-    taper_run = rib_top - rib_z0;
-    taper_y0 = splitter_y - taper_run;
-    knee_top = unified_deck_raise + 14.0;
-    knee_run = knee_top - rib_top;
-
-    for (x0 = [spine_x, spine_x + spine_w - rib_t]) {
-        // Two edge flanges turn the flat 12 mm neck into a shallow U-channel.
-        // Each flange tapers to the floor before the splitter body begins.
-        reinforcement_extrude_x(x0, rib_t)
-            polygon(points = [
-                [rib_z0, spine_y0],
-                [rib_top, spine_y0],
-                [rib_top, taper_y0],
-                [rib_z0, splitter_y]
-            ]);
-
-        // Compact 45-degree knees reinforce the face/spine root. Their upper
-        // edge is kept below the compact layout's lowest cable envelope.
-        reinforcement_extrude_x(x0, rib_t)
-            polygon(points = [
-                [rib_top - 0.20, spine_y0],
-                [knee_top, spine_y0],
-                [rib_top - 0.20, spine_y0 + knee_run + 0.20]
-            ]);
-    }
-}
-
 // Closed box beam between the two cage walls. The existing 3 mm bridge floor
 // is the lower skin; thin side walls and a thin upper skin close the section.
 // In the faceplate-down print orientation, original Y becomes print Z, so the
@@ -1065,8 +1024,44 @@ module device_bridge_box_local(
     }
 }
 
+// Hollow rectangular spine from the faceplate to the TP-Link floor. Unlike
+// the former edge flanges and triangular knees, its section is constant and
+// contains no permanent print-support geometry. Faceplate-down, this tube
+// grows directly from the panel; slicer-generated support may be placed only
+// beneath the TP-Link cage's outer wings if desired.
+module splitter_spine_box_local(
+    spine_x, spine_w, spine_y0, spine_d,
+    wall_t, box_top) {
+    box_bottom = unified_deck_z0;
+    cavity_bottom = box_bottom + base_thickness;
+    cavity_top = box_top - wall_t;
+
+    assert(spine_w > 2 * wall_t,
+           "Splitter spine needs room between its side walls");
+    assert(spine_d > wall_t,
+           "Splitter spine needs a positive hollow length");
+    assert(cavity_top > cavity_bottom,
+           "Splitter spine needs a positive hollow core");
+
+    difference() {
+        translate([spine_x, spine_y0, box_bottom])
+            cube([spine_w, spine_d, box_top - box_bottom]);
+
+        // Keep a front end wall against the panel and leave the rear open into
+        // the splitter bay so this is a vented tube rather than a sealed void.
+        translate([
+            spine_x + wall_t,
+            spine_y0 + wall_t,
+            cavity_bottom
+        ]) cube([
+                spine_w - 2 * wall_t,
+                spine_d - wall_t + epsilon,
+                cavity_top - cavity_bottom
+            ]);
+    }
+}
+
 module side_by_side_device_bridges() {
-    splitter_outer_left = splitter_x - splitter_clearance - wall_thickness;
     splitter_outer_right = splitter_x + splitter_w + splitter_clearance
                            + wall_thickness;
     green_outer_left = green_x - wall_thickness;
@@ -1102,19 +1097,7 @@ module side_by_side_device_bridges() {
     spine_x = splitter_x + splitter_w / 2 - 6.0;
     spine_w = 12.0;
     spine_y0 = face_thickness - 0.20;
-    // The face-down print grows in original +Y. Widen the 12 mm center spine
-    // at 45 degrees until it covers the complete TP-Link floor before that
-    // floor begins. This replaces two unsupported outer cantilevers with a
-    // continuously supported flare and adds only a small, low solid web below
-    // every modeled cable envelope.
-    splitter_flare_end_y = splitter_outer_front + 0.40;
-    splitter_flare_run = max(
-        spine_x - splitter_outer_left,
-        splitter_outer_right - (spine_x + spine_w));
-    splitter_flare_start_y = splitter_flare_end_y - splitter_flare_run;
-
-    assert(splitter_flare_start_y > spine_y0,
-           "TP-Link support flare must start behind the faceplate");
+    spine_d = splitter_y - face_thickness + 0.40;
 
     union() {
         // Two closed hollow beams tie the straight cage walls together. Their
@@ -1126,25 +1109,11 @@ module side_by_side_device_bridges() {
                 y0, bridge_web_d, bridge_x, bridge_w,
                 bridge_box_wall, bridge_box_top);
 
-        // A narrow center spine carries rear-patching loads to the face.
-        translate([spine_x, spine_y0, unified_deck_z0])
-            cube([spine_w, splitter_y - face_thickness + 0.40,
-                  base_thickness]);
-
-        // Full-width only at the cage, narrow at its print-leading end. In
-        // faceplate-down orientation the two diagonal edges are 45-degree
-        // self-supporting overhangs rather than a floating splitter shelf.
-        translate([0, 0, unified_deck_z0])
-            linear_extrude(height = base_thickness)
-                polygon(points = [
-                    [spine_x, splitter_flare_start_y],
-                    [spine_x + spine_w, splitter_flare_start_y],
-                    [splitter_outer_right, splitter_flare_end_y],
-                    [splitter_outer_left, splitter_flare_end_y]
-                ]);
-
-        splitter_spine_reinforcement_local(
-            spine_x, spine_w, spine_y0);
+        // A constant hollow center spine carries the splitter load back to
+        // the face without permanent triangular braces.
+        splitter_spine_box_local(
+            spine_x, spine_w, spine_y0, spine_d,
+            bridge_box_wall, bridge_box_top);
     }
 }
 
