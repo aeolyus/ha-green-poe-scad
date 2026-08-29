@@ -1042,7 +1042,10 @@ module side_by_side_device_bridges() {
                           + wall_thickness;
     green_outer_front = face_thickness - 0.20;
     green_outer_rear = green_y + green_inner_d + wall_thickness;
-    bridge_overlap = unified_roof_layout ? 0.20 : 0;
+    // The unified-frame production export needs enough buried engagement to
+    // survive CGAL cleanup as one connected solid, not merely face-contacting
+    // bridge shells. This overlap remains entirely inside the cage floors.
+    bridge_overlap = unified_roof_layout ? 1.20 : 0;
     bridge_x = splitter_outer_right - bridge_overlap;
     bridge_w = green_outer_left - splitter_outer_right
                + 2 * bridge_overlap;
@@ -1422,8 +1425,11 @@ module one_piece_mount_without_green_tray() {
 module one_piece_ventilated_sleeves_mount() {
     union() {
         one_piece_mount_without_green_tray();
-        translate([ear_width, 0, 0])
+        translate([ear_width, 0, 0]) {
             retention_ventilated_sleeves_local();
+            if (unified_roof_layout)
+                unified_roof_cross_bridges_local();
+        }
     }
 }
 
@@ -1433,8 +1439,11 @@ module one_piece_ventilated_sleeves_mount() {
 module one_piece_dovetail_ready_mount() {
     union() {
         one_piece_mount_without_green_tray();
-        translate([ear_width, 0, 0])
+        translate([ear_width, 0, 0]) {
             retention_dovetail_cages_local();
+            if (unified_roof_layout)
+                unified_roof_cross_bridges_local();
+        }
     }
 }
 
