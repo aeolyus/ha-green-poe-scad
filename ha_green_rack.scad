@@ -4321,8 +4321,8 @@ module splitter_corner_l_ties_local() {
 }
 
 // Bottom-aligned unified-frame comparison: the existing two hollow lower box
-// bridges join the coplanar cage floors. These two lightweight sloped channel
-// ties connect the unequal roof heights so both cages resist twist as one
+// bridges join the coplanar cage floors. These two lightweight sloped hollow
+// box ties connect the unequal roof heights so both cages resist twist as one
 // frame without lifting the shorter TP-Link or adding a deep stepped support.
 module unified_roof_cross_bridges_local() {
     splitter_outer_right = splitter_x + splitter_w + splitter_clearance
@@ -4342,6 +4342,9 @@ module unified_roof_cross_bridges_local() {
     bridge_d = 12.0;
     bridge_t = sleeve_roof_t;
     return_h = 5.0;
+    lower_skin_t = 1.20;
+    side_wall_t = 1.20;
+    end_wall_t = 1.20;
     // This branch is currently a viewer study. Keep a visually negligible
     // gap from each cage so the crossbars remain clean independent shells;
     // a selected production version will receive dedicated fused sockets.
@@ -4373,36 +4376,40 @@ module unified_roof_cross_bridges_local() {
            "Unified frame bridges need two separated landing zones");
 
     for (y0 = [front_y, rear_y]) {
-        union() {
-            // Constant-thickness sloped roof skin between the two cages.
-            hull() {
-                translate([splitter_end_x, y0, splitter_roof_z0])
-                    cube([bridge_t, bridge_d, sleeve_roof_t]);
-                translate([green_end_x, y0, green_roof_z0])
-                    cube([bridge_t, bridge_d, sleeve_roof_t]);
-            }
-
-            // Shallow front and rear returns form a stiff channel rather than
-            // leaving the roof tie as a flexible flat strip.
+        difference() {
+            // Outer sloped box follows the two unequal cage-roof heights.
             hull() {
                 translate([
                     splitter_end_x, y0,
                     splitter_roof_top - return_h
-                ]) cube([bridge_t, bridge_t, return_h]);
+                ]) cube([bridge_t, bridge_d, return_h]);
                 translate([
                     green_end_x, y0,
                     green_roof_top - return_h
-                ]) cube([bridge_t, bridge_t, return_h]);
+                ]) cube([bridge_t, bridge_d, return_h]);
             }
+
+            // Remove a matching sloped core while retaining 1.2 mm front,
+            // rear, lower, and end walls plus the 1.6 mm roof skin.
             hull() {
                 translate([
-                    splitter_end_x, y0 + bridge_d - bridge_t,
-                    splitter_roof_top - return_h
-                ]) cube([bridge_t, bridge_t, return_h]);
+                    splitter_end_x + end_wall_t,
+                    y0 + side_wall_t,
+                    splitter_roof_top - return_h + lower_skin_t
+                ]) cube([
+                    epsilon,
+                    bridge_d - 2 * side_wall_t,
+                    return_h - lower_skin_t - sleeve_roof_t
+                ]);
                 translate([
-                    green_end_x, y0 + bridge_d - bridge_t,
-                    green_roof_top - return_h
-                ]) cube([bridge_t, bridge_t, return_h]);
+                    green_end_x + bridge_t - end_wall_t - epsilon,
+                    y0 + side_wall_t,
+                    green_roof_top - return_h + lower_skin_t
+                ]) cube([
+                    epsilon,
+                    bridge_d - 2 * side_wall_t,
+                    return_h - lower_skin_t - sleeve_roof_t
+                ]);
             }
         }
     }

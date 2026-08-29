@@ -525,7 +525,7 @@ VARIANTS = [
         "note": (
             "Recommended rigidity study. Both cages remain bottom-aligned on "
             "the shared raised deck. Two hollow lower box bridges join their "
-            "floors, two lightweight sloped channel ties join their unequal "
+            "floors, two lightweight sloped hollow-box ties join their unequal "
             "roof heights, and four corner L-rails continue forward to the "
             "faceplate."
         ),
