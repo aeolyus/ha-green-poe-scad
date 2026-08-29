@@ -4507,6 +4507,16 @@ module dovetail_gate_frame_local(
         ]) rounded_prism_z(
                 gate_x1 - gate_x0,
                 dovetail_gate_t, dovetail_gate_bar_h, 0.65);
+        // Fill the forward part of the lower-beam travel opening when the gate
+        // is seated. This center tongue makes the top surface continuous while
+        // leaving the receiver material intact beside both dovetails.
+        translate([
+            contact_x0, contact_y,
+            roof_top - dovetail_gate_bar_h
+        ]) rounded_prism_z(
+                contact_x1 - contact_x0,
+                gate_rear_y - contact_y,
+                dovetail_gate_bar_h, 0.65);
 
         for (center_x = [left_center, right_center]) {
             translate([
@@ -4699,9 +4709,11 @@ module green_dovetail_cage_local() {
             wall_z0, roof_top);
         dovetail_gate_contact_slot_local(
             dovetail_left_center(outer_left)
-                - dovetail_gate_post_w / 2,
+                + dovetail_receiver_w() / 2
+                + dovetail_gate_contact_slot_clearance,
             dovetail_right_center(outer_right)
-                + dovetail_gate_post_w / 2,
+                - dovetail_receiver_w() / 2
+                - dovetail_gate_contact_slot_clearance,
             green_y + green_d,
             receiver_y, roof_top);
     }
@@ -4730,9 +4742,11 @@ module splitter_dovetail_cage_local() {
             wall_z0, roof_top);
         dovetail_gate_contact_slot_local(
             dovetail_left_center(outer_left)
-                - dovetail_gate_post_w / 2,
+                + dovetail_receiver_w() / 2
+                + dovetail_gate_contact_slot_clearance,
             dovetail_right_center(outer_right)
-                + dovetail_gate_post_w / 2,
+                - dovetail_receiver_w() / 2
+                - dovetail_gate_contact_slot_clearance,
             splitter_d,
             receiver_y, roof_top);
     }
