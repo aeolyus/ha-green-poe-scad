@@ -4287,11 +4287,42 @@ module retention_splitter_ventilated_sleeve_local() {
     }
 }
 
+// Upper tie from the faceplate to the center of the TP-Link cage roof. The
+// lower hollow spine and this roof tie form a deep frame in side view, which
+// resists splitter sag and twist far more effectively than thickening the
+// lower floor alone. It begins inside the faceplate and lands on the solid
+// front roof border, stays below the 1U outline, and grows directly from the
+// faceplate in the face-down print orientation.
+module splitter_upper_face_tie_local() {
+    tie_w = 12.0;
+    tie_h = 3.0;
+    root_overlap = 0.20;
+    roof_overlap = 0.20;
+    tie_x = splitter_x + splitter_w / 2 - tie_w / 2;
+    tie_y0 = face_thickness - root_overlap;
+    cage_front_y = splitter_y - splitter_clearance - wall_thickness;
+    tie_y1 = cage_front_y + sleeve_roof_border;
+    splitter_roof_top = unified_deck_raise + base_thickness + splitter_h
+                        + sleeve_splitter_vertical_clearance + sleeve_roof_t;
+    tie_z0 = splitter_roof_top - roof_overlap;
+
+    assert(tie_y1 > tie_y0,
+           "Splitter upper tie needs a positive span");
+    assert(tie_z0 + tie_h <= rack_height,
+           "Splitter upper tie must remain within the 1U panel height");
+
+    if (!stacked_center_layout && splitter_model == "tplink")
+        translate([tie_x, tie_y0, tie_z0])
+            cube([tie_w, tie_y1 - tie_y0, tie_h]);
+}
+
 module retention_ventilated_sleeves_local() {
     retention_green_ventilated_sleeve_local();
-    if (splitter_model == "tplink")
+    if (splitter_model == "tplink") {
         splitter_transform()
             retention_splitter_ventilated_sleeve_local();
+        splitter_upper_face_tie_local();
+    }
 }
 
 function dovetail_receiver_w() =
@@ -4818,9 +4849,11 @@ module splitter_dovetail_cage_local() {
 module retention_dovetail_cages_local() {
     green_dovetail_cage_local();
 
-    if (splitter_model == "tplink")
+    if (splitter_model == "tplink") {
         splitter_transform()
             splitter_dovetail_cage_local();
+        splitter_upper_face_tie_local();
+    }
 }
 
 module retention_dovetail_gate_parts_local() {
