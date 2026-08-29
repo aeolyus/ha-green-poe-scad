@@ -1029,16 +1029,44 @@ module splitter_spine_reinforcement_local(spine_x, spine_w, spine_y0) {
     }
 }
 
-module device_bridge_web_2d(
-    y0, web_d, bridge_x, bridge_w) {
-    // A straight web with only the 0.20 mm manifold overlap at each end. Its
-    // long visible edges terminate directly against the two inner tray walls;
-    // there are no rounded landing blocks extending into either tray floor.
-    translate([bridge_x, y0])
-        square([bridge_w, web_d]);
+// Closed box beam between the two cage walls. The existing 3 mm bridge floor
+// is the lower skin; thin side walls and a thin upper skin close the section.
+// In the faceplate-down print orientation, original Y becomes print Z, so the
+// broad upper and lower skins become vertical walls instead of overhangs. The
+// only unsupported event is the first roughly 16 mm span between cage walls,
+// which is a short slicer bridge rather than a cantilevered return flange.
+module device_bridge_box_local(
+    y0, box_d, bridge_x, bridge_w,
+    wall_t, box_top) {
+    box_bottom = unified_deck_z0;
+    cavity_bottom = box_bottom + base_thickness;
+    cavity_top = box_top - wall_t;
+
+    assert(box_d > 2 * wall_t,
+           "Bridge box needs room between its side walls");
+    assert(cavity_top > cavity_bottom,
+           "Bridge box needs a positive hollow core");
+
+    difference() {
+        translate([bridge_x, y0, box_bottom])
+            cube([bridge_w, box_d, box_top - box_bottom]);
+
+        // Leave the X ends open inside this helper. The 0.20 mm overlaps into
+        // both cages close them in the final union and avoid trapped slivers.
+        translate([
+            bridge_x - epsilon,
+            y0 + wall_t,
+            cavity_bottom
+        ]) cube([
+                bridge_w + 2 * epsilon,
+                box_d - 2 * wall_t,
+                cavity_top - cavity_bottom
+            ]);
+    }
 }
 
 module side_by_side_device_bridges() {
+    splitter_outer_left = splitter_x - splitter_clearance - wall_thickness;
     splitter_outer_right = splitter_x + splitter_w + splitter_clearance
                            + wall_thickness;
     green_outer_left = green_x - wall_thickness;
@@ -1069,53 +1097,54 @@ module side_by_side_device_bridges() {
         (bridge_available_d - bridge_pair_gap) / 2);
     bridge_front_y = bridge_straight_front;
     bridge_rear_y = bridge_straight_rear - bridge_web_d;
-    bridge_rib_t = 2.4;
-    bridge_rib_z0 = unified_deck_raise + base_thickness - 0.20;
-    bridge_rib_top = unified_deck_raise + 8.0;
+    bridge_box_wall = 1.20;
+    bridge_box_top = unified_deck_raise + 8.0;
     spine_x = splitter_x + splitter_w / 2 - 6.0;
     spine_w = 12.0;
     spine_y0 = face_thickness - 0.20;
+    // The face-down print grows in original +Y. Widen the 12 mm center spine
+    // at 45 degrees until it covers the complete TP-Link floor before that
+    // floor begins. This replaces two unsupported outer cantilevers with a
+    // continuously supported flare and adds only a small, low solid web below
+    // every modeled cable envelope.
+    splitter_flare_end_y = splitter_outer_front + 0.40;
+    splitter_flare_run = max(
+        spine_x - splitter_outer_left,
+        splitter_outer_right - (spine_x + spine_w));
+    splitter_flare_start_y = splitter_flare_end_y - splitter_flare_run;
 
-    difference() {
-        union() {
-            // Two flush-ended webs tie the straight inner walls together
-            // without changing either tray's rounded outer silhouette.
-            for (y0 = [bridge_front_y, bridge_rear_y])
-                translate([0, 0, unified_deck_z0])
-                    linear_extrude(height = base_thickness)
-                        device_bridge_web_2d(
-                            y0, bridge_web_d, bridge_x, bridge_w);
+    assert(splitter_flare_start_y > spine_y0,
+           "TP-Link support flare must start behind the faceplate");
 
-            // A narrow center spine carries rear-patching loads to the face.
-            translate([spine_x, spine_y0, unified_deck_z0])
-                cube([spine_w, splitter_y - face_thickness + 0.40,
-                      base_thickness]);
+    union() {
+        // Two closed hollow beams tie the straight cage walls together. Their
+        // 0.20 mm X overlaps make the final mount manifold without changing
+        // either rounded cage silhouette. A closed section is substantially
+        // stiffer in bending and torsion than the earlier one-sided L-flange.
+        for (y0 = [bridge_front_y, bridge_rear_y])
+            device_bridge_box_local(
+                y0, bridge_web_d, bridge_x, bridge_w,
+                bridge_box_wall, bridge_box_top);
 
-            splitter_spine_reinforcement_local(
-                spine_x, spine_w, spine_y0);
+        // A narrow center spine carries rear-patching loads to the face.
+        translate([spine_x, spine_y0, unified_deck_z0])
+            cube([spine_w, splitter_y - face_thickness + 0.40,
+                  base_thickness]);
 
-            // A low return flange on the rear edge turns each flat bridge web
-            // into an L-beam. It avoids the central zip slot and remains below
-            // the DC and Ethernet cable envelopes in every TP-Link layout.
-            // Its 0.20 mm overlaps point inward into each tray, guaranteeing a
-            // manifold union without extending beyond either outer silhouette.
-            for (y0 = [bridge_front_y, bridge_rear_y])
-                translate([bridge_x,
-                           y0 + bridge_web_d - bridge_rib_t,
-                           bridge_rib_z0])
-                    rounded_prism_z(
-                        bridge_w, bridge_rib_t,
-                        bridge_rib_top - bridge_rib_z0, 0.65);
-        }
+        // Full-width only at the cage, narrow at its print-leading end. In
+        // faceplate-down orientation the two diagonal edges are 45-degree
+        // self-supporting overhangs rather than a floating splitter shelf.
+        translate([0, 0, unified_deck_z0])
+            linear_extrude(height = base_thickness)
+                polygon(points = [
+                    [spine_x, splitter_flare_start_y],
+                    [spine_x + spine_w, splitter_flare_start_y],
+                    [splitter_outer_right, splitter_flare_end_y],
+                    [splitter_outer_left, splitter_flare_end_y]
+                ]);
 
-        // Optional 2.5 mm zip-tie slots for the short DC and LAN jumpers.
-        for (y0 = [
-            bridge_front_y + (bridge_web_d - 3.2) / 2,
-            bridge_rear_y + (bridge_web_d - 3.2) / 2
-        ])
-            translate([bridge_x + (bridge_w - 7.5) / 2, y0,
-                       unified_deck_z0 - epsilon])
-                cube([7.5, 3.2, base_thickness + 2 * epsilon]);
+        splitter_spine_reinforcement_local(
+            spine_x, spine_w, spine_y0);
     }
 }
 
@@ -1395,10 +1424,11 @@ module core() {
     }
 }
 
-// Optional one-piece version for the X2D main nozzle. At 254 mm wide it is
-// nominally inside the 256 mm main-nozzle bed, but leaves only 1 mm per side,
-// so center it carefully and do not use a brim. It does not fit the 235.5 mm
-// dual-nozzle overlap area; use the split core/ears for that workflow.
+// Optional one-piece version for the X2D. At 254 mm wide it is nominally
+// inside nozzle 1's 256 mm area, but leaves only 1 mm per side, so center it
+// carefully and do not use a brim. Nozzle 2 reaches X=20.5..256 mm; localized
+// PLA support interfaces around the X=28..88 mm PoE/bridge zone remain inside
+// that reach even though the complete PETG part is wider than the overlap.
 module one_piece_mount() {
     difference() {
         union() {

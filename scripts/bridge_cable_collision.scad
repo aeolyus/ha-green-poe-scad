@@ -1,0 +1,18 @@
+// Regression fixture: any exported geometry is an intersection between the
+// side-by-side cage bridge and a modeled cable/plug envelope.
+//
+// Example:
+//   openscad -o /tmp/bridge-cable-collision.stl \
+//     -D 'part="__validation_only__"' \
+//     scripts/bridge_cable_collision.scad
+
+include <../ha_green_rack.scad>
+
+intersection() {
+    translate([ear_width, 0, 0]) device_bridges();
+    union() {
+        viewer_internal_data_cable();
+        viewer_input_data_cable();
+        viewer_dc_cable();
+    }
+}
