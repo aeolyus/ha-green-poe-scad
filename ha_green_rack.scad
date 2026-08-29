@@ -160,12 +160,10 @@ splitter_lower_bevel_inset = splitter_side_bevel_inset;
 splitter_upper_bevel_inset = splitter_side_bevel_inset;
 splitter_upper_end_bevel_inset =
     (splitter_d - splitter_top_flat_d) / 2;
-// Viewer comparison: raise the TP-Link until its 1.6 mm cage roof is exactly
-// coplanar with the Green cage roof. The value is the difference between the
-// measured enclosure heights plus their respective roof clearances.
-splitter_unified_roof_raise = 8.78125;
-splitter_vertical_raise = unified_roof_layout
-    ? splitter_unified_roof_raise : 0;
+// All side-by-side comparisons keep the device floors aligned. The
+// `unified_roof` identifier is retained for existing viewer links, but that
+// branch now uses sloped upper ties instead of raising the shorter TP-Link.
+splitter_vertical_raise = 0;
 splitter_lan_local_x = 15.7;
 splitter_dc_local_x = 37.3;
 splitter_input_local_x = 31.9;
@@ -1044,8 +1042,10 @@ module side_by_side_device_bridges() {
                           + wall_thickness;
     green_outer_front = face_thickness - 0.20;
     green_outer_rear = green_y + green_inner_d + wall_thickness;
-    bridge_x = splitter_outer_right;
-    bridge_w = green_outer_left - splitter_outer_right;
+    bridge_overlap = unified_roof_layout ? 0.20 : 0;
+    bridge_x = splitter_outer_right - bridge_overlap;
+    bridge_w = green_outer_left - splitter_outer_right
+               + 2 * bridge_overlap;
     bridge_target_d = 14.0;
     bridge_pair_gap = 2.0;
 
@@ -1129,7 +1129,7 @@ module stacked_center_device_bridge() {
 
 module device_bridges() {
     if (stacked_center_layout) stacked_center_device_bridge();
-    else if (!unified_roof_layout) side_by_side_device_bridges();
+    else side_by_side_device_bridges();
 }
 
 module sics_transform() {
@@ -4311,11 +4311,10 @@ module splitter_corner_l_ties_local() {
         }
 }
 
-// Raised-PoE comparison: two short inverted-U crossbars join the coplanar
-// cage roofs, and two matching sloped lower beams join the offset cage floors.
-// Together the four ties make both cages act as one frame. The upper skins
-// stay flush with both honeycomb roofs; the lower beams land directly on each
-// floor without filling the open volume between the devices.
+// Bottom-aligned unified-frame comparison: the existing two hollow lower box
+// bridges join the coplanar cage floors. These two lightweight sloped channel
+// ties connect the unequal roof heights so both cages resist twist as one
+// frame without lifting the shorter TP-Link or adding a deep stepped support.
 module unified_roof_cross_bridges_local() {
     splitter_outer_right = splitter_x + splitter_w + splitter_clearance
                            + wall_thickness;
@@ -4349,61 +4348,53 @@ module unified_roof_cross_bridges_local() {
     green_roof_z0 = green_device_z + green_h
                     + sleeve_green_vertical_clearance;
     green_roof_top = green_roof_z0 + sleeve_roof_t;
+    splitter_roof_z0 = splitter_device_z + splitter_h
+                       + sleeve_splitter_vertical_clearance;
     splitter_roof_top = splitter_device_z + splitter_h
                         + sleeve_splitter_vertical_clearance + sleeve_roof_t;
-    green_floor_z0 = unified_deck_z0;
-    splitter_floor_z0 = unified_deck_z0 + splitter_vertical_raise;
+    splitter_end_x = bridge_x + visual_seam;
+    green_end_x = bridge_x + bridge_w - visual_seam - bridge_t;
+    roof_delta = green_roof_top - splitter_roof_top;
 
     assert(unified_roof_layout,
-           "Unified roof bridges require the raised-PoE layout");
-    assert(abs(green_roof_top - splitter_roof_top) < 0.001,
-           "Unified roof bridge endpoints must be coplanar");
+           "Unified frame bridges require the comparison layout");
+    assert(roof_delta > 0,
+           "Green roof must remain above the bottom-aligned TP-Link roof");
     assert(rear_y > front_y + bridge_d,
-           "Unified roof bridges need two separated landing zones");
+           "Unified frame bridges need two separated landing zones");
 
     for (y0 = [front_y, rear_y]) {
         union() {
-            // The visible top stays exactly flush with both cage roofs.
-            translate([
-                bridge_x + visual_seam, y0,
-                green_roof_z0
-            ]) cube([
-                bridge_w - 2 * visual_seam,
-                bridge_d, sleeve_roof_t
-            ]);
-            translate([
-                bridge_x + visual_seam, y0,
-                green_roof_top - return_h
-            ]) cube([
-                bridge_w - 2 * visual_seam,
-                bridge_t, return_h
-            ]);
-            translate([
-                bridge_x + visual_seam,
-                y0 + bridge_d - bridge_t,
-                green_roof_top - return_h
-            ]) cube([
-                bridge_w - 2 * visual_seam,
-                bridge_t, return_h
-            ]);
-        }
+            // Constant-thickness sloped roof skin between the two cages.
+            hull() {
+                translate([splitter_end_x, y0, splitter_roof_z0])
+                    cube([bridge_t, bridge_d, sleeve_roof_t]);
+                translate([green_end_x, y0, green_roof_z0])
+                    cube([bridge_t, bridge_d, sleeve_roof_t]);
+            }
 
-        // A short solid ramp joins the two floor skins despite their 8.78 mm
-        // height offset. At this span it is lighter and cleaner than a deep
-        // stepped box, while the paired front/rear beams still resist twist.
-        hull() {
-            translate([
-                bridge_x + visual_seam, y0,
-                splitter_floor_z0
-            ]) cube([
-                bridge_t, bridge_d, base_thickness
-            ]);
-            translate([
-                bridge_x + bridge_w - visual_seam - bridge_t, y0,
-                green_floor_z0
-            ]) cube([
-                bridge_t, bridge_d, base_thickness
-            ]);
+            // Shallow front and rear returns form a stiff channel rather than
+            // leaving the roof tie as a flexible flat strip.
+            hull() {
+                translate([
+                    splitter_end_x, y0,
+                    splitter_roof_top - return_h
+                ]) cube([bridge_t, bridge_t, return_h]);
+                translate([
+                    green_end_x, y0,
+                    green_roof_top - return_h
+                ]) cube([bridge_t, bridge_t, return_h]);
+            }
+            hull() {
+                translate([
+                    splitter_end_x, y0 + bridge_d - bridge_t,
+                    splitter_roof_top - return_h
+                ]) cube([bridge_t, bridge_t, return_h]);
+                translate([
+                    green_end_x, y0 + bridge_d - bridge_t,
+                    green_roof_top - return_h
+                ]) cube([bridge_t, bridge_t, return_h]);
+            }
         }
     }
 }
@@ -5649,17 +5640,14 @@ assert(abs(led_status_z
        "Preview LEDs must remain centered on the measured illuminated band");
 assert(abs(unified_deck_z0 + base_thickness - green_device_z) < 0.001,
        "Unified raised deck must finish at the Green seating plane");
-assert(unified_roof_layout
-       || abs(splitter_device_z - green_device_z) < 0.001,
-       "Standard Green and TP-Link bottoms must share the unified deck height");
+assert(abs(splitter_device_z - green_device_z) < 0.001,
+       "Green and TP-Link bottoms must share the unified deck height");
 assert(!unified_roof_layout
-       || abs(
-           green_device_z + green_h + sleeve_green_vertical_clearance
-               + sleeve_roof_t
-           - (splitter_device_z + splitter_h
-              + sleeve_splitter_vertical_clearance + sleeve_roof_t)
-       ) < 0.001,
-       "Unified-roof layout must align both cage roof surfaces");
+       || green_device_z + green_h + sleeve_green_vertical_clearance
+              + sleeve_roof_t
+          > splitter_device_z + splitter_h
+              + sleeve_splitter_vertical_clearance + sleeve_roof_t,
+       "Bottom-aligned unified frame needs unequal cage roof heights");
 assert(device_layout == "side_by_side"
        || device_layout == "unified_roof"
        || device_layout == "stacked_center",
