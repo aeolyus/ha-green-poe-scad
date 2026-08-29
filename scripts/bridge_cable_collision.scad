@@ -11,7 +11,7 @@ include <../ha_green_rack.scad>
 intersection() {
     translate([ear_width, 0, 0]) union() {
         device_bridges();
-        splitter_upper_face_tie_local();
+        splitter_corner_l_ties_local();
     }
     union() {
         viewer_internal_data_cable();

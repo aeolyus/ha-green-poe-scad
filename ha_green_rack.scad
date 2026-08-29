@@ -1057,13 +1057,6 @@ module side_by_side_device_bridges() {
     bridge_rear_y = bridge_straight_rear - bridge_web_d;
     bridge_box_wall = 1.20;
     bridge_box_top = unified_deck_raise + 8.0;
-    spine_x = splitter_x + splitter_w / 2 - 6.0;
-    spine_w = 12.0;
-    spine_y0 = face_thickness - 0.20;
-    // Continue through the cage's solid front floor border. Because this tie
-    // has exactly the same Z range as the cage floor, the union is seamless
-    // and leaves no raised ridge inside the device cavity.
-    spine_d = splitter_outer_front + sleeve_roof_border - spine_y0;
 
     union() {
         // Two closed hollow beams tie the straight cage walls together. Their
@@ -1075,11 +1068,6 @@ module side_by_side_device_bridges() {
                 y0, bridge_web_d, bridge_x, bridge_w,
                 bridge_box_wall, bridge_box_top);
 
-        // Flat lower tie: flush with the splitter floor instead of projecting
-        // above the seating plane. The matching roof tie in the rounded cage
-        // completes a deep frame without a visible internal ridge.
-        translate([spine_x, spine_y0, unified_deck_z0])
-            cube([spine_w, spine_d, base_thickness]);
     }
 }
 
@@ -4253,31 +4241,62 @@ module retention_splitter_ventilated_sleeve_local() {
     }
 }
 
-// Upper tie from the faceplate to the center of the TP-Link cage roof. It is
-// exactly coplanar with the roof rather than sitting on top as a visible rib.
-// Together with the flush lower floor tie, it forms a deep frame in side view
-// that resists splitter sag and twist. It begins inside the faceplate, lands
-// on the solid front roof border, remains below the 1U outline, and grows
-// directly from the faceplate in the face-down print orientation.
-module splitter_upper_face_tie_local() {
-    tie_w = 12.0;
+// Four longitudinal L-section rails continue the TP-Link cage's upper and
+// lower side corners forward into the faceplate. Spreading the support to the
+// cage edges resists both sag and twist, leaves the connector/cable centerline
+// open, and looks like a continuation of the rounded cage rather than a pair
+// of center bars. Horizontal flanges remain coplanar with the floor/roof;
+// vertical flanges stay outside the measured device envelope.
+module splitter_corner_l_ties_local() {
+    tie_t = sleeve_roof_t;
+    tie_leg = sleeve_roof_border;
     root_overlap = 0.20;
-    tie_x = splitter_x + splitter_w / 2 - tie_w / 2;
     tie_y0 = face_thickness - root_overlap;
+    outer_left = splitter_x - splitter_clearance - wall_thickness;
+    outer_right = splitter_x + splitter_w + splitter_clearance
+                  + wall_thickness;
     cage_front_y = splitter_y - splitter_clearance - wall_thickness;
     tie_y1 = cage_front_y + sleeve_roof_border;
+    tie_d = tie_y1 - tie_y0;
+    floor_z0 = unified_deck_z0;
     splitter_roof_top = unified_deck_raise + base_thickness + splitter_h
                         + sleeve_splitter_vertical_clearance + sleeve_roof_t;
-    tie_z0 = splitter_roof_top - sleeve_roof_t;
+    roof_z0 = splitter_roof_top - sleeve_roof_t;
 
-    assert(tie_y1 > tie_y0,
-           "Splitter upper tie needs a positive span");
-    assert(tie_z0 + sleeve_roof_t <= rack_height,
-           "Splitter upper tie must remain within the 1U panel height");
+    assert(tie_d > 0, "Splitter corner ties need a positive span");
+    assert(splitter_roof_top <= rack_height,
+           "Splitter corner ties must remain within the 1U panel height");
+    assert(tie_leg > tie_t,
+           "Splitter corner L rails need positive flange legs");
 
     if (!stacked_center_layout && splitter_model == "tplink")
-        translate([tie_x, tie_y0, tie_z0])
-            cube([tie_w, tie_y1 - tie_y0, sleeve_roof_t]);
+        union() {
+            // Lower-left and lower-right angles. The horizontal legs use the
+            // complete 3 mm floor thickness so both faces finish flush.
+            translate([outer_left, tie_y0, floor_z0])
+                cube([tie_leg, tie_d, base_thickness]);
+            translate([outer_left, tie_y0, floor_z0])
+                cube([tie_t, tie_d, tie_leg]);
+            translate([outer_right - tie_leg, tie_y0, floor_z0])
+                cube([tie_leg, tie_d, base_thickness]);
+            translate([outer_right - tie_t, tie_y0, floor_z0])
+                cube([tie_t, tie_d, tie_leg]);
+
+            // Upper-left and upper-right mirrored angles. Their top and
+            // underside are exactly coplanar with the cage roof skin.
+            translate([outer_left, tie_y0, roof_z0])
+                cube([tie_leg, tie_d, sleeve_roof_t]);
+            translate([
+                outer_left, tie_y0,
+                splitter_roof_top - tie_leg
+            ]) cube([tie_t, tie_d, tie_leg]);
+            translate([outer_right - tie_leg, tie_y0, roof_z0])
+                cube([tie_leg, tie_d, sleeve_roof_t]);
+            translate([
+                outer_right - tie_t, tie_y0,
+                splitter_roof_top - tie_leg
+            ]) cube([tie_t, tie_d, tie_leg]);
+        }
 }
 
 module retention_ventilated_sleeves_local() {
@@ -4285,7 +4304,7 @@ module retention_ventilated_sleeves_local() {
     if (splitter_model == "tplink") {
         splitter_transform()
             retention_splitter_ventilated_sleeve_local();
-        splitter_upper_face_tie_local();
+        splitter_corner_l_ties_local();
     }
 }
 
@@ -4816,7 +4835,7 @@ module retention_dovetail_cages_local() {
     if (splitter_model == "tplink") {
         splitter_transform()
             splitter_dovetail_cage_local();
-        splitter_upper_face_tie_local();
+        splitter_corner_l_ties_local();
     }
 }
 
