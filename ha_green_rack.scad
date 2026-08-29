@@ -16,7 +16,7 @@
 
 $fn = 48;
 
-// [assembly_preview, assembly, one_piece, one_piece_ventilated_sleeves, one_piece_ventilated_sleeves_print, one_piece_logo_inlay, x2d_plate, x2d_plate_ventilated_sleeves, core, core_ventilated_sleeves, logo_inlay, left_ear, right_ear, led_insert, led_shutter, led_shutter_retainer, led_shutter_kit, led_fixed_window_kit, green_spacer, green_spacers_4x, fit_test, friction_fit_coupon, green_hybrid_clip_coupon, splitter_fit_coupon, splitter_hybrid_clip_coupon, hybrid_clip_coupon, green_vent_frame_coupon, splitter_vent_frame_coupon, vent_frame_coupon, dovetail_rail_coupon, green_dovetail_gate, splitter_dovetail_gate, keystone_fit_test, viewer_mount, viewer_mount_without_green_tray, viewer_splitter_floor, viewer_splitter_side_walls, viewer_splitter_end_stops, viewer_green_tray_standard, viewer_green_tray_friction, viewer_green_tray_friction_raised, viewer_green_tray_friction_full, viewer_green_tray_friction_pads, viewer_green_tray_friction_skeletal, viewer_insert, viewer_shutter_open, viewer_shutter_closed, viewer_shutter_retainer, viewer_logo, viewer_green, viewer_splitter, viewer_ports, viewer_green_ports, viewer_keystone_ports, viewer_data_cables, viewer_internal_data_cable, viewer_input_data_cable, viewer_dc_cable, viewer_fasteners, viewer_retention_factory_screws, viewer_retention_slide_latch, viewer_retention_corner_gate, viewer_retention_sled_gate, viewer_retention_padded_rails, viewer_retention_captive_strap, viewer_retention_x_cage, viewer_retention_hybrid_clips, viewer_retention_ventilated_sleeves, viewer_retention_dovetail_gates, viewer_retention_friction_sleeve, viewer_enclosure_airframe, viewer_rulers, viewer_led_power, viewer_led_activity, viewer_led_health]
+// [assembly_preview, assembly, one_piece, one_piece_ventilated_sleeves, one_piece_ventilated_sleeves_print, one_piece_dovetail_ready, one_piece_dovetail_ready_print, dovetail_gates_plate, one_piece_logo_inlay, x2d_plate, x2d_plate_ventilated_sleeves, core, core_ventilated_sleeves, logo_inlay, left_ear, right_ear, led_insert, led_shutter, led_shutter_retainer, led_shutter_kit, led_fixed_window_kit, green_spacer, green_spacers_4x, fit_test, friction_fit_coupon, green_hybrid_clip_coupon, splitter_fit_coupon, splitter_hybrid_clip_coupon, hybrid_clip_coupon, green_vent_frame_coupon, splitter_vent_frame_coupon, vent_frame_coupon, dovetail_rail_coupon, green_dovetail_gate, splitter_dovetail_gate, keystone_fit_test, viewer_mount, viewer_mount_without_green_tray, viewer_splitter_floor, viewer_splitter_side_walls, viewer_splitter_end_stops, viewer_green_tray_standard, viewer_green_tray_friction, viewer_green_tray_friction_raised, viewer_green_tray_friction_full, viewer_green_tray_friction_pads, viewer_green_tray_friction_skeletal, viewer_insert, viewer_shutter_open, viewer_shutter_closed, viewer_shutter_retainer, viewer_logo, viewer_green, viewer_splitter, viewer_ports, viewer_green_ports, viewer_keystone_ports, viewer_data_cables, viewer_internal_data_cable, viewer_input_data_cable, viewer_dc_cable, viewer_fasteners, viewer_retention_factory_screws, viewer_retention_slide_latch, viewer_retention_corner_gate, viewer_retention_sled_gate, viewer_retention_padded_rails, viewer_retention_captive_strap, viewer_retention_x_cage, viewer_retention_hybrid_clips, viewer_retention_ventilated_sleeves, viewer_retention_dovetail_gates, viewer_retention_friction_sleeve, viewer_enclosure_airframe, viewer_rulers, viewer_led_power, viewer_led_activity, viewer_led_health]
 part = "assembly_preview";
 
 // Production geometry uses the TP-Link. Viewer-only builds may override this
@@ -1493,6 +1493,17 @@ module one_piece_ventilated_sleeves_mount() {
     }
 }
 
+// Printable one-piece mount with the same validated friction cages plus the
+// recessed receiver tracks for optional rear dovetail gates. The devices are
+// still retained by the cages when the separately printed gates are omitted.
+module one_piece_dovetail_ready_mount() {
+    union() {
+        one_piece_mount_without_green_tray();
+        translate([ear_width, 0, 0])
+            retention_dovetail_cages_local();
+    }
+}
+
 module core_without_device_trays() {
     difference() {
         union() {
@@ -1798,6 +1809,11 @@ module core_face_down_print() {
 module one_piece_ventilated_sleeves_face_down_print() {
     translate([0, rack_height, 0]) rotate([90, 0, 0])
         one_piece_ventilated_sleeves_mount();
+}
+
+module one_piece_dovetail_ready_face_down_print() {
+    translate([0, rack_height, 0]) rotate([90, 0, 0])
+        one_piece_dovetail_ready_mount();
 }
 
 module core_ventilated_sleeves_face_down_print() {
@@ -4744,6 +4760,20 @@ module splitter_dovetail_gate_print() {
         rotate([-90, 0, 0]) splitter_dovetail_gate_local();
 }
 
+// Optional second print for the dovetail-ready rack mount. Both gates lie on
+// their broad rear faces and are separated far enough for independent slicing.
+module dovetail_gates_plate() {
+    green_outer_w = green_w + 2 * sleeve_green_side_clearance
+                    + 2 * sleeve_green_frame_t;
+    green_gate_print_w = green_outer_w
+                         - dovetail_receiver_w()
+                         + dovetail_gate_post_w;
+
+    green_dovetail_gate_print();
+    translate([green_gate_print_w + 8.0, 0, 0])
+        splitter_dovetail_gate_print();
+}
+
 // Rounded cages plus two installed removable rear gates. The receiver tracks
 // are buried in locally thickened rear sidewall ends, and the H-frames occupy
 // matching shallow pockets so their rear faces finish flush with the cages.
@@ -4816,15 +4846,25 @@ module splitter_dovetail_cage_local() {
     }
 }
 
-module retention_dovetail_gates_local() {
+module retention_dovetail_cages_local() {
     green_dovetail_cage_local();
+
+    if (splitter_model == "tplink")
+        splitter_transform()
+            splitter_dovetail_cage_local();
+}
+
+module retention_dovetail_gate_parts_local() {
     green_dovetail_gate_local();
 
     if (splitter_model == "tplink")
-        splitter_transform() {
-            splitter_dovetail_cage_local();
+        splitter_transform()
             splitter_dovetail_gate_local();
-        }
+}
+
+module retention_dovetail_gates_local() {
+    retention_dovetail_cages_local();
+    retention_dovetail_gate_parts_local();
 }
 
 module dovetail_coupon_key_local(marker_count = 1) {
@@ -5544,6 +5584,12 @@ if (part == "assembly_preview") {
     one_piece_ventilated_sleeves_mount();
 } else if (part == "one_piece_ventilated_sleeves_print") {
     one_piece_ventilated_sleeves_face_down_print();
+} else if (part == "one_piece_dovetail_ready") {
+    one_piece_dovetail_ready_mount();
+} else if (part == "one_piece_dovetail_ready_print") {
+    one_piece_dovetail_ready_face_down_print();
+} else if (part == "dovetail_gates_plate") {
+    dovetail_gates_plate();
 } else if (part == "one_piece_logo_inlay") {
     one_piece_logo_inlay();
 } else if (part == "x2d_plate") {

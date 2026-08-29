@@ -360,7 +360,7 @@ RETENTION_OPTIONS = [
         "color": (217, 119, 6, 0),
         "highlight": (217, 119, 6, 255),
         "roughness": 0.62,
-        "printable": False,
+        "printable": True,
         "note": (
             "Viewer prototype based on the rounded vent-frame cages. The "
             "devices load from the rear, then separate H-shaped gates slide "
@@ -382,8 +382,10 @@ RETENTION_OPTIONS = [
             "full-height gates need about "
             "38 mm (Green) and 25 mm (TP-Link) of clearance above them during "
             "installation or removal. "
-            "Only the dovetail rail-and-gate fit coupon is printable for now; "
-            "the full rack mount has not been promoted to production."
+            "The one-piece dovetail-ready mount and a separate two-gate plate "
+            "are now exported. The friction cages remain the primary retention "
+            "when the gates are omitted; the gate sliding fit is still "
+            "physically unvalidated."
         ),
     },
     {
