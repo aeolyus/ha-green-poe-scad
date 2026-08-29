@@ -381,10 +381,16 @@ dovetail_top_lead_extra = 0.35;
 dovetail_gate_t = 2.40;
 dovetail_gate_post_w = 6.20;
 dovetail_gate_bar_h = 3.20;
-dovetail_gate_contact_preload = 0.15;
-dovetail_gate_contact_ramp_h = 0.80;
+dovetail_gate_contact_clearance = 0.05;
+dovetail_gate_contact_lead_h = 0.80;
 dovetail_gate_contact_lead_relief = 0.35;
 dovetail_gate_contact_slot_clearance = 0.25;
+dovetail_green_contact_bottom = green_device_z + 0.60;
+dovetail_green_contact_top = green_device_z + 4.20;
+dovetail_splitter_contact_bottom =
+    base_thickness + splitter_lower_bevel_h;
+dovetail_splitter_contact_top =
+    dovetail_splitter_contact_bottom + 1.60;
 dovetail_coupon_h = 28.0;
 dovetail_coupon_spacing = 5.0;
 
@@ -4376,57 +4382,65 @@ module dovetail_receiver_channel_pair_local(
             track_h + epsilon, lock_clearance);
 }
 
-// Two compact rear pads bear on solid lower enclosure faces, away from the
-// connector field and any upper taper. Their leading lower edge is relieved,
-// so the last 0.8 mm of gate travel progressively closes the fore/aft play.
-module dovetail_gate_contact_pad_local(
-    x0, contact_y, gate_rear_y, z0, width, height) {
-    ramp_h = min(dovetail_gate_contact_ramp_h, height / 2);
+// The gate's lower H-beam is also its contact surface. It spans the solid
+// lower rear band of the enclosure as one smooth member, replacing the two
+// protruding pads. A shallow bevel across its complete lower edge guides the
+// straight-sliding gate past the enclosure without a localized pressure point.
+module dovetail_gate_contact_beam_local(
+    gate_x0, gate_x1, contact_y, gate_rear_y,
+    contact_bottom_z, contact_top_z) {
+    lead_h = min(
+        dovetail_gate_contact_lead_h,
+        (contact_top_z - contact_bottom_z) / 2);
     full_depth = gate_rear_y - contact_y;
 
     union() {
         hull() {
             translate([
-                x0,
+                gate_x0,
                 contact_y + dovetail_gate_contact_lead_relief,
-                z0
+                contact_bottom_z
             ]) rounded_prism_z(
-                    width,
+                    gate_x1 - gate_x0,
                     full_depth - dovetail_gate_contact_lead_relief,
-                    epsilon, 0.60);
-            translate([x0, contact_y, z0 + ramp_h])
+                    epsilon, 0.65);
+            translate([gate_x0, contact_y, contact_bottom_z + lead_h])
                 rounded_prism_z(
-                    width, full_depth, epsilon, 0.60);
+                    gate_x1 - gate_x0,
+                    full_depth, epsilon, 0.65);
         }
-        translate([x0, contact_y, z0 + ramp_h - epsilon])
-            rounded_prism_z(
-                width, full_depth,
-                height - ramp_h + epsilon, 0.60);
+        translate([
+            gate_x0, contact_y,
+            contact_bottom_z + lead_h - epsilon
+        ]) rounded_prism_z(
+                gate_x1 - gate_x0,
+                full_depth,
+                contact_top_z - contact_bottom_z
+                    - lead_h + epsilon, 0.65);
     }
 }
 
-// The rear pads travel vertically with the gate. These two narrow roof slots
-// clear their complete swept path while leaving the rest of the roof border
-// intact. The pads finish below the roof and close against the device only at
-// the bottom of the stroke.
-module dovetail_gate_contact_slots_local(
-    contact_x_positions, device_rear_y,
-    receiver_y, roof_top, contact_w) {
-    contact_y = device_rear_y - dovetail_gate_contact_preload;
+// One clean rear roof opening clears the continuous lower beam through its
+// vertical travel. The installed H-gate closes and reinforces this rear edge;
+// there are no separate pad slots or small stress risers.
+module dovetail_gate_contact_slot_local(
+    gate_x0, gate_x1, device_rear_y,
+    receiver_y, roof_top) {
+    contact_y = device_rear_y + dovetail_gate_contact_clearance;
     cage_rear_y = receiver_y - dovetail_rear_extension;
     slot_y0 = contact_y - dovetail_gate_contact_slot_clearance;
     slot_d = cage_rear_y - slot_y0 + epsilon;
 
-    for (contact_x = contact_x_positions)
-        translate([
-            contact_x - dovetail_gate_contact_slot_clearance,
-            slot_y0,
-            roof_top - sleeve_roof_t - epsilon
-        ]) cube([
-            contact_w + 2 * dovetail_gate_contact_slot_clearance,
-            slot_d,
-            sleeve_roof_t + 2 * epsilon
-        ]);
+    translate([
+        gate_x0 - dovetail_gate_contact_slot_clearance,
+        slot_y0,
+        roof_top - sleeve_roof_t - epsilon
+    ]) cube([
+        gate_x1 - gate_x0
+            + 2 * dovetail_gate_contact_slot_clearance,
+        slot_d,
+        sleeve_roof_t + 2 * epsilon
+    ]);
 }
 
 module dovetail_gate_rail_local(
@@ -4454,27 +4468,37 @@ module dovetail_gate_frame_local(
     outer_left, outer_right,
     device_rear_y, cage_rear_y,
     wall_z0, roof_top,
-    contact_x_positions, contact_w, contact_z, contact_h) {
+    contact_bottom_z, contact_top_z) {
     left_center = dovetail_left_center(outer_left);
     right_center = dovetail_right_center(outer_right);
     mouth_y = cage_rear_y + 0.10;
     gate_y = cage_rear_y + 0.35;
     gate_x0 = left_center - dovetail_gate_post_w / 2;
     gate_x1 = right_center + dovetail_gate_post_w / 2;
+    contact_x0 = left_center + dovetail_receiver_w() / 2
+                 + dovetail_gate_contact_slot_clearance;
+    contact_x1 = right_center - dovetail_receiver_w() / 2
+                 - dovetail_gate_contact_slot_clearance;
     gate_h = roof_top - wall_z0;
-    contact_y = device_rear_y - dovetail_gate_contact_preload;
+    contact_y = device_rear_y + dovetail_gate_contact_clearance;
     gate_rear_y = gate_y + dovetail_gate_t;
     bottom_bar_h = max(
         dovetail_gate_bar_h,
-        contact_z + contact_h - wall_z0);
+        contact_top_z - wall_z0);
 
     union() {
-        // Top and bottom rails overlap only the enclosure edges, leaving the
-        // complete center connector field open for Ethernet and DC cables.
+        // The continuous lower beam limits motion at the solid lower enclosure
+        // band with only the nominal anti-rattle clearance.
+        // Everything above it remains open for Ethernet, DC, USB, and selector
+        // access; its depth merges cleanly into the rear H-frame.
         translate([gate_x0, gate_y, wall_z0])
             rounded_prism_z(
                 gate_x1 - gate_x0,
                 dovetail_gate_t, bottom_bar_h, 0.65);
+        dovetail_gate_contact_beam_local(
+            contact_x0, contact_x1,
+            contact_y, gate_rear_y,
+            contact_bottom_z, contact_top_z);
         translate([
             gate_x0, gate_y,
             roof_top - dovetail_gate_bar_h
@@ -4507,12 +4531,6 @@ module dovetail_gate_frame_local(
                     - dovetail_stop_clearance
             ]);
         }
-
-        for (contact_x = contact_x_positions)
-            dovetail_gate_contact_pad_local(
-                contact_x, contact_y, gate_rear_y,
-                contact_z, contact_w, contact_h);
-
     }
 }
 
@@ -4551,8 +4569,8 @@ module green_dovetail_gate_local() {
         green_y + green_d,
         sleeve_y0 + sleeve_depth + dovetail_rear_extension,
         wall_z0, roof_top,
-        [green_x + 16.0, green_x + 64.0], 6.00,
-        green_device_z + 0.60, 3.60);
+        dovetail_green_contact_bottom,
+        dovetail_green_contact_top);
 }
 
 module splitter_dovetail_receivers_local() {
@@ -4584,14 +4602,14 @@ module splitter_dovetail_gate_local() {
         splitter_d,
         outer_y + outer_depth + dovetail_rear_extension,
         wall_z0, roof_top,
-        [17.75, 42.0], 5.50,
-        base_thickness + splitter_lower_bevel_h + 1.00, 3.00);
+        dovetail_splitter_contact_bottom,
+        dovetail_splitter_contact_top);
 }
 
 // Standalone gate exports place the broad rear H-frame on the build plate.
-// The dovetail rails and anti-rattle pads then rise from that face without a
-// long unsupported bridge; the installed-orientation modules remain unchanged
-// for the browser viewer and complete assembly.
+// The dovetail rails and continuous lower contact beam then rise from that
+// face without a long unsupported bridge; the installed-orientation modules
+// remain unchanged for the browser viewer and complete assembly.
 module green_dovetail_gate_print() {
     outer_w = green_w + 2 * sleeve_green_side_clearance
               + 2 * sleeve_green_frame_t;
@@ -4648,10 +4666,15 @@ module green_dovetail_cage_local() {
         dovetail_receiver_channel_pair_local(
             outer_left, outer_right, receiver_y,
             wall_z0, roof_top);
-        dovetail_gate_contact_slots_local(
-            [green_x + 16.0, green_x + 64.0],
+        dovetail_gate_contact_slot_local(
+            dovetail_left_center(outer_left)
+                + dovetail_receiver_w() / 2
+                + dovetail_gate_contact_slot_clearance,
+            dovetail_right_center(outer_right)
+                - dovetail_receiver_w() / 2
+                - dovetail_gate_contact_slot_clearance,
             green_y + green_d,
-            receiver_y, roof_top, 6.00);
+            receiver_y, roof_top);
     }
 }
 
@@ -4673,9 +4696,15 @@ module splitter_dovetail_cage_local() {
         dovetail_receiver_channel_pair_local(
             outer_left, outer_right, receiver_y,
             wall_z0, roof_top);
-        dovetail_gate_contact_slots_local(
-            [17.75, 42.0], splitter_d,
-            receiver_y, roof_top, 5.50);
+        dovetail_gate_contact_slot_local(
+            dovetail_left_center(outer_left)
+                + dovetail_receiver_w() / 2
+                + dovetail_gate_contact_slot_clearance,
+            dovetail_right_center(outer_right)
+                - dovetail_receiver_w() / 2
+                - dovetail_gate_contact_slot_clearance,
+            splitter_d,
+            receiver_y, roof_top);
     }
 }
 
@@ -5354,6 +5383,9 @@ assert(dovetail_receiver_wall >= 1.20,
 assert(dovetail_lock_clearance >= 0
            && dovetail_lock_clearance < dovetail_running_clearance,
        "Dovetail lock zone must be tighter than the sliding section");
+assert(dovetail_gate_contact_clearance >= 0
+           && dovetail_gate_contact_clearance <= 0.10,
+       "Dovetail contact beam clearance must remain effectively anti-rattle");
 assert(dovetail_lock_h + dovetail_top_lead_h
            < splitter_h + sleeve_roof_t - dovetail_bottom_stop_h,
        "Dovetail taper and lead-in must fit the shorter TP-Link gate");

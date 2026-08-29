@@ -353,8 +353,8 @@ RETENTION_OPTIONS = [
     },
     {
         "id": "dovetail_gates",
-        "label": "Vent-frame cages + dovetail rear gates",
-        "short_label": "Dovetail gates",
+        "label": "Vent-frame cages + padless dovetail gates",
+        "short_label": "Padless dovetails",
         "filename": "viewer_retention_dovetail_gates.stl",
         "material_name": "Device retention — dovetail rear H-gates",
         "color": (217, 119, 6, 0),
@@ -367,11 +367,15 @@ RETENTION_OPTIONS = [
             "vertically into captured dovetail rails to block withdrawal. "
             "The receiver blocks are recessed inside the cages' outer wall "
             "planes and shifted 2.0 mm rearward, eliminating the earlier "
-            "external brim without reducing device clearance. Two low rear "
-            "pads close the cages' 0.15 mm front-stop allowance while narrow "
-            "roof slots clear their vertical insertion path. The last 7 mm "
-            "of rail travel wedges to a nominal line fit, so the seated gate "
-            "does not lift or rattle freely. The full-height gates need about "
+            "external brim without reducing device clearance. Each gate now "
+            "uses straight vertical rails and one smooth lower crossbeam "
+            "instead of separate pads. The crossbeam sits only 0.05 mm behind "
+            "the solid lower rear face, has a continuous insertion bevel, and "
+            "leaves the connector field open. A single clean rear roof opening "
+            "clears the beam. The final 7 mm of rail travel still wedges to a "
+            "nominal line fit, so the seated gate does not lift or rattle "
+            "freely. Disconnect rear cables before sliding a gate. The "
+            "full-height gates need about "
             "38 mm (Green) and 25 mm (TP-Link) of clearance above them during "
             "installation or removal. "
             "Only the dovetail rail-and-gate fit coupon is printable for now; "
